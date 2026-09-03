@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.1.2">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/logo.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/logo.png">
+  <link rel="mask-icon" href="/blog/images/logo.png" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.css" integrity="sha256-gkQVf8UKZgQ0HyuxL/VnacadJ+D2Kox2TCEBuNQg5+w=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"sitjac.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":true},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/blog/search.json","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="这里是一些代码段以及常用指令的集合，可能是来自网上的，也可能是平时的积累，常看常新，learning by doing ~">
+<meta property="og:type" content="article">
+<meta property="og:title" content="A collection of code snippets">
+<meta property="og:url" content="https://sitjac.github.io/blog/code-segment/index.html">
+<meta property="og:site_name" content="sitJac&#39;s Blog">
+<meta property="og:description" content="这里是一些代码段以及常用指令的集合，可能是来自网上的，也可能是平时的积累，常看常新，learning by doing ~">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-03-27T09:51:47.000Z">
+<meta property="article:modified_time" content="2026-08-29T07:51:17.473Z">
+<meta property="article:author" content="sitJac">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://sitjac.github.io/blog/code-segment/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://sitjac.github.io/blog/code-segment/","path":"code-segment/","title":"A collection of code snippets"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>A collection of code snippets | sitJac's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.umd.js" integrity="sha256-a+H7FYzJv6oU2hfsfDGM2Ohw/cR9v+hPfxHCLdmCrE8=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.5.0/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+  <script src="/blog/js/third-party/fancybox.js" defer></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+  <script class="next-config" data-name="katex" type="application/json">{"copy_tex_js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/copy-tex.min.js","integrity":"sha256-Us54+rSGDSTvIhKKUs4kygE2ipA0RXpWWh0/zLqw3bs="}}</script>
+  <script src="/blog/js/third-party/math/katex.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">sitJac's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/blog/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/blog/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-photos"><a href="/blog/photos/" rel="section"><i class="fa fa-camera fa-fw"></i>Photos</a></li><li class="menu-item menu-item-categories"><a href="/blog/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-bookmarks"><a href="/blog/bookmarks/" rel="section"><i class="fa fa-bookmark fa-fw"></i>Bookmarks</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="Searching..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#C"><span class="nav-number">1.</span> <span class="nav-text">C++</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Python"><span class="nav-number">2.</span> <span class="nav-text">Python</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Others"><span class="nav-number">3.</span> <span class="nav-text">Others</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">sitJac</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://sitjac.github.io/blog/code-segment/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="sitJac">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sitJac's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="A collection of code snippets | sitJac's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          A collection of code snippets
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2022-03-27 17:51:47" itemprop="dateCreated datePublished" datetime="2022-03-27T17:51:47+08:00">2022-03-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/blog/categories/Uncategorized/" itemprop="url" rel="index"><span itemprop="name">Uncategorized</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><div class="note info">
+<p>这里是一些代码段以及常用指令的集合，可能是来自网上的，也可能是平时的积累，常看常新，learning
+by doing ~</p>
+</div>
+<span id="more"></span>
+<h2 id="C">C++</h2>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>万能头函数，包含了C++标准库中几乎所有的头文件。优点可以简化代码，可以节省一些输入的时间，在编程竞赛中很常用。缺点是包含了很多不必要的头文件，可能会导致编译时间增加，实际的项目开发中不推荐使用。</p>
+</blockquote>
+<hr>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ios::<span class="built_in">sync_with_stdio</span>(<span class="literal">false</span>);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>用来优化输入/输出流的一个方法，在使用输入/输出流之前调用，并且只需要调用一次。调用后C++的标准输入/输出流和C的标准输入/输出流就不再同步，优点是由于取消了同步，<code>cin</code>和<code>cout</code>的性能会得到提升。同时这意味着不能再混合使用<code>cin</code>/<code>cout</code>和<code>scanf</code>/<code>printf</code>，否则可能会导致未定义的行为。</p>
+</blockquote>
+<hr>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">std::priority_queue&lt;<span class="type">int</span>&gt; pq;</span><br><span class="line">std::priority_queue&lt;<span class="type">int</span>, std::vector&lt;<span class="type">int</span>&gt;, std::greater&lt;<span class="type">int</span>&gt;&gt; pq;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><code>priority_queue</code>是C++标准库中的一个容器适配器，它提供了优先队列的功能。优先队列是一种特殊的队列，每次出队的元素是当前队列中优先级最高的元素。默认创建一个最大堆，也就是说每次出队的元素是当前队列中的最大元素,可以通过提供自定义的比较函数来改变这个行为。</p>
+</blockquote>
+<hr>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cout &lt;&lt; fixed &lt;&lt; <span class="built_in">setprecision</span>(<span class="number">2</span>) &lt;&lt; floatNum &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>将浮点数a以固定的格式和2位的精度输出，然后输出一个换行符。例如，如果a的值为3.14159，那么这段代码会输出3.14。</p>
+</blockquote>
+<hr>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cout &lt;&lt; year &lt;&lt; <span class="string">&quot;-&quot;</span> &lt;&lt; <span class="built_in">setw</span>(<span class="number">2</span>) &lt;&lt; <span class="built_in">setfill</span>(<span class="string">&#x27;0&#x27;</span>) &lt;&lt; month &lt;&lt; <span class="string">&quot;-&quot;</span> &lt;&lt; <span class="built_in">setw</span>(<span class="number">2</span>) &lt;&lt; <span class="built_in">setfill</span>(<span class="string">&#x27;0&#x27;</span>) &lt;&lt; day &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>输出一个日期，日期的格式为&quot;年-月-日&quot;，并且月和日都是两位数，如果不足两位则在前面补0。例如，如果year的值为1999，month的值为9，day的值为14，那么这段代码会输出1999-09-14。</p>
+</blockquote>
+<hr>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">std::string str = <span class="string">&quot;123&quot;</span>;</span><br><span class="line"><span class="type">int</span> num = std::<span class="built_in">stoi</span>(str);</span><br><span class="line"></span><br><span class="line">std::string str = <span class="string">&quot;123.45&quot;</span>;</span><br><span class="line"><span class="type">float</span> num = std::<span class="built_in">stof</span>(str);</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> num = <span class="number">123</span>;</span><br><span class="line">std::string str = std::<span class="built_in">to_string</span>(num);</span><br><span class="line"></span><br><span class="line"><span class="type">float</span> num = <span class="number">123.45</span>;</span><br><span class="line">std::string str = std::<span class="built_in">to_string</span>(num);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>string → int: <code>std::stoi</code> string → float: <code>std::stof</code> int → string: <code>std::to_string</code>
+float → string: <code>std::to_string</code></p>
+</blockquote>
+<hr>
+<hr>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span> str[] = <span class="string">&quot;123&quot;</span>;</span><br><span class="line"><span class="type">int</span> num = <span class="built_in">atoi</span>(str);</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>, num);  <span class="comment">// 输出：123</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> num = <span class="number">123</span>;</span><br><span class="line"><span class="type">char</span> str[<span class="number">10</span>];</span><br><span class="line"><span class="built_in">itoa</span>(num, str, <span class="number">10</span>);</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;%s\n&quot;</span>, str);  <span class="comment">// 输出：123</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>用于数字和字符串之间转换的函数ASCII to integer:
+<code>atoi()</code>，接收字符数组形式的字符串，转换为对应的整数。如果字符串不能转换为有效的整数，或者字符串为空，<code>atoi()</code>函数将返回 0。integer
+to ASCII:
+<code>itoa()</code>，接收一个整数和一个字符数组，并将证书转换为字符串传出在字符数组中。<code>itoa()</code>还接受一个第三个参数，用于指定转换的基数（例如，10 表示十进制，16 表示十六进制）</p>
+</blockquote>
+<hr>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">std::vector&lt;<span class="type">int</span>&gt; vec = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">4</span>, <span class="number">4</span>, <span class="number">4</span>&#125;;</span><br><span class="line">std::<span class="built_in">sort</span>(vec.<span class="built_in">begin</span>(), vec.<span class="built_in">end</span>());</span><br><span class="line">vec.<span class="built_in">erase</span>(std::<span class="built_in">unique</span>(vec.<span class="built_in">begin</span>(), vec.<span class="built_in">end</span>()), vec.<span class="built_in">end</span>());</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>使用<code>std::sort</code>和<code>std::unique</code>函数来去除<code>std::vector</code>中的重复元素。首先，使用<code>std::sort</code>函数对<code>std::vector</code>进行排序。这是因为<code>std::unique</code>函数只能去除相邻的重复元素，所以需要先进行排序。然后，使用<code>std::unique</code>函数去除<code>std::vector</code>中的重复元素。<code>std::unique</code>函数会将所有重复的元素移到<code>std::vector</code>的末尾，并返回一个迭代器指向第一个重复元素。最后，使用<code>std::vector::erase</code>函数删除所有重复的元素。</p>
+</blockquote>
+<hr>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> max_it = *std::<span class="built_in">max_element</span>(v.<span class="built_in">begin</span>(), v.<span class="built_in">end</span>());</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>找到<code>std::vector</code>中的最大值并将其赋值给max_it
+<code>std::max_element</code>函数返回一个指向最大元素的迭代器，使用*操作符来获取这个元素的值。注意的是，如果<code>std::vector</code>是空的，那么<code>std::max_element</code>会返回<code>v.end()</code>，这是一个无效的迭代器，不能对它进行解引用。</p>
+</blockquote>
+<hr>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::numeric_limits&lt;<span class="type">int</span>&gt;::<span class="built_in">min</span>()</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>常量表达式，它返回int类型可以表示的最小值，通常是-2147483648。同理<code>std::numeric_limits&lt;int&gt;::max()</code>返回int类型可以表示的最大值，<code>std::numeric_limits&lt;double&gt;::epsilon()</code>返回double类型的机器epsilon。</p>
+</blockquote>
+<hr>
+<h2 id="Python">Python</h2>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">x = <span class="number">3.14159</span></span><br><span class="line">y = <span class="number">2.71828</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;&#123;0:.1f&#125; &#123;0:.2f&#125; &#123;0:.3f&#125;, &#123;1:.3f&#125;&quot;</span>.<span class="built_in">format</span>(x, y))</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Python字符串格式化表达式，这段代码会输出<code>&quot;3.1 3.14 3.141, 2.718&quot;</code>
+<code>{}</code>：这是一个占位符，它会被.format()方法中的参数替换。
+<code>0</code>：这是格式说明符中的字段名，表示.format()方法中的第一个参数。如果.format()方法中有多个参数，你可以通过改变这个数字来选择不同的参数。
+<code>:</code>：这是格式说明符的开始，它后面的内容用于控制参数的输出格式。
+<code>.3</code>：这是精度，表示小数点后的位数。在这里，它设置精度为3，也就是小数点后有三位。
+<code>f</code>：这是格式类型，表示浮点数。它会将参数转换为浮点数，并按照前面的精度输出。</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># worse</span></span><br><span class="line"><span class="built_in">print</span> <span class="string">&quot;My name is %s and weight is %d kg!&quot;</span> % (<span class="string">&#x27;Zara&#x27;</span>, <span class="number">21</span>)   <span class="comment">#Python2</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># better 1</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;My name is &#123;&#125; and weight is &#123;&#125; kg!&quot;</span>.<span class="built_in">format</span>(<span class="string">&#x27;Zara&#x27;</span>, <span class="number">21</span>))  <span class="comment">#Python3</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># better 2</span></span><br><span class="line">name = <span class="string">&#x27;Zara&#x27;</span></span><br><span class="line">weight = <span class="number">21</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;My name is <span class="subst">&#123;name&#125;</span> and weight is <span class="subst">&#123;weight&#125;</span> kg!&quot;</span>)  <span class="comment">#Python3</span></span><br></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">print</span>(math.sin(math.radians(<span class="number">30</span>)))</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>在Python的math模块中，所有的三角函数（如sin、cos等）都接受的是弧度值，而不是角度值。所以，需要先要用<code>math.radians()</code>转换为弧度。</p>
+</blockquote>
+<hr>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">arr = <span class="built_in">input</span>()</span><br><span class="line">num = [<span class="built_in">int</span>(n) <span class="keyword">for</span> n <span class="keyword">in</span> arr.split()]</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>标准输入读取一行文本，然后将这行文本分割为多个字符串，再将这些字符串转换为整数，并将这些整数存储在一个列表中。</p>
+</blockquote>
+<hr>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">print</span>(<span class="string">&quot;ASCII value of &#x27;A&#x27;:&quot;</span>, <span class="built_in">ord</span>(<span class="string">&#x27;A&#x27;</span>))  <span class="comment"># Output: 65</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;ASCII value of &#x27;Z&#x27;:&quot;</span>, <span class="built_in">ord</span>(<span class="string">&#x27;Z&#x27;</span>))  <span class="comment"># Output: 90</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;ASCII value of &#x27;a&#x27;:&quot;</span>, <span class="built_in">ord</span>(<span class="string">&#x27;a&#x27;</span>))  <span class="comment"># Output: 97</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;ASCII value of &#x27;z&#x27;:&quot;</span>, <span class="built_in">ord</span>(<span class="string">&#x27;z&#x27;</span>))  <span class="comment"># Output: 122</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Character for ASCII value 65:&quot;</span>, <span class="built_in">chr</span>(<span class="number">65</span>))     <span class="comment"># Output: &#x27;A&#x27;</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Character for ASCII value 90:&quot;</span>, <span class="built_in">chr</span>(<span class="number">90</span>))     <span class="comment"># Output: &#x27;Z&#x27;</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Character for ASCII value 97:&quot;</span>, <span class="built_in">chr</span>(<span class="number">97</span>))     <span class="comment"># Output: &#x27;a&#x27;</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Character for ASCII value 122:&quot;</span>, <span class="built_in">chr</span>(<span class="number">122</span>))   <span class="comment"># Output: &#x27;z&#x27;</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>A-Z: 65-90, a-z: 97-122</p>
+</blockquote>
+<hr>
+<h2 id="Others">Others</h2>
+<p><code>gcd(a, b) = gcd(b, a % b)</code></p>
+<blockquote>
+<p>基于欧几里得算法递归实现求两个整数的最大公约数</p>
+</blockquote>
+<p><code>lcm(a, b) = a * b / gcd(a, b)</code></p>
+<blockquote>
+<p>一个数的最小公倍数和最大公约数的乘积等于这两个数的乘积。</p>
+</blockquote>
+<hr>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find . -type f -exec sed -i &#x27;s#https://github.com/#https://mirror.ghproxy.com/github.com/#g&#x27; &#123;&#125; \;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>替换当前目录及其子目录中所有文件中的Github资源下载镜像地址</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find . -type f \( -name &quot;*.cpp&quot; -o -name &quot;*.hpp&quot; \) -exec sed -i &#x27;s/MW_LOG_I/MW_LOG_D/g&#x27; &#123;&#125; \;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>修改当前目录及其子目录中所有.cpp和.hpp文件中的log打印等级</p>
+</blockquote>
+<hr>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/cpp-cheat-sheet/" rel="prev" title="C++ Cheat Sheet">
+                  <i class="fa fa-angle-left"></i> C++ Cheat Sheet
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/python-string-tips/" rel="next" title="Python String Processing Tips &amp; Tricks">
+                  Python String Processing Tips & Tricks <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">sitJac</span>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.1.2">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/logo.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/logo.png">
+  <link rel="mask-icon" href="/blog/images/logo.png" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.css" integrity="sha256-gkQVf8UKZgQ0HyuxL/VnacadJ+D2Kox2TCEBuNQg5+w=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"sitjac.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":true},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/blog/search.json","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="OTA差分升级，主要是解决整车OTA升级中升级包更新推送不必全量推送的问题。 差分算法用于减小升级包体积，从而缩短下载时间、节省网络带宽、减少用户流量使用。 本文主要介绍几种差分算法，并实践应用一种常见的差分算法。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OTA差分升级技术">
+<meta property="og:url" content="https://sitjac.github.io/blog/ota-diffpatch-algorithm/index.html">
+<meta property="og:site_name" content="sitJac&#39;s Blog">
+<meta property="og:description" content="OTA差分升级，主要是解决整车OTA升级中升级包更新推送不必全量推送的问题。 差分算法用于减小升级包体积，从而缩短下载时间、节省网络带宽、减少用户流量使用。 本文主要介绍几种差分算法，并实践应用一种常见的差分算法。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://s2.loli.net/2022/08/24/63WebGDpNZHvYTy.png">
+<meta property="article:published_time" content="2022-08-23T01:44:52.000Z">
+<meta property="article:modified_time" content="2026-08-29T07:51:17.473Z">
+<meta property="article:author" content="sitJac">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s2.loli.net/2022/08/24/63WebGDpNZHvYTy.png">
+
+
+<link rel="canonical" href="https://sitjac.github.io/blog/ota-diffpatch-algorithm/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://sitjac.github.io/blog/ota-diffpatch-algorithm/","path":"ota-diffpatch-algorithm/","title":"OTA差分升级技术"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>OTA差分升级技术 | sitJac's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.umd.js" integrity="sha256-a+H7FYzJv6oU2hfsfDGM2Ohw/cR9v+hPfxHCLdmCrE8=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.5.0/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+  <script src="/blog/js/third-party/fancybox.js" defer></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+  <script class="next-config" data-name="katex" type="application/json">{"copy_tex_js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/copy-tex.min.js","integrity":"sha256-Us54+rSGDSTvIhKKUs4kygE2ipA0RXpWWh0/zLqw3bs="}}</script>
+  <script src="/blog/js/third-party/math/katex.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">sitJac's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/blog/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/blog/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-photos"><a href="/blog/photos/" rel="section"><i class="fa fa-camera fa-fw"></i>Photos</a></li><li class="menu-item menu-item-categories"><a href="/blog/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-bookmarks"><a href="/blog/bookmarks/" rel="section"><i class="fa fa-bookmark fa-fw"></i>Bookmarks</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="Searching..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%AE%E5%88%86%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">差分介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E5%B7%AE%E5%88%86%E7%AE%97%E6%B3%95"><span class="nav-number">1.1.</span> <span class="nav-text">常见差分算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%95%86%E4%B8%9A%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">1.2.</span> <span class="nav-text">商业解决方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%97%E6%B3%95%E5%AE%9E%E8%B7%B5"><span class="nav-number">2.</span> <span class="nav-text">算法实践</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">2.1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E8%AF%91"><span class="nav-number">2.2.</span> <span class="nav-text">编译</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4"><span class="nav-number">2.3.</span> <span class="nav-text">步骤</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">sitJac</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://sitjac.github.io/blog/ota-diffpatch-algorithm/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="sitJac">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sitJac's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="OTA差分升级技术 | sitJac's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          OTA差分升级技术
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2022-08-23 09:44:52" itemprop="dateCreated datePublished" datetime="2022-08-23T09:44:52+08:00">2022-08-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/blog/categories/Works/" itemprop="url" rel="index"><span itemprop="name">Works</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><div class="note info">
+<ul>
+<li>OTA差分升级，主要是解决整车OTA升级中升级包更新推送不必全量推送的问题。</li>
+<li>差分算法用于减小升级包体积，从而缩短下载时间、节省网络带宽、减少用户流量使用。</li>
+<li>本文主要介绍几种差分算法，并实践应用一种常见的差分算法。</li>
+</ul>
+</div>
+<span id="more"></span>
+<h2 id="差分介绍">差分介绍</h2>
+<p>例如，一个新版本的升级包1G，通过云端差分服务，可以把两个新旧版本的升级包之间有差异的地方抽离出来新生成一个比较小的差分包，这个差分包的体积仅为整包大小的5%-20%，云端只要向车端推送这个比较小的差分包，车端拿到差分包之后，再通过对应的差分还原算法，利用旧包和拿到的差分包还原成新的升级包实现升级包的替换安装。</p>
+<h3 id="常见差分算法">常见差分算法</h3>
+<p>OTA差分算法，常见的开源方案有bsdiff、hdiffpatch、xdelta3等：</p>
+<ul>
+<li>bsdiff：这是一种高效的文件差分算法，常用于生成二进制文件的差异。它在 OTA 更新中被广泛使用。</li>
+</ul>
+<blockquote>
+<p>项目链接：<a target="_blank" rel="noopener" href="http://www.daemonology.net/bsdiff/">http://www.daemonology.net/bsdiff/</a></p>
+</blockquote>
+<ul>
+<li>hdiffpatch：这是一个开源的差分和补丁库，可以在二进制文件或目录之间进行差分和补丁。它运行速度快，生成的差分小，支持大文件，且在差分和补丁时内存需求较小。</li>
+</ul>
+<blockquote>
+<p>项目链接：<a target="_blank" rel="noopener" href="https://github.com/sisong/HDiffPatch">https://github.com/sisong/HDiffPatch</a></p>
+</blockquote>
+<ul>
+<li>xdelta3：这是一个开源的二进制文件差分算法，它可以生成和应用 VCDIFF 格式的差分和补丁。</li>
+</ul>
+<blockquote>
+<p>项目链接：<a target="_blank" rel="noopener" href="https://github.com/jmacd/xdelta">https://github.com/jmacd/xdelta</a></p>
+</blockquote>
+<ul>
+<li>courgette：这是 Google Chrome 使用的差分算法，它特别适合于生成二进制可执行文件的差分。</li>
+</ul>
+<blockquote>
+<p>项目链接：<a target="_blank" rel="noopener" href="https://chromium.googlesource.com/chromium/src/courgette/">https://chromium.googlesource.com/chromium/src/courgette/</a></p>
+</blockquote>
+<h3 id="商业解决方案">商业解决方案</h3>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.abupdate.com/index.php?catid=78">艾拉比汽车OTA升级解决方案</a></li>
+</ul>
+<h2 id="算法实践">算法实践</h2>
+<p>上述几种差分算法都可以完成对升级软件包生成差分包，其中hdiffpatch是开源且性能比较好、占用内存比较少的方案，下面针对该算法做一个详细介绍，并最终利用该算法实现一个REST API供业务调用。</p>
+<p>hidffpath的源代码托管在Github上，可以在<a target="_blank" rel="noopener" href="https://github.com/sisong/HDiffPatch">这里</a>查看和下载。</p>
+<h3 id="简介">简介</h3>
+<p>hdiffpatch 包含两个主要的工具：hdiff 和 hpatch：</p>
+<ul>
+<li>
+<p>hdiff：这个工具用于生成两个文件之间的差分。它会比较两个文件的内容，找出它们的差异，然后生成一个差分文件。这个差分文件可以用来将旧版本的文件更新到新版本。</p>
+</li>
+<li>
+<p>hpatch：这个工具用于将差分应用到旧版本的文件上，生成新版本的文件。它会读取旧版本的文件和差分文件，然后根据差分文件的指示修改旧版本的文件，生成新版本的文件。</p>
+</li>
+</ul>
+<p>其接口实现在<code>hdiffz.cpp</code>和<code>hpatch.c</code>文件中，包含了 hdiffpatch 的主要接口:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">hdiff_cmd_line</span><span class="params">(<span class="type">int</span> argc,<span class="type">const</span> <span class="type">char</span> * argv[])</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">hdiff</span><span class="params">(<span class="type">const</span> <span class="type">char</span>* oldFileName,<span class="type">const</span> <span class="type">char</span>* newFileName,<span class="type">const</span> <span class="type">char</span>* outDiffFileName,</span></span></span><br><span class="line"><span class="params"><span class="function">          <span class="type">const</span> hdiff_TCompress* compressPlugin,<span class="type">const</span> TDiffSets&amp; diffSets)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">hpatch</span><span class="params">(<span class="type">const</span> <span class="type">char</span>* oldFileName,<span class="type">const</span> <span class="type">char</span>* diffFileName,<span class="type">const</span> <span class="type">char</span>* outNewFileName,</span></span></span><br><span class="line"><span class="params"><span class="function">           hpatch_BOOL isLoadOldAll,<span class="type">size_t</span> patchCacheSize,hpatch_StreamPos_t diffDataOffert,</span></span></span><br><span class="line"><span class="params"><span class="function">           hpatch_StreamPos_t diffDataSize,hpatch_BOOL vcpatch_isChecksum,hpatch_BOOL vcpatch_isInMem)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>基于源码自行封装接口参数后得到以下接口：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">ota_diff</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *old_path, <span class="type">const</span> <span class="type">char</span> *new_path, <span class="type">const</span> <span class="type">char</span> *diff_path)</span></span>;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">ota_patch</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *diff_path, <span class="type">const</span> <span class="type">char</span> *old_path, <span class="type">const</span> <span class="type">char</span> *new_path)</span></span>;</span><br></pre></td></tr></table></figure>
+<h3 id="编译">编译</h3>
+<ul>
+<li>Linux</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git <span class="built_in">clone</span> https://github.com/sisong/HDiffPatch</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">cd</span> HDiffPatch</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git <span class="built_in">clone</span> https://github.com/sisong/bzip2.git ../bzip2</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git <span class="built_in">clone</span> https://github.com/sisong/libmd5.git ../libmd5</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git <span class="built_in">clone</span> https://github.com/sisong/lzma.git ../lzma</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git <span class="built_in">clone</span> https://github.com/sisong/zstd.git ../zstd</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">make LZMA=1 ZSTD=1 MD5=1 BZIP2=1</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>Android</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">1.下载安装 Android NDK</span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">wget https://dl.google.com/android/repository/android-ndk-r21d-linux-x86_64.zip</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">unzip android-ndk-r21d-linux-x86_64.zip</span></span><br><span class="line"></span><br><span class="line">2.执行build_libs.sh</span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">cd</span> HDiffPatch/builds/android_ndk_jni_mk</span></span><br><span class="line"></span><br><span class="line">3.在安卓项目中添加 HPatch.java 和 libhpatchz.so 文件，java 代码就可以调用 patch 函数了</span><br><span class="line">  所在路径 HDiffPatch/builds/android_ndk_jni_mk/java/</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Cross Compile
+<ul>
+<li>针对不同平台ECU，利用不同交叉编译工具编译相应平台的还原库。</li>
+</ul>
+</li>
+</ul>
+<h3 id="步骤">步骤</h3>
+<ul>
+<li>
+<p>把hdiffpatch源文件编译成Linux下的动态库，<a target="_blank" rel="noopener" href="http://xn--Javalibhdiffpatch-d011aq13bp71dujgx29j633e.so">Java侧调用动态库libhdiffpatch.so</a></p>
+</li>
+<li>
+<p>把libhdiffpatch.so文件放在src/main/resource/linux-x86-64/文件夹下</p>
+</li>
+<li>
+<p>Maven引入JNA</p>
+  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;net.java.dev.jna&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;jna&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;5.10.0&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+  <details>
+      <summary>
+          PS.
+      </summary>
+      <ol>
+          要用Java调用C的接口需要用到JNI，过程较为晦涩繁琐，此处采用JNA调用C代码。
+          <li>JNA provides Java programs easy access to native shared libraries without writing anything but Java code - no JNI or native code is required.</li>
+          <li>Doc：https://java-native-access.github.io/jna/5.10.0/javadoc/index.html</li>
+      </ol>
+  </details>
+</li>
+<li>
+<p>创建HDiff类</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.hh.ota.diff;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.sun.jna.Library;</span><br><span class="line"><span class="keyword">import</span> com.sun.jna.Native;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">HDiff</span> <span class="keyword">extends</span> <span class="title class_">Library</span>&#123;</span><br><span class="line">    <span class="type">HDiff</span> <span class="variable">INSTANCE</span> <span class="operator">=</span> (HDiff) Native.load(<span class="string">&quot;hdiffpatch&quot;</span>, HDiff.class);</span><br><span class="line">    <span class="comment">//diff usage: ota_hdiff [options] oldPath newPath outDiffFile</span></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">ota_hdiff</span><span class="params">(String oldData, String newData, String outPatchFile, <span class="type">long</span> size)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>创建HPatch类</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.hh.ota.patch;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.sun.jna.Library;</span><br><span class="line"><span class="keyword">import</span> com.sun.jna.Native;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">HPatch</span> <span class="keyword">extends</span> <span class="title class_">Library</span> &#123;</span><br><span class="line">    <span class="type">HPatch</span> <span class="variable">INSTANCE</span> <span class="operator">=</span> (HPatch) Native.load(<span class="string">&quot;hdiffpatch&quot;</span>, HPatch.class);</span><br><span class="line">    <span class="comment">//patch usage: ota_hpatch [options] oldPath diffFile outNewPath</span></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">ota_hpatch</span><span class="params">(String oldPath, String diffFile, String outNewPath)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>创建FileUtils类</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.hh.ota.cache;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.File;</span><br><span class="line"><span class="keyword">import</span> java.io.FileNotFoundException;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">FileUtils</span> &#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Verify if the file exists, if not, throw an exception</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> filePath：local file path</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> FileNotFoundException if filePath not exist</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">requireFileExist</span><span class="params">(String filePath)</span> <span class="keyword">throws</span> FileNotFoundException &#123;</span><br><span class="line">        <span class="type">File</span> <span class="variable">file</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">File</span>(filePath);</span><br><span class="line">        <span class="keyword">if</span> (!file.exists()) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">FileNotFoundException</span>(filePath);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>JNA实例化</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> oldFile：old version file path</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> newFile：new version file path</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> diffFile：diff package file path</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@throws</span> FileNotFoundException if oldFile or newFile not exist</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">diff</span><span class="params">(String oldFile, String newFile, String diffFile)</span> <span class="keyword">throws</span> FileNotFoundException &#123;</span><br><span class="line">    FileUtils.requireFileExist(oldFile);</span><br><span class="line">    FileUtils.requireFileExist(newFile);</span><br><span class="line">    HDiff.INSTANCE.hdiffz(oldFile,newFile, diffFile, <span class="number">1024</span>*<span class="number">1024</span>*<span class="number">128</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> oldPath：old version file path</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> diffPath：diff package file path</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> outNewPath：patch out file path</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@throws</span> FileNotFoundException if oldFile or patchFile not exist</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">patch</span><span class="params">(String oldPath, String diffPath, String outNewPath)</span> <span class="keyword">throws</span> FileNotFoundException &#123;</span><br><span class="line">    FileUtils.requireFileExist(oldPath);</span><br><span class="line">    FileUtils.requireFileExist(diffPath);</span><br><span class="line">    HPatch.INSTANCE.hpatchz(oldPath, diffPath, outNewPath);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>创建调用主类</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">    <span class="type">String</span> <span class="variable">oldFile</span> <span class="operator">=</span> <span class="string">&quot;/home/jack_xie/cloud_api_java/bigFile/soc_old.zip&quot;</span>;</span><br><span class="line">    <span class="type">String</span> <span class="variable">newFile</span> <span class="operator">=</span> <span class="string">&quot;/home/jack_xie/cloud_api_java/bigFile/soc_new.zip&quot;</span>;</span><br><span class="line">    <span class="type">String</span> <span class="variable">diffFile</span> <span class="operator">=</span> <span class="string">&quot;/home/jack_xie/cloud_api_java/bigFile/soc_diff.zip&quot;</span>;</span><br><span class="line">    <span class="type">String</span> <span class="variable">outNewPath</span> <span class="operator">=</span> <span class="string">&quot;/home/jack_xie/cloud_api_java/bigFile/soc_patch.zip&quot;</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        diff(oldFile, newFile, diffFile);</span><br><span class="line">        patch(oldFile, diffFile, outNewPath);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (FileNotFoundException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>Java层调用接口结果
+<img src="https://s2.loli.net/2022/08/24/63WebGDpNZHvYTy.png" alt="image.png"></p>
+</li>
+<li>
+<p>Java层封装REST接口
+将上述 Java 方法封装成 REST API供外部调用，使用 Spring Boot 框架实现。</p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/cpp-design-patterns/" rel="prev" title="C++ 设计模式学习路线">
+                  <i class="fa fa-angle-left"></i> C++ 设计模式学习路线
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/huawei-obs/" rel="next" title="华为对象云存储OBS开发记录">
+                  华为对象云存储OBS开发记录 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">sitJac</span>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

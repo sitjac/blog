@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.1.2">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/logo.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/logo.png">
+  <link rel="mask-icon" href="/blog/images/logo.png" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.css" integrity="sha256-gkQVf8UKZgQ0HyuxL/VnacadJ+D2Kox2TCEBuNQg5+w=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"sitjac.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":true},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/blog/search.json","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="在项目中使用 GTest 编写单测以保证代码质量是必要的，通过构造各种单元测试的case，可以测试功能是否正确，发现肉眼不容易发现的bug。 GTest 是 Google 发布的一款非常优秀的开源 C&#x2F;C++ 单元测试框架，它简单易用，功能完善，已被应用于多个开源项目及Google内部项目中：ChromeWeb浏览器、LLVM编译器、ProtocolBuffers数据交换格式等。 本文分享 G">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GoogleTest 快速入门">
+<meta property="og:url" content="https://sitjac.github.io/blog/gtest-tutorial/index.html">
+<meta property="og:site_name" content="sitJac&#39;s Blog">
+<meta property="og:description" content="在项目中使用 GTest 编写单测以保证代码质量是必要的，通过构造各种单元测试的case，可以测试功能是否正确，发现肉眼不容易发现的bug。 GTest 是 Google 发布的一款非常优秀的开源 C&#x2F;C++ 单元测试框架，它简单易用，功能完善，已被应用于多个开源项目及Google内部项目中：ChromeWeb浏览器、LLVM编译器、ProtocolBuffers数据交换格式等。 本文分享 G">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-01-16T07:37:20.000Z">
+<meta property="article:modified_time" content="2026-08-29T07:51:17.469Z">
+<meta property="article:author" content="sitJac">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://sitjac.github.io/blog/gtest-tutorial/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://sitjac.github.io/blog/gtest-tutorial/","path":"gtest-tutorial/","title":"GoogleTest 快速入门"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>GoogleTest 快速入门 | sitJac's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.umd.js" integrity="sha256-a+H7FYzJv6oU2hfsfDGM2Ohw/cR9v+hPfxHCLdmCrE8=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.5.0/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+  <script src="/blog/js/third-party/fancybox.js" defer></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+  <script class="next-config" data-name="katex" type="application/json">{"copy_tex_js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/copy-tex.min.js","integrity":"sha256-Us54+rSGDSTvIhKKUs4kygE2ipA0RXpWWh0/zLqw3bs="}}</script>
+  <script src="/blog/js/third-party/math/katex.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">sitJac's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/blog/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/blog/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-photos"><a href="/blog/photos/" rel="section"><i class="fa fa-camera fa-fw"></i>Photos</a></li><li class="menu-item menu-item-categories"><a href="/blog/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-bookmarks"><a href="/blog/bookmarks/" rel="section"><i class="fa fa-bookmark fa-fw"></i>Bookmarks</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="Searching..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85"><span class="nav-number">1.</span> <span class="nav-text">安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#GitHub-%E6%BA%90%E7%A0%81%E4%BB%93%E5%BA%93%E5%AE%89%E8%A3%85"><span class="nav-number">1.1.</span> <span class="nav-text">GitHub 源码仓库安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Ubuntu-apt-%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85"><span class="nav-number">1.2.</span> <span class="nav-text">Ubuntu apt 源码安装</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5"><span class="nav-number">2.</span> <span class="nav-text">概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Test-Suite"><span class="nav-number">2.1.</span> <span class="nav-text">Test Suite</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Test-Case"><span class="nav-number">2.2.</span> <span class="nav-text">Test Case</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8"><span class="nav-number">3.</span> <span class="nav-text">使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%AD%E8%A8%80"><span class="nav-number">3.1.</span> <span class="nav-text">断言</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E7%9A%84%E6%96%AD%E8%A8%80"><span class="nav-number">3.1.1.</span> <span class="nav-text">基础的断言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%95%B0%E5%80%BC%E6%AF%94%E8%BE%83"><span class="nav-number">3.1.2.</span> <span class="nav-text">数值比较</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B5%AE%E7%82%B9%E6%95%B0%E6%AF%94%E8%BE%83"><span class="nav-number">3.1.3.</span> <span class="nav-text">浮点数比较</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%AF%94%E8%BE%83"><span class="nav-number">3.1.4.</span> <span class="nav-text">字符串比较</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B"><span class="nav-number">4.</span> <span class="nav-text">示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E5%86%99%E8%A7%84%E8%8C%83"><span class="nav-number">5.</span> <span class="nav-text">编写规范</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84%E3%80%81%E6%96%87%E4%BB%B6%E4%B8%8E%E5%91%BD%E5%90%8D%E8%A7%84%E8%8C%83"><span class="nav-number">5.1.</span> <span class="nav-text">目录结构、文件与命名规范</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8D%95%E6%B5%8B%E7%9A%84%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84%EF%BC%8C%E8%A6%81%E5%92%8C%E6%BA%90%E7%A0%81%E7%9A%84%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84%E4%B8%80%E8%87%B4"><span class="nav-number">5.1.1.</span> <span class="nav-text">单测的目录结构，要和源码的目录结构一致</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TestSuite%E3%80%81TestCase-%E5%91%BD%E5%90%8D%E8%A7%84%E8%8C%83"><span class="nav-number">5.1.2.</span> <span class="nav-text">TestSuite、TestCase 命名规范</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E4%BB%A3%E7%A0%81%E7%BC%96%E5%86%99%E8%A7%84%E8%8C%83"><span class="nav-number">5.2.</span> <span class="nav-text">单元测试代码编写规范</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%8D%E8%A6%81%E7%94%A8-std-cout-%E8%BE%93%E5%87%BA%E5%8F%98%E9%87%8F%E5%80%BC%EF%BC%8C%E6%94%B9%E4%B8%BA%E7%94%A8-ASSERT-EXPECT-%E6%A3%80%E6%9F%A5"><span class="nav-number">5.2.1.</span> <span class="nav-text">不要用 std::cout 输出变量值，改为用 ASSERT &#x2F; EXPECT 检查</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%8D%E8%A6%81%E7%9B%B4%E6%8E%A5%E5%86%99%E6%95%B0%E5%80%BC%EF%BC%8C%E8%A6%81%E5%86%99%E6%B8%85%E6%A5%9A%E8%BF%99%E4%B8%AA%E6%95%B0%E5%AD%97%E6%98%AF%E6%80%8E%E4%B9%88%E7%AE%97%E7%9A%84"><span class="nav-number">5.2.2.</span> <span class="nav-text">不要直接写数值，要写清楚这个数字是怎么算的</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%A4%A7%E6%8B%AC%E5%8F%B7%E5%88%86%E9%9A%94%E3%80%81%E7%BC%A9%E8%BF%9B%E4%B8%8D%E5%90%8C%E7%9A%84-Test-Case"><span class="nav-number">5.2.3.</span> <span class="nav-text">使用大括号分隔、缩进不同的 Test Case</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%BA%E5%8D%95%E6%B5%8B%E8%A1%A5%E5%85%85%E8%AF%A6%E7%BB%86%E7%9A%84%E6%B3%A8%E9%87%8A"><span class="nav-number">5.2.4.</span> <span class="nav-text">为单测补充详细的注释</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3"><span class="nav-number">6.</span> <span class="nav-text">参考文档</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">sitJac</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://sitjac.github.io/blog/gtest-tutorial/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="sitJac">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sitJac's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="GoogleTest 快速入门 | sitJac's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          GoogleTest 快速入门
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-01-16 15:37:20" itemprop="dateCreated datePublished" datetime="2024-01-16T15:37:20+08:00">2024-01-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/blog/categories/C/" itemprop="url" rel="index"><span itemprop="name">C++</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><div class="note info">
+<ul>
+<li>在项目中使用 GTest 编写单测以保证代码质量是必要的，通过构造各种单元测试的case，可以测试功能是否正确，发现肉眼不容易发现的bug。</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/google/googletest">GTest</a>
+是 Google 发布的一款非常优秀的开源 C/C++ 单元测试框架，它简单易用，功能完善，已被应用于多个开源项目及Google内部项目中：<a target="_blank" rel="noopener" href="https://www.chromium.org/">ChromeWeb浏览器</a>、<a target="_blank" rel="noopener" href="https://llvm.org/">LLVM编译器</a>、<a target="_blank" rel="noopener" href="https://github.com/google/protobuf">ProtocolBuffers数据交换格式</a>等。</li>
+<li>本文分享 GTest 的核心用法、常用技巧以及单测编写的思路，包含最必要、最常用的内容，能覆盖大部分场景的单测需求，同时会引用外部文档供扩展阅读。</li>
+</ul>
+</div>
+<span id="more"></span>
+<h2 id="安装">安装</h2>
+<p>官方传送门：<a target="_blank" rel="noopener" href="https://github.com/google/googletest">GoogleTest - Google Testing and Mocking Framework</a>
+现在官方已经把 GoogleTest 和 GoogleMock 一起维护，所以这个 git 仓库还包含了 GoogleMock。</p>
+<h3 id="GitHub-源码仓库安装">GitHub 源码仓库安装</h3>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">➜  ~ wget https://github.com/google/googletest/archive/refs/tags/v1.14.0.tar.gz</span><br><span class="line">➜  ~ tar xf v1.14.0.tar.gz</span><br><span class="line">➜  ~ cd googletest-1.14.0</span><br><span class="line">➜  googletest-1.14.0 cmake -DBUILD_SHARED_LIBS=ON .</span><br><span class="line">➜  googletest-1.14.0 make</span><br><span class="line">➜  googletest-1.14.0 sudo cp -a googletest/include /usr/include</span><br><span class="line">➜  googletest-1.14.0 sudo cp -a lib/libgtest_main.so lib/libgtest.so /usr/lib/</span><br></pre></td></tr></table></figure>
+<p>这样就 OK 了，可以用 <code>sudo ldconfig -v | grep gtest</code> 检查，看到下面就 OK 了：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">libgtest.so -&gt; libgtest.so</span><br><span class="line">libgtest_main.so -&gt; libgtest_main.so</span><br></pre></td></tr></table></figure>
+<h3 id="Ubuntu-apt-源码安装">Ubuntu apt 源码安装</h3>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">➜  ~ sudo apt-get install libgtest-dev</span><br><span class="line">➜  ~ cd /usr/src/gtest</span><br><span class="line">➜  gtest sudo cmake CMakeLists.txt</span><br><span class="line">➜  gtest sudo make</span><br><span class="line">➜  gtest sudo cp *.a /usr/lib</span><br></pre></td></tr></table></figure>
+<p>上述步骤OK后就可以使用<code>-lgtest</code>选项编译测试代码了。</p>
+<h2 id="概念">概念</h2>
+<h3 id="Test-Suite">Test Suite</h3>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">TEST</span>(TestSuiteName, TestCaseName) &#123;</span><br><span class="line">    <span class="comment">// 单测代码</span></span><br><span class="line">    <span class="built_in">EXPECT_EQ</span>(<span class="built_in">func</span>(<span class="number">0</span>), <span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>TestSuiteName</code> 用来汇总 test case，相关的 test case 应该是相同的
+<code>TestSuiteName</code>。一个文件里只能有一个 <code>TestSuiteName</code>，建议命名为这个文件测试的类名。</li>
+<li><code>TestCaseName</code>
+是测试用例的名称。建议有意义，比如“被测试的函数名称”，或者被测试的函数名的不同输入的情况。</li>
+<li><code>TestSuiteName_TestCaseName</code> 的组合应该是唯一的。</li>
+<li>GTest 生成的类名是带下划线的，所以上面这些名字里不建议有下划线。</li>
+</ul>
+<h3 id="Test-Case">Test Case</h3>
+<p>一个 <code>TEST(Foo, Bar){...}</code> 就是一个 Test Case。考虑到构造输入有成本，通常一个
+<code>TEST(Foo, Bar)</code>
+里会反复修改输入，构造多个 case，测试不同的执行流程。这里建议<strong>用大括号分隔不同的 case</strong>，整体更条理。另一个好处在于：<strong>每个变量的生命周期仅限于大括号内</strong>。这样就可以反复使用相同的变量名，而不用给变量名编号。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">TEST</span>(Foo, bar) &#123;</span><br><span class="line">    <span class="comment">// case 1: enable = true</span></span><br><span class="line">    &#123;</span><br><span class="line">        Context ctx;</span><br><span class="line">        params.enable_refresh = <span class="literal">true</span>;</span><br><span class="line">        <span class="built_in">ASSERT_EQ</span>(ctx-&gt;<span class="built_in">is_enable_fresh</span>(), <span class="literal">true</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// case 2: enable = false</span></span><br><span class="line">    &#123;</span><br><span class="line">        Context ctx;</span><br><span class="line">        params.enable_refresh = <span class="literal">false</span>;</span><br><span class="line">        <span class="built_in">ASSERT_EQ</span>(ctx-&gt;<span class="built_in">is_enable_fresh</span>(), <span class="literal">false</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果待测函数十分复杂，建议拆分多个 <code>TEST(Foo, Bar){...}</code>，避免 Test
+Case 代码膨胀。比如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 待测函数</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">foo</span><span class="params">(TarAddr ta)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!ta)</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">switch</span>(ta.did) &#123;</span><br><span class="line">        <span class="keyword">case</span> <span class="number">0x193b</span>:</span><br><span class="line">            ...</span><br><span class="line">        <span class="keyword">case</span> <span class="number">0x1204</span>:</span><br><span class="line">            ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">TEST</span>(Foo, IsNil) &#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">TEST</span>(Foo, <span class="number">0x193b</span>) &#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">TEST</span>(Foo, <span class="number">0x1204</span>) &#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="使用">使用</h2>
+<p>官方 WIKI：<a target="_blank" rel="noopener" href="https://github.com/google/googletest/blob/master/googletest/docs/Primer.md">GTest</a></p>
+<h3 id="断言">断言</h3>
+<p>GTest 使用一系列<a target="_blank" rel="noopener" href="http://google.github.io/googletest/reference/assertions.html">断言</a>的宏来检查返回值是否符合预期、是否抛出预期的异常等。主要分为两类：<code>ASSERT</code>
+和
+<code>EXPECT</code>。区别在于 ASSERT 不通过的时候会认为是一个 fatal 的错误，退出当前函数（只是函数）。而 EXPECT 失败的话会继续运行当前函数，所以对于函数内几个失败可以同时报告出来。</p>
+<p>通常我们用 EXPECT 级别的断言就好，除非你认为当前检查点失败后函数的后续检查没有意义:</p>
+<ul>
+<li>如果某个判断不通过时，会影响后续步骤，要使用 ASSERT。常见的是空指针，或者数组访问越界。</li>
+<li>其他情况，可以使用 EXPECT，尽可能多测试几个用例。</li>
+</ul>
+<h4 id="基础的断言">基础的断言</h4>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"><strong>Fatal assertion</strong></th>
+<th style="text-align:left"><strong>Nonfatal assertion</strong></th>
+<th style="text-align:left"><strong>Verifies</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>ASSERT_TRUE(_condition_)</code>;</td>
+<td style="text-align:left"><code>EXPECT_TRUE(_condition_)</code>;</td>
+<td style="text-align:left"><em>condition</em> is true</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>ASSERT_FALSE(_condition_)</code>;</td>
+<td style="text-align:left"><code>EXPECT_FALSE(_condition_)</code>;</td>
+<td style="text-align:left"><em>condition</em> is false</td>
+</tr>
+</tbody>
+</table>
+<h4 id="数值比较">数值比较</h4>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"><strong>Fatal assertion</strong></th>
+<th style="text-align:left"><strong>Nonfatal assertion</strong></th>
+<th style="text-align:left"><strong>Verifies</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>ASSERT_EQ(_val1_, _val2_);</code></td>
+<td style="text-align:left"><code>EXPECT_EQ(_val1_, _val2_);</code></td>
+<td style="text-align:left"><em>val1</em> <code>==</code> <em>val2</em></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>ASSERT_NE(_val1_, _val2_);</code></td>
+<td style="text-align:left"><code>EXPECT_NE(_val1_, _val2_);</code></td>
+<td style="text-align:left"><em>val1</em> <code>!=</code> <em>val2</em></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>ASSERT_LT(_val1_, _val2_);</code></td>
+<td style="text-align:left"><code>EXPECT_LT(_val1_, _val2_);</code></td>
+<td style="text-align:left"><em>val1</em> <code>&lt;</code> <em>val2</em></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>ASSERT_LE(_val1_, _val2_);</code></td>
+<td style="text-align:left"><code>EXPECT_LE(_val1_, _val2_);</code></td>
+<td style="text-align:left"><em>val1</em> <code>&lt;=</code> <em>val2</em></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>ASSERT_GT(_val1_, _val2_);</code></td>
+<td style="text-align:left"><code>EXPECT_GT(_val1_, _val2_);</code></td>
+<td style="text-align:left"><em>val1</em> <code>&gt;</code> <em>val2</em></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>ASSERT_GE(_val1_, _val2_);</code></td>
+<td style="text-align:left"><code>EXPECT_GE(_val1_, _val2_);</code></td>
+<td style="text-align:left"><em>val1</em> <code>&gt;=</code> <em>val2</em></td>
+</tr>
+</tbody>
+</table>
+<h4 id="浮点数比较">浮点数比较</h4>
+<table>
+<thead>
+<tr>
+<th style="text-align:right"><strong>Fatal assertion</strong></th>
+<th style="text-align:right"><strong>Nonfatal assertion</strong></th>
+<th style="text-align:left"><strong>Verifies</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right"><code>ASSERT_FLOAT_EQ(_val1_, _val2_);</code></td>
+<td style="text-align:right"><code>EXPECT_FLOAT_EQ(_val1_, _val2_);</code></td>
+<td style="text-align:left"><em>val1</em> == <em>val2</em> (within 4 ULPs)</td>
+</tr>
+<tr>
+<td style="text-align:right"><code>ASSERT_DOUBLE_EQ(_val1_, _val2_);</code></td>
+<td style="text-align:right"><code>EXPECT_DOUBLE_EQ(_val1_, _val2_);</code></td>
+<td style="text-align:left"><em>val1</em> == <em>val2</em> (within 4 ULPs)</td>
+</tr>
+<tr>
+<td style="text-align:right"><code>ASSERT_NEAR(_val1_, _val2_, _abs_error_);</code></td>
+<td style="text-align:right"><code>EXPECT_NEAR(_val1_, _val2_, _abs_error_);</code></td>
+<td style="text-align:left">判断两个数字的绝对值相差是否小于等于 <em>abs_error</em></td>
+</tr>
+</tbody>
+</table>
+<h4 id="字符串比较">字符串比较</h4>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"><strong>Fatal assertion</strong></th>
+<th style="text-align:left"><strong>Nonfatal assertion</strong></th>
+<th style="text-align:left"><strong>Verifies</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>ASSERT_STREQ(_str1_, _str2_);</code></td>
+<td style="text-align:left"><code>EXPECT_STREQ(_str1_, _str_2);</code></td>
+<td style="text-align:left">the two C strings have the same content</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>ASSERT_STRNE(_str1_, _str2_);</code></td>
+<td style="text-align:left"><code>EXPECT_STRNE(_str1_, _str2_);</code></td>
+<td style="text-align:left">the two C strings have different content</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>ASSERT_STRCASEEQ(_str1_, _str2_);</code></td>
+<td style="text-align:left"><code>EXPECT_STRCASEEQ(_str1_, _str2_);</code></td>
+<td style="text-align:left">the two C strings have the same content, ignoring case</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>ASSERT_STRCASENE(_str1_, _str2_);</code></td>
+<td style="text-align:left"><code>EXPECT_STRCASENE(_str1_, _str2_);</code></td>
+<td style="text-align:left">the two C strings have different content, ignoring case</td>
+</tr>
+</tbody>
+</table>
+<h2 id="示例">示例</h2>
+<p>创建一个简单的C++类，例如<code>MyClass</code>:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// MyClass.h</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyClass</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">Add</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> a + b;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">Subtract</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> a - b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>创建一个测试文件，例如<code>MyClassTest.cpp</code>:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// MyClassTest.cpp</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;MyClass.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;gtest/gtest.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="built_in">TEST</span>(MyClassTest, AddTest) &#123;</span><br><span class="line">    MyClass my_class;</span><br><span class="line">    <span class="built_in">EXPECT_EQ</span>(my_class.<span class="built_in">Add</span>(<span class="number">1</span>, <span class="number">2</span>), <span class="number">3</span>);</span><br><span class="line">    <span class="built_in">EXPECT_EQ</span>(my_class.<span class="built_in">Add</span>(<span class="number">1</span>, <span class="number">1</span>), <span class="number">3</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">TEST</span>(MyClassTest, SubtractTest) &#123;</span><br><span class="line">    MyClass my_class;</span><br><span class="line">    <span class="built_in">EXPECT_EQ</span>(my_class.<span class="built_in">Subtract</span>(<span class="number">1</span>, <span class="number">2</span>), <span class="number">-1</span>);</span><br><span class="line">    <span class="built_in">EXPECT_EQ</span>(my_class.<span class="built_in">Subtract</span>(<span class="number">1</span>, <span class="number">1</span>), <span class="number">3</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span> </span>&#123;</span><br><span class="line">    ::testing::<span class="built_in">InitGoogleTest</span>(&amp;argc, argv);</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">RUN_ALL_TESTS</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>编译运行：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">➜  cd demo</span><br><span class="line">➜  demo g++ -std=c++11 -pthread MyClassTest.cpp -lgtest -o MyClassTest</span><br><span class="line">➜  demo ./MyClassTest</span><br><span class="line">[==========] Running 2 tests from 1 test suite.</span><br><span class="line">[----------] Global test environment set-up.</span><br><span class="line">[----------] 2 tests from MyClassTest</span><br><span class="line">[ RUN      ] MyClassTest.AddTest</span><br><span class="line">MyClassTest.cpp:7: Failure</span><br><span class="line">Expected equality of these values:</span><br><span class="line">  my_class.Add(1, 1)</span><br><span class="line">    Which is: 2</span><br><span class="line">  3</span><br><span class="line">[  FAILED  ] MyClassTest.AddTest (0 ms)</span><br><span class="line">[ RUN      ] MyClassTest.SubtractTest</span><br><span class="line">MyClassTest.cpp:13: Failure</span><br><span class="line">Expected equality of these values:</span><br><span class="line">  my_class.Subtract(1, 1)</span><br><span class="line">    Which is: 0</span><br><span class="line">  3</span><br><span class="line">[  FAILED  ] MyClassTest.SubtractTest (0 ms)</span><br><span class="line">[----------] 2 tests from MyClassTest (0 ms total)</span><br><span class="line"></span><br><span class="line">[----------] Global test environment tear-down</span><br><span class="line">[==========] 2 tests from 1 test suite ran. (0 ms total)</span><br><span class="line">[  PASSED  ] 0 tests.</span><br><span class="line">[  FAILED  ] 2 tests, listed below:</span><br><span class="line">[  FAILED  ] MyClassTest.AddTest</span><br><span class="line">[  FAILED  ] MyClassTest.SubtractTest</span><br><span class="line"></span><br><span class="line"> 2 FAILED TESTS</span><br></pre></td></tr></table></figure>
+<h2 id="编写规范">编写规范</h2>
+<div class="note info"><p>💡 单测代码也需要经过 Code Review。单测代码和线上代码同等重要。</p></div>
+<h3 id="目录结构、文件与命名规范">目录结构、文件与命名规范</h3>
+<h4 id="单测的目录结构，要和源码的目录结构一致">单测的目录结构，要和源码的目录结构一致</h4>
+<p>单测文件的路径名，等价于源码的文件名加上 <code>_test</code> 后缀。</p>
+<p>目的在于：让写单测的人能很快定位是否已经有这个文件或这个类的单测，让新增代码更聚合，避免写重复单测。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// bad</span></span><br><span class="line">src/</span><br><span class="line">  common/</span><br><span class="line">    item_data.cpp</span><br><span class="line">  frame/</span><br><span class="line">    request_context.cpp</span><br><span class="line">unittest/</span><br><span class="line">  item_data_test.cpp</span><br><span class="line">  request_context_test.cpp</span><br><span class="line"></span><br><span class="line"><span class="comment">// good</span></span><br><span class="line">src/</span><br><span class="line">  common/</span><br><span class="line">    item_data.cpp</span><br><span class="line">  frame/</span><br><span class="line">    request_context.cpp</span><br><span class="line">unittest/</span><br><span class="line">  common/</span><br><span class="line">    item_data_test.cpp</span><br><span class="line">  frame/</span><br><span class="line">    request_context_test.cpp</span><br></pre></td></tr></table></figure>
+<h4 id="TestSuite、TestCase-命名规范">TestSuite、TestCase 命名规范</h4>
+<p>TestSuite 建议命名为被测试的类名加上 <code>Test</code> 后缀：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// bad</span></span><br><span class="line"><span class="built_in">TEST</span>(MyTest, foo) &#123;...&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// good</span></span><br><span class="line"><span class="built_in">TEST</span>(RequestContextTest, foo) &#123;...&#125;</span><br></pre></td></tr></table></figure>
+<p>TestCase 建议命名为被测试的函数名，不要随意起名，也不需要增加不必要的前缀：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// bad</span></span><br><span class="line">TEST(RequestContextTest<span class="punctuation">,</span> test_uav) <span class="punctuation">&#123;</span></span><br><span class="line">    ASSERT_EQ(ctx-&gt;init_uav_to_group_bid()<span class="punctuation">,</span> <span class="number">1</span>);</span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// good</span></span><br><span class="line">TEST(RequestContextTest<span class="punctuation">,</span> init_uav_to_group_bid) <span class="punctuation">&#123;</span></span><br><span class="line">    ASSERT_EQ(ctx-&gt;init_uav_to_group_bid()<span class="punctuation">,</span> <span class="number">1</span>);</span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>GTest 生成的类名是带下划线的，所以上面这些名字建议用驼峰形式。</p>
+<h3 id="单元测试代码编写规范">单元测试代码编写规范</h3>
+<h4 id="不要用-std-cout-输出变量值，改为用-ASSERT-EXPECT-检查">不要用 std::cout 输出变量值，改为用 <code>ASSERT</code> / <code>EXPECT</code> 检查</h4>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// bad</span></span><br><span class="line">std::cout &lt;&lt; <span class="string">&quot;ads_size = &quot;</span> &lt;&lt; rsp.ads.<span class="built_in">size</span>() &lt;&lt; std::endl;</span><br><span class="line"><span class="built_in">EXPECT_EQ</span>(rsp.ads.<span class="built_in">size</span>(), <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// good</span></span><br><span class="line"><span class="built_in">EXPECT_EQ</span>(rsp.<span class="built_in">size</span>(), <span class="number">1</span>); <span class="comment">// 这一行在检测失败时，会打印 rsp.size() 的值</span></span><br><span class="line"><span class="built_in">EXPECT_EQ</span>(rsp.<span class="built_in">size</span>(), <span class="number">1</span>) &lt;&lt; rsp.ads.<span class="built_in">debug_string</span>() &lt;&lt; std::endl;  <span class="comment">// 可以在检测失败时，打印更多 debug 日志</span></span><br></pre></td></tr></table></figure>
+<h4 id="不要直接写数值，要写清楚这个数字是怎么算的">不要直接写数值，要写清楚这个数字是怎么算的</h4>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// bad</span></span><br><span class="line">params.alpha = <span class="number">2</span>;</span><br><span class="line">params.beta = <span class="number">2.5</span>;</span><br><span class="line"><span class="built_in">ASSERT_EQ</span>(params.<span class="built_in">get_score</span>(), <span class="number">2965</span>); <span class="comment">// 这 2965 咋算的？</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// good</span></span><br><span class="line">params.alpha = <span class="number">2</span>;</span><br><span class="line">params.beta = <span class="number">2.5</span>;</span><br><span class="line"><span class="built_in">ASSERT_EQ</span>(params.<span class="built_in">get_score</span>(), <span class="number">2</span> * <span class="number">2.5</span> * <span class="number">593</span>); <span class="comment">// alpha * beta * ctx.bid</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// good: 把变量名直接注释在字面量后面</span></span><br><span class="line"><span class="built_in">ASSERT_EQ</span>(params.<span class="built_in">get_score</span>(), <span class="number">2</span> <span class="comment">/* alpha */</span> * <span class="number">2.5</span> <span class="comment">/* beta */</span> * <span class="number">593</span> <span class="comment">/* ctx.bid */</span>);</span><br></pre></td></tr></table></figure>
+<h4 id="使用大括号分隔、缩进不同的-Test-Case">使用大括号分隔、缩进不同的 Test Case</h4>
+<p>一个 <code>TEST(Foo, Bar){...}</code> 就是一个 Test Case。考虑到构造输入有成本，通常一个
+<code>TEST(Foo, Bar)</code>
+里会反复修改输入，构造多个 case，测试不同的执行流程。这里建议<strong>用大括号分隔不同的 case</strong>，整体更条理。另一个好处在于：<strong>每个变量的生命周期仅限于大括号内</strong>。这样就可以反复使用相同的变量名，而不用给变量名编号。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// bad</span></span><br><span class="line"><span class="built_in">TEST</span>(Foo, bar) &#123;</span><br><span class="line">    Context ctx1;</span><br><span class="line">    params.enable_refresh = <span class="literal">true</span>;</span><br><span class="line">    <span class="built_in">ASSERT_EQ</span>(ctx1-&gt;<span class="built_in">is_enable_fresh</span>(), <span class="literal">true</span>);</span><br><span class="line"></span><br><span class="line">    Context ctx2;</span><br><span class="line">    params.enable_refresh = <span class="literal">false</span>;</span><br><span class="line">    <span class="built_in">ASSERT_EQ</span>(ctx2-&gt;<span class="built_in">is_enable_fresh</span>(), <span class="literal">false</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// good</span></span><br><span class="line"><span class="built_in">TEST</span>(Foo, bar) &#123;</span><br><span class="line">    <span class="comment">// case 1: enable = true</span></span><br><span class="line">    &#123;</span><br><span class="line">        Context ctx;</span><br><span class="line">        params.enable_refresh = <span class="literal">true</span>;</span><br><span class="line">        <span class="built_in">ASSERT_EQ</span>(ctx-&gt;<span class="built_in">is_enable_fresh</span>(), <span class="literal">true</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// case 2: enable = false</span></span><br><span class="line">    &#123;</span><br><span class="line">        Context ctx;</span><br><span class="line">        params.enable_refresh = <span class="literal">false</span>;</span><br><span class="line">        <span class="built_in">ASSERT_EQ</span>(ctx-&gt;<span class="built_in">is_enable_fresh</span>(), <span class="literal">false</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="为单测补充详细的注释">为单测补充详细的注释</h4>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// bad</span></span><br><span class="line">req.type = Type::foo;</span><br><span class="line">req.from = <span class="string">&quot;localhost&quot;</span>;</span><br><span class="line"><span class="built_in">EXPECT_EQ</span>(ctx.<span class="built_in">get_value</span>(), <span class="number">5</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// good：补充注释</span></span><br><span class="line">req.type = Type::foo;  <span class="comment">// is_foo()</span></span><br><span class="line">req.from = <span class="string">&quot;localhost&quot;</span>;  <span class="comment">// is_local_req()</span></span><br><span class="line"><span class="built_in">EXPECT_EQ</span>(ctx.<span class="built_in">get_value</span>(), <span class="number">5</span>);  <span class="comment">// 本地请求，默认值是 5</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// best：代码即注释</span></span><br><span class="line">req.type = Type::foo;</span><br><span class="line"><span class="built_in">ASSERT_TRUE</span>(ctx-&gt;<span class="built_in">is_foo</span>());</span><br><span class="line">req.from = <span class="string">&quot;localhost&quot;</span>;</span><br><span class="line"><span class="built_in">ASSERT_TRUE</span>(ctx-&gt;<span class="built_in">is_local_req</span>());</span><br><span class="line"><span class="built_in">EXPECT_EQ</span>(ctx.<span class="built_in">get_value</span>(), <span class="number">5</span>);  <span class="comment">// 本地请求，默认值是 5</span></span><br></pre></td></tr></table></figure>
+<h2 id="参考文档">参考文档</h2>
+<p><a target="_blank" rel="noopener" href="http://google.github.io/googletest/primer.html">GTest 官方手册 (Google Test Primer)</a>
+<a target="_blank" rel="noopener" href="https://imageslr.com/2023/gtest">C++ 研发基本功 - GTest / GMock 单元测试实践手册</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/docker-tutorial/" rel="prev" title="Docker 使用手册">
+                  <i class="fa fa-angle-left"></i> Docker 使用手册
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/recruitment-technology-review-2024/" rel="next" title="技术面试问题回顾与总结">
+                  技术面试问题回顾与总结 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">sitJac</span>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

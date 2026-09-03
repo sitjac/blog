@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.1.2">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/logo.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/logo.png">
+  <link rel="mask-icon" href="/blog/images/logo.png" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.css" integrity="sha256-gkQVf8UKZgQ0HyuxL/VnacadJ+D2Kox2TCEBuNQg5+w=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"sitjac.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":true},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/blog/search.json","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="Effective C++ 是 Scott Meyers 最经典的 C++ 经验总结之一，内容不追求面面俱到，而是聚焦在日常开发里最容易踩坑、也最值得反复思考的语言细节。 这篇文章作为阅读笔记，按条款整理其中的核心观点，尽量用简洁的方式记录每条建议背后的关注点，方便后续回顾和查阅。 它不适合作为 C++ 入门教材，但很适合已经写过一段时间 C++ 之后，用来系统修正常见编码习惯。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Effective C++ 阅读笔记">
+<meta property="og:url" content="https://sitjac.github.io/blog/effective-cpp-reading-note/index.html">
+<meta property="og:site_name" content="sitJac&#39;s Blog">
+<meta property="og:description" content="Effective C++ 是 Scott Meyers 最经典的 C++ 经验总结之一，内容不追求面面俱到，而是聚焦在日常开发里最容易踩坑、也最值得反复思考的语言细节。 这篇文章作为阅读笔记，按条款整理其中的核心观点，尽量用简洁的方式记录每条建议背后的关注点，方便后续回顾和查阅。 它不适合作为 C++ 入门教材，但很适合已经写过一段时间 C++ 之后，用来系统修正常见编码习惯。">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-08-01T11:21:59.000Z">
+<meta property="article:modified_time" content="2026-08-29T07:51:17.469Z">
+<meta property="article:author" content="sitJac">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://sitjac.github.io/blog/effective-cpp-reading-note/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://sitjac.github.io/blog/effective-cpp-reading-note/","path":"effective-cpp-reading-note/","title":"Effective C++ 阅读笔记"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Effective C++ 阅读笔记 | sitJac's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.umd.js" integrity="sha256-a+H7FYzJv6oU2hfsfDGM2Ohw/cR9v+hPfxHCLdmCrE8=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.5.0/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+  <script src="/blog/js/third-party/fancybox.js" defer></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+  <script class="next-config" data-name="katex" type="application/json">{"copy_tex_js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/copy-tex.min.js","integrity":"sha256-Us54+rSGDSTvIhKKUs4kygE2ipA0RXpWWh0/zLqw3bs="}}</script>
+  <script src="/blog/js/third-party/math/katex.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">sitJac's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/blog/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/blog/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-photos"><a href="/blog/photos/" rel="section"><i class="fa fa-camera fa-fw"></i>Photos</a></li><li class="menu-item menu-item-categories"><a href="/blog/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-bookmarks"><a href="/blog/bookmarks/" rel="section"><i class="fa fa-bookmark fa-fw"></i>Bookmarks</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="Searching..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Effective-C-Scott-Meyers"><span class="nav-number">1.</span> <span class="nav-text">Effective C++ - Scott Meyers</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9D%A1%E6%AC%BE-01%EF%BC%9A%E8%A7%86-C-%E4%B8%BA%E4%B8%80%E4%B8%AA%E8%AF%AD%E8%A8%80%E8%81%94%E9%82%A6"><span class="nav-number">1.1.</span> <span class="nav-text">条款 01：视 C++ 为一个语言联邦</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9D%A1%E6%AC%BE-02%EF%BC%9A%E5%B0%BD%E9%87%8F%E4%BB%A5-const%E3%80%81enum%E3%80%81inline-%E6%9B%BF%E6%8D%A2-define"><span class="nav-number">1.2.</span> <span class="nav-text">条款 02：尽量以 const、enum、inline 替换 #define</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9D%A1%E6%AC%BE-03%EF%BC%9A%E5%B0%BD%E5%8F%AF%E8%83%BD%E4%BD%BF%E7%94%A8-const"><span class="nav-number">1.3.</span> <span class="nav-text">条款 03：尽可能使用 const</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9D%A1%E6%AC%BE-04%EF%BC%9A%E7%A1%AE%E5%AE%9A%E5%AF%B9%E8%B1%A1%E8%A2%AB%E4%BD%BF%E7%94%A8%E5%89%8D%E5%B7%B2%E5%85%88%E8%A2%AB%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-number">1.4.</span> <span class="nav-text">条款 04：确定对象被使用前已先被初始化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9D%A1%E6%AC%BE-05%EF%BC%9A%E4%BA%86%E8%A7%A3-C-%E9%BB%98%E9%BB%98%E7%BC%96%E5%86%99%E5%B9%B6%E8%B0%83%E7%94%A8%E5%93%AA%E4%BA%9B%E5%87%BD%E6%95%B0"><span class="nav-number">1.5.</span> <span class="nav-text">条款 05：了解 C++ 默默编写并调用哪些函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9D%A1%E6%AC%BE-06%EF%BC%9A%E8%8B%A5%E4%B8%8D%E6%83%B3%E4%BD%BF%E7%94%A8%E7%BC%96%E8%AF%91%E5%99%A8%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E7%9A%84%E5%87%BD%E6%95%B0%EF%BC%8C%E5%B0%B1%E8%AF%A5%E6%98%8E%E7%A1%AE%E6%8B%92%E7%BB%9D"><span class="nav-number">1.6.</span> <span class="nav-text">条款 06：若不想使用编译器自动生成的函数，就该明确拒绝</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9D%A1%E6%AC%BE-07%EF%BC%9A%E4%B8%BA%E5%A4%9A%E6%80%81%E5%9F%BA%E7%B1%BB%E5%A3%B0%E6%98%8E-virtual-%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0"><span class="nav-number">1.7.</span> <span class="nav-text">条款 07：为多态基类声明 virtual 析构函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9D%A1%E6%AC%BE-08%EF%BC%9A%E5%88%AB%E8%AE%A9%E5%BC%82%E5%B8%B8%E9%80%83%E7%A6%BB%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0"><span class="nav-number">1.8.</span> <span class="nav-text">条款 08：别让异常逃离析构函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9D%A1%E6%AC%BE-09%EF%BC%9A%E7%BB%9D%E4%B8%8D%E5%9C%A8%E6%9E%84%E9%80%A0%E5%92%8C%E6%9E%90%E6%9E%84%E8%BF%87%E7%A8%8B%E4%B8%AD%E8%B0%83%E7%94%A8-virtual-%E5%87%BD%E6%95%B0"><span class="nav-number">1.9.</span> <span class="nav-text">条款 09：绝不在构造和析构过程中调用 virtual 函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9D%A1%E6%AC%BE-10%EF%BC%9A%E4%BB%A4-operator-%E8%BF%94%E5%9B%9E%E4%B8%80%E4%B8%AA-reference-to-this"><span class="nav-number">1.10.</span> <span class="nav-text">条款 10：令 operator&#x3D; 返回一个 reference to *this</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">sitJac</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://sitjac.github.io/blog/effective-cpp-reading-note/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="sitJac">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sitJac's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Effective C++ 阅读笔记 | sitJac's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Effective C++ 阅读笔记
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2025-08-01 19:21:59" itemprop="dateCreated datePublished" datetime="2025-08-01T19:21:59+08:00">2025-08-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/blog/categories/C/" itemprop="url" rel="index"><span itemprop="name">C++</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><div class="note info">
+<ul>
+<li><code>Effective C++</code> 是 Scott
+Meyers 最经典的 C++ 经验总结之一，内容不追求面面俱到，而是聚焦在日常开发里最容易踩坑、也最值得反复思考的语言细节。</li>
+<li>这篇文章作为阅读笔记，按条款整理其中的核心观点，尽量用简洁的方式记录每条建议背后的关注点，方便后续回顾和查阅。</li>
+<li>它不适合作为 C++ 入门教材，但很适合已经写过一段时间 C++ 之后，用来系统修正常见编码习惯。</li>
+</ul>
+</div>
+<span id="more"></span>
+<h2 id="Effective-C-Scott-Meyers">Effective C++ - Scott Meyers</h2>
+<h3 id="条款-01：视-C-为一个语言联邦">条款 01：视 C++ 为一个语言联邦</h3>
+<p>C++ 不是单一语言，而是四种子语言的组合：</p>
+<ul>
+<li>C：保留了过程式语言的高效与底层能力。</li>
+<li>Object-Oriented C++：类、继承、多态。</li>
+<li>Template C++：模板元编程与泛型编程。</li>
+<li>STL：容器、迭代器、算法、函数对象。</li>
+</ul>
+<p>这一条的核心意思是：<strong>不同子语言有不同规则，写代码时要知道自己正在使用哪一套语义。</strong></p>
+<h3 id="条款-02：尽量以-const、enum、inline-替换-define">条款 02：尽量以 const、enum、inline 替换 #define</h3>
+<p><code>#define</code> 本质上只是预处理阶段的文本替换，缺点很明显：</p>
+<ul>
+<li>没有作用域</li>
+<li>没有类型检查</li>
+<li>调试信息不友好</li>
+<li>容易出现副作用</li>
+</ul>
+<p>因此更推荐：</p>
+<ul>
+<li>常量：使用 <code>const</code> 或 <code>enum</code></li>
+<li>类内整型常量：优先 <code>static const</code> 或 <code>enum</code></li>
+<li>函数宏：使用 <code>inline</code> 函数</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">const</span> <span class="type">int</span> MaxSize = <span class="number">100</span>;</span><br><span class="line"><span class="keyword">enum</span> &#123; NumTurns = <span class="number">5</span> &#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="type">int</span> <span class="title">square</span><span class="params">(<span class="type">int</span> x)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> x * x;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>一句话总结：<strong>尽量让编译器替你工作，而不是依赖预处理器。</strong></p>
+<h3 id="条款-03：尽可能使用-const">条款 03：尽可能使用 const</h3>
+<p><code>const</code> 的价值不只是“不可修改”，更重要的是它能明确表达接口意图。</p>
+<p>常见场景：</p>
+<ul>
+<li>修饰变量：避免误改</li>
+<li>修饰指针：区分“指针本身不可变”还是“指向内容不可变”</li>
+<li>修饰成员函数：说明该函数不会修改对象状态</li>
+<li>修饰参数和返回值：提升接口可读性</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">const</span> <span class="type">char</span>* p;       <span class="comment">// 指向常量的指针</span></span><br><span class="line"><span class="type">char</span>* <span class="type">const</span> p2 = p0; <span class="comment">// 常量指针</span></span><br><span class="line"><span class="type">const</span> <span class="type">char</span>* <span class="type">const</span> p3 = p0;</span><br></pre></td></tr></table></figure>
+<p>对于成员函数：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">TextBlock</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span>&amp; <span class="keyword">operator</span>[](std::<span class="type">size_t</span> pos) <span class="type">const</span>;</span><br><span class="line">    <span class="type">char</span>&amp; <span class="keyword">operator</span>[](std::<span class="type">size_t</span> pos);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>原则很简单：<strong>只要某个值不该被改，就尽早加上 <code>const</code>。</strong></p>
+<h3 id="条款-04：确定对象被使用前已先被初始化">条款 04：确定对象被使用前已先被初始化</h3>
+<p>C++ 不保证内置类型一定被自动初始化，所以最稳妥的做法是：<strong>声明时就初始化。</strong></p>
+<p>对于类成员，优先使用成员初始化列表，而不是在构造函数体内赋值：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Widget</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Widget</span>() : <span class="built_in">x</span>(<span class="number">0</span>), <span class="built_in">y</span>(<span class="number">0</span>) &#123;&#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="type">int</span> x;</span><br><span class="line">    <span class="type">int</span> y;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>原因有两个：</p>
+<ul>
+<li>更高效：直接初始化，而不是先默认构造再赋值</li>
+<li>更安全：避免未初始化状态</li>
+</ul>
+<p>另外，跨编译单元的 non-local
+static 对象存在初始化顺序问题。常见解法是把它改成函数内的 local static：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Logger&amp; <span class="title">globalLogger</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">static</span> Logger logger;</span><br><span class="line">    <span class="keyword">return</span> logger;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="条款-05：了解-C-默默编写并调用哪些函数">条款 05：了解 C++ 默默编写并调用哪些函数</h3>
+<p>如果你没有显式声明，编译器可能会为类自动生成这些函数：</p>
+<ul>
+<li>默认构造函数</li>
+<li>拷贝构造函数</li>
+<li>拷贝赋值运算符</li>
+<li>析构函数</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span> &#123;&#125;;</span><br></pre></td></tr></table></figure>
+<p>大致会被视作：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Empty</span>();</span><br><span class="line">    <span class="built_in">Empty</span>(<span class="type">const</span> Empty&amp;);</span><br><span class="line">    Empty&amp; <span class="keyword">operator</span>=(<span class="type">const</span> Empty&amp;);</span><br><span class="line">    ~<span class="built_in">Empty</span>();</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>这条的重点是：<strong>编译器会帮你生成成员函数，但生成出来的不一定符合你的语义要求。</strong></p>
+<h3 id="条款-06：若不想使用编译器自动生成的函数，就该明确拒绝">条款 06：若不想使用编译器自动生成的函数，就该明确拒绝</h3>
+<p>有些类天生就不该被拷贝，例如：</p>
+<ul>
+<li>管理互斥锁的类</li>
+<li>文件句柄封装类</li>
+<li>单例类</li>
+</ul>
+<p>这种情况下，不要依赖“大家自觉不拷贝”，而要从语法层面禁止。</p>
+<p>现代 C++ 最推荐的写法是：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Uncopyable</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Uncopyable</span>() = <span class="keyword">default</span>;</span><br><span class="line">    ~<span class="built_in">Uncopyable</span>() = <span class="keyword">default</span>;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">Uncopyable</span>(<span class="type">const</span> Uncopyable&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">    Uncopyable&amp; <span class="keyword">operator</span>=(<span class="type">const</span> Uncopyable&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>老式写法是声明为 <code>private</code> 且不提供定义，但现在 <code>= delete</code> 更直接清晰。</p>
+<h3 id="条款-07：为多态基类声明-virtual-析构函数">条款 07：为多态基类声明 virtual 析构函数</h3>
+<p>如果一个类打算作为基类，并且会通过基类指针操作派生类对象，那么析构函数必须是 <code>virtual</code>。</p>
+<p>否则会出现“只析构基类部分、不析构派生类部分”的问题，最终导致资源泄漏。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Base</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">virtual</span> ~<span class="built_in">Base</span>() = <span class="keyword">default</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Derived</span> : <span class="keyword">public</span> Base &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ~<span class="built_in">Derived</span>() &#123;</span><br><span class="line">        <span class="comment">// 释放资源</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>只有一种情况通常不需要虚析构：<strong>类不作为多态基类使用。</strong></p>
+<h3 id="条款-08：别让异常逃离析构函数">条款 08：别让异常逃离析构函数</h3>
+<p>析构函数通常用于资源释放，而资源释放往往发生在异常传播过程中。如果析构函数自己再抛异常，程序很容易直接
+<code>terminate</code>。</p>
+<p>因此析构函数应遵循两个原则：</p>
+<ul>
+<li>自己内部吞掉异常</li>
+<li>或者把可能失败的操作挪到普通成员函数里，让调用者显式处理</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">DBConn</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ~<span class="built_in">DBConn</span>() &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="built_in">close</span>();</span><br><span class="line">        &#125; <span class="built_in">catch</span> (...) &#123;</span><br><span class="line">            <span class="comment">// 记录错误，禁止异常继续向外传播</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">close</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>一句话：<strong>析构函数应该尽最大努力善后，但不要把异常往外丢。</strong></p>
+<h3 id="条款-09：绝不在构造和析构过程中调用-virtual-函数">条款 09：绝不在构造和析构过程中调用 virtual 函数</h3>
+<p>在构造基类阶段，派生类部分尚未完成初始化；在析构基类阶段，派生类部分已经被销毁。</p>
+<p>所以此时调用 <code>virtual</code>
+函数，并不会表现出你想要的“多态行为”，而是只会调用当前构造/析构阶段所属类的版本。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Transaction</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Transaction</span>() &#123;</span><br><span class="line">        <span class="built_in">logTransaction</span>(); <span class="comment">// 不安全</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">logTransaction</span><span class="params">()</span> <span class="type">const</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>如果你希望不同派生类执行不同逻辑，应改成：</p>
+<ul>
+<li>让派生类把必要信息先准备好</li>
+<li>再把这些信息传给基类构造函数</li>
+<li>或者在对象构造完成后再调用普通接口</li>
+</ul>
+<h3 id="条款-10：令-operator-返回一个-reference-to-this">条款 10：令 operator= 返回一个 reference to *this</h3>
+<p>赋值运算符应返回当前对象的引用，这样才能支持连锁赋值，并保持与内置类型一致的行为。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Widget</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Widget&amp; <span class="keyword">operator</span>=(<span class="type">const</span> Widget&amp; rhs) &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span> != &amp;rhs) &#123;</span><br><span class="line">            <span class="comment">// 复制 rhs 的内容</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>这样才能写出：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">x = y = z;</span><br></pre></td></tr></table></figure>
+<p>不只是 <code>operator=</code>，像 <code>+=</code>、<code>-=</code>、<code>*=</code> 这类赋值相关运算符，通常也都应该返回 <code>*this</code>
+的引用。</p>
+<div class="note info"><p>To be continued...</p></div>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/conan-tutorial/" rel="prev" title="Conan 使用手册">
+                  <i class="fa fa-angle-left"></i> Conan 使用手册
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/classification-evaluation/" rel="next" title="机器学习与统计分类中的性能评估">
+                  机器学习与统计分类中的性能评估 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">sitJac</span>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

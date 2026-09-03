@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.1.2">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/logo.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/logo.png">
+  <link rel="mask-icon" href="/blog/images/logo.png" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.css" integrity="sha256-gkQVf8UKZgQ0HyuxL/VnacadJ+D2Kox2TCEBuNQg5+w=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"sitjac.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":true},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/blog/search.json","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="第一题吃货馋嘴分披萨，考察深度优先遍历和动态规划处理环形数组问题，在一个环形数组（比萨）中，每次可以选择左边或右边的元素，并且每次选择的元素必须是当前可选元素中的最大值，求能够选择的元素的最大和。 第二题字符串变换最小字符串，考察对字符串的处理，从后面向前面查找，把倒数第一个字典序最小字符的与第一个字符替换，保证最小。 第三题满足要求的最长子串，考察滑动窗口+字符串的处理，使用滑动窗口来找出只">
+<meta property="og:type" content="article">
+<meta property="og:title" content="华为OD机试 C卷 三道题目思路汇总">
+<meta property="og:url" content="https://sitjac.github.io/blog/recruitment-huawei-od-2024-03-30/index.html">
+<meta property="og:site_name" content="sitJac&#39;s Blog">
+<meta property="og:description" content="第一题吃货馋嘴分披萨，考察深度优先遍历和动态规划处理环形数组问题，在一个环形数组（比萨）中，每次可以选择左边或右边的元素，并且每次选择的元素必须是当前可选元素中的最大值，求能够选择的元素的最大和。 第二题字符串变换最小字符串，考察对字符串的处理，从后面向前面查找，把倒数第一个字典序最小字符的与第一个字符替换，保证最小。 第三题满足要求的最长子串，考察滑动窗口+字符串的处理，使用滑动窗口来找出只">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-03-30T03:15:00.000Z">
+<meta property="article:modified_time" content="2026-08-29T07:51:17.469Z">
+<meta property="article:author" content="sitJac">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://sitjac.github.io/blog/recruitment-huawei-od-2024-03-30/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://sitjac.github.io/blog/recruitment-huawei-od-2024-03-30/","path":"recruitment-huawei-od-2024-03-30/","title":"华为OD机试 C卷 三道题目思路汇总"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>华为OD机试 C卷 三道题目思路汇总 | sitJac's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.umd.js" integrity="sha256-a+H7FYzJv6oU2hfsfDGM2Ohw/cR9v+hPfxHCLdmCrE8=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.5.0/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+  <script src="/blog/js/third-party/fancybox.js" defer></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+  <script class="next-config" data-name="katex" type="application/json">{"copy_tex_js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/copy-tex.min.js","integrity":"sha256-Us54+rSGDSTvIhKKUs4kygE2ipA0RXpWWh0/zLqw3bs="}}</script>
+  <script src="/blog/js/third-party/math/katex.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">sitJac's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/blog/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/blog/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-photos"><a href="/blog/photos/" rel="section"><i class="fa fa-camera fa-fw"></i>Photos</a></li><li class="menu-item menu-item-categories"><a href="/blog/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-bookmarks"><a href="/blog/bookmarks/" rel="section"><i class="fa fa-bookmark fa-fw"></i>Bookmarks</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="Searching..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E9%A2%98-%E5%90%83%E8%B4%A7%E9%A6%8B%E5%98%B4%E5%88%86%E6%8A%AB%E8%90%A8%EF%BC%88100%EF%BC%89"><span class="nav-number">1.</span> <span class="nav-text">第一题 吃货馋嘴分披萨（100）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E9%A2%98-%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8F%98%E6%8D%A2%E6%9C%80%E5%B0%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%88100%EF%BC%89"><span class="nav-number">2.</span> <span class="nav-text">第二题 字符串变换最小字符串（100）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E9%81%93-%E6%BB%A1%E8%B6%B3%E8%A6%81%E6%B1%82%E7%9A%84%E6%9C%80%E9%95%BF%E5%AD%90%E4%B8%B2%EF%BC%88200%EF%BC%89"><span class="nav-number">3.</span> <span class="nav-text">第三道 满足要求的最长子串（200）</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">sitJac</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://sitjac.github.io/blog/recruitment-huawei-od-2024-03-30/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="sitJac">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sitJac's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="华为OD机试 C卷 三道题目思路汇总 | sitJac's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          华为OD机试 C卷 三道题目思路汇总
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-03-30 11:15:00" itemprop="dateCreated datePublished" datetime="2024-03-30T11:15:00+08:00">2024-03-30</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/blog/categories/Review/" itemprop="url" rel="index"><span itemprop="name">Review</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><div class="note info">
+<ul>
+<li>第一题<code>吃货馋嘴分披萨</code>，考察深度优先遍历和动态规划处理环形数组问题，在一个环形数组（比萨）中，每次可以选择左边或右边的元素，并且每次选择的元素必须是当前可选元素中的最大值，求能够选择的元素的最大和。</li>
+<li>第二题<code>字符串变换最小字符串</code>，考察对字符串的处理，从后面向前面查找，把倒数第一个字典序最小字符的与第一个字符替换，保证最小。</li>
+<li>第三题<code>满足要求的最长子串</code>，考察滑动窗口+字符串的处理，使用滑动窗口来找出只包含一个字母和任意数量数字的最长子串。</li>
+</ul>
+</div>
+<span id="more"></span>
+<h4 id="第一题-吃货馋嘴分披萨（100）">第一题 吃货馋嘴分披萨（100）</h4>
+<p>&quot;吃货&quot;和&quot;馋嘴&quot;两人到披萨店点了一份铁盘圆形披萨，并嘱咐店员将披萨按放射状切成大小相同的偶数个小块。但是粗心的服务员将披萨切成了每块大小都完全不同奇数块，且肉眼能分辨出大小。</p>
+<p>由于两人都想吃到最多的披萨，他们商量了一个他们认为公平的分法：从&quot;吃货&quot;开始，轮流取被萨。除了第一块破产可以任意选取外，其他都必须从缺口开始选。</p>
+<p>他俩选披萨的思路不同。&quot;馋嘴&quot;每次都会选最大块的披萨，而且&quot;吃货&quot;知道&quot;馋嘴&quot;的想法。</p>
+<p>已知披萨小块的数量以及每块的大小，求&quot;吃货&quot;能分得的最大的披萨大小的总和。</p>
+<p>输入描述：</p>
+<blockquote>
+<p>1.第1行为一个正整数奇数 N，表示披萨小块数量。2.接下来的第 2 行到第 N +
+1行(共 N 行)，每行为一个正整数，表示第 i 块披萨的大小。</p>
+<p>说明：3 &lt;= N &lt;= 500 1 &lt;= i &lt;= N每块披萨的大小范围为[1, 2147483647]</p>
+</blockquote>
+<p>输出描述：</p>
+<blockquote>
+<p>&quot;吃货&quot;能分到的最大的披萨大小的总和。</p>
+</blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">Input:</span></span><br><span class="line"><span class="comment">5</span></span><br><span class="line"><span class="comment">8</span></span><br><span class="line"><span class="comment">2</span></span><br><span class="line"><span class="comment">10</span></span><br><span class="line"><span class="comment">5</span></span><br><span class="line"><span class="comment">7</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">Output:</span></span><br><span class="line"><span class="comment">19</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">Description:</span></span><br><span class="line"><span class="comment">此例子中，有5块披萨，每块大小分别为8、2、10、5、7</span></span><br><span class="line"><span class="comment">按照如下顺序拿披萨，可以使&quot;吃货&quot;拿到最多的披萨:</span></span><br><span class="line"><span class="comment">&quot;吃货&quot;拿大小为10的披萨</span></span><br><span class="line"><span class="comment">&quot;馋嘴&quot;拿大小为5的披萨</span></span><br><span class="line"><span class="comment">&quot;吃货&quot;拿大小为7的披萨</span></span><br><span class="line"><span class="comment">&quot;馋嘴&quot;拿大小为8的披萨</span></span><br><span class="line"><span class="comment">&quot;吃货&quot;拿大小为2的披萨</span></span><br><span class="line"><span class="comment">至披萨瓜分完毕，&quot;吃货&quot;拿到的披萨总大小为10 + 7 + 2 = 19</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">注：可能存在多种拿法，以上只身其中一种拿法。</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line">vector&lt;vector&lt;<span class="type">long</span>&gt;&gt; memory; <span class="comment">// 用于存储已经计算过的子问题的结果</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用DFS和DP的方法来解决问题</span></span><br><span class="line"><span class="function"><span class="type">long</span> <span class="title">backtrace</span><span class="params">(vector&lt;<span class="type">long</span>&gt; nums, <span class="type">int</span> n, <span class="type">int</span> left, <span class="type">int</span> right)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 调整left和right的值，使其始终在数组的范围内</span></span><br><span class="line">    <span class="keyword">if</span>(nums[left] &gt; nums[right]) &#123;</span><br><span class="line">        left = left &lt; <span class="number">0</span> ? left : (left + n + <span class="number">1</span>) % n;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span>(nums[left] &lt; nums[right]) &#123;</span><br><span class="line">        right = right &lt; <span class="number">0</span> ? right : (right + n - <span class="number">1</span>) % n;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 如果当前子问题的结果已经计算过，直接返回结果</span></span><br><span class="line">    <span class="keyword">if</span>(memory[left][right] &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="comment">// 如果left和right相等，说明只有一个元素可以选择，直接返回这个元素的值</span></span><br><span class="line">        <span class="keyword">if</span>(left == right) &#123;</span><br><span class="line">            memory[left][right] = nums[left];</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 否则，计算选择左边元素和选择右边元素两种情况的最大值</span></span><br><span class="line">            <span class="type">int</span> newLeft = (left + <span class="number">1</span>) % n;</span><br><span class="line">            <span class="type">int</span> newRight = (right + n - <span class="number">1</span>) % n;</span><br><span class="line">            memory[left][right] = nums[left] + <span class="built_in">backtrace</span>(nums, n, newLeft, right);</span><br><span class="line">            <span class="keyword">if</span>(nums[right] + <span class="built_in">backtrace</span>(nums, n, left, newRight) &gt; memory[left][right]) &#123;</span><br><span class="line">                memory[left][right] = nums[right] + <span class="built_in">backtrace</span>(nums, n, left, newRight);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> memory[left][right];</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> memory[left][right];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> n;</span><br><span class="line">    <span class="keyword">while</span>(cin &gt;&gt; n) &#123;</span><br><span class="line">        <span class="function">vector&lt;<span class="type">long</span>&gt; <span class="title">nums</span><span class="params">(n)</span></span>;    <span class="comment">// 披萨大小</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            cin &gt;&gt; nums[i];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 初始化memory数组</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            vector&lt;<span class="type">long</span>&gt; tmp;</span><br><span class="line">            memory.<span class="built_in">push_back</span>(tmp);</span><br><span class="line">            <span class="keyword">for</span>(<span class="type">int</span> j = <span class="number">0</span>; j &lt; n; j++) &#123;</span><br><span class="line">                memory[i].<span class="built_in">push_back</span>(<span class="number">0</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="type">long</span> res = <span class="number">0</span>;</span><br><span class="line">        <span class="type">int</span> i = <span class="number">0</span>;  <span class="comment">// 遍历数组</span></span><br><span class="line">        <span class="keyword">while</span>(<span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (i &gt; n - <span class="number">1</span>) &#123;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="type">int</span> left = (i + n + <span class="number">1</span>) % n;</span><br><span class="line">                <span class="type">int</span> right = (i + n - <span class="number">1</span>) % n;</span><br><span class="line">                <span class="type">long</span> target = <span class="built_in">backtrace</span>(nums, n, left, right);</span><br><span class="line">                <span class="keyword">if</span>(target + nums[i] &gt; res) &#123;</span><br><span class="line">                    res = target + nums[i];</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            i++;</span><br><span class="line">        &#125;</span><br><span class="line">        cout &lt;&lt; res &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="第二题-字符串变换最小字符串（100）">第二题 字符串变换最小字符串（100）</h4>
+<p>给定一个字符串s，最多只能进行一次变换，返回变换后能得到的最小字符串（按照字典序进行比较）。变换规则：交换字符串中任意两个不同位置的字符。</p>
+<p>输入描述：</p>
+<blockquote>
+<p>一串小写字母组成的字符串s。</p>
+<p>说明: s是都是小写字符组成1 &lt;= s.length &lt;= 1000</p>
+</blockquote>
+<p>输出描述：</p>
+<blockquote>
+<p>按照要求进行变换得到的最小字符串。</p>
+</blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">Input:</span></span><br><span class="line"><span class="comment">abcdef</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">Output:</span></span><br><span class="line"><span class="comment">abcdef</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">Description:</span></span><br><span class="line"><span class="comment">abcdef已经是最小字符串，不需要交换</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">Input:</span></span><br><span class="line"><span class="comment">bcdefa</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">Output:</span></span><br><span class="line"><span class="comment">acdefb</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">Description:</span></span><br><span class="line"><span class="comment">a和b进行位置交换，可以等到最小字符串</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    string str;</span><br><span class="line">    <span class="keyword">while</span>(cin &gt;&gt; str) &#123;</span><br><span class="line">        <span class="type">char</span> minChar = <span class="string">&#x27;z&#x27;</span>;</span><br><span class="line">        <span class="type">int</span> minCharIndex = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i = str.<span class="built_in">size</span>() - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) &#123; <span class="comment">// 注意遍历顺序！！！</span></span><br><span class="line">            <span class="keyword">if</span>(str[i] &lt;= minChar) &#123; <span class="comment">// 确保如果有多个最小字符，总是选择最后一个</span></span><br><span class="line">                minChar = str[i];</span><br><span class="line">                minCharIndex = i;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="type">char</span> tmp = str[<span class="number">0</span>];</span><br><span class="line">        str[<span class="number">0</span>] = minChar;</span><br><span class="line">        str[minCharIndex] = tmp;</span><br><span class="line"></span><br><span class="line">        cout &lt;&lt; str &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="第三道-满足要求的最长子串（200）">第三道 满足要求的最长子串（200）</h4>
+<p>给定一个字符串，只包含字母和数字，按要求找出字符串中的最长（连续）子串的长度，字符串本身是其最长的子串，子串要求：</p>
+<ol>
+<li>只包含1个字母(a ~ z, A ~ Z)，其余必须是数字。</li>
+<li>字母可以在子串中的任意位置。</li>
+</ol>
+<p>如果找不到满足要求的子串，如全是字母或全是数字，则返回-1。</p>
+<p>输入描述：</p>
+<blockquote>
+<p>字符串(只包含字母和数字)</p>
+</blockquote>
+<p>输出描述：</p>
+<blockquote>
+<p>子串的长度，没有满足要求的子串，返回-1</p>
+</blockquote>
+<p>解题思路：</p>
+<blockquote>
+<p>什么时候右边界滑动：每次滑动一个什么时候形成滑动窗口：当charCount = 1 &amp;&amp;
+numCount &gt;=1什么时候左边界滑动：当charCount &gt; 1时，当charCount == 1时停止</p>
+</blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">Input:</span></span><br><span class="line"><span class="comment">abC124ACb</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">Output:</span></span><br><span class="line"><span class="comment">4</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">Description:</span></span><br><span class="line"><span class="comment">满足条件的最长子串是C124或者124A，长度都是4</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">Input:</span></span><br><span class="line"><span class="comment">a5</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">Output:</span></span><br><span class="line"><span class="comment">2</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">Description:</span></span><br><span class="line"><span class="comment">字符串自身就是满足条件的子串，长度为2</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">Input:</span></span><br><span class="line"><span class="comment">aBB9</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">Output:</span></span><br><span class="line"><span class="comment">2</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">Description:</span></span><br><span class="line"><span class="comment">满足条件的子串为B9，长度为2</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">Input:</span></span><br><span class="line"><span class="comment">abcdef</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">Output:</span></span><br><span class="line"><span class="comment">-1</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">Description:</span></span><br><span class="line"><span class="comment">找不到满足要求的子串，返回-1</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 只包含一个字母 + 字母可在任意位置</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">maxLength</span><span class="params">(string str)</span> </span>&#123;</span><br><span class="line">     <span class="type">int</span> left = <span class="number">0</span>, right = <span class="number">0</span>; <span class="comment">// 滑动窗口</span></span><br><span class="line">     <span class="type">int</span> charCount = <span class="number">0</span>, digitCount = <span class="number">0</span>, maxCount = <span class="number">-1</span>;</span><br><span class="line">     <span class="keyword">while</span>(right &lt; str.<span class="built_in">size</span>()) &#123;</span><br><span class="line">         <span class="keyword">if</span>(<span class="built_in">isdigit</span>(str[right])) &#123;</span><br><span class="line">             digitCount++;</span><br><span class="line">         &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">             charCount++;</span><br><span class="line">         &#125;</span><br><span class="line">         <span class="keyword">if</span>(charCount == <span class="number">1</span> &amp;&amp; digitCount &gt; <span class="number">0</span>) &#123;</span><br><span class="line">             maxCount = <span class="built_in">max</span>(maxCount, right + <span class="number">1</span> - left);</span><br><span class="line">         &#125;</span><br><span class="line">         <span class="keyword">while</span>(charCount &gt; <span class="number">1</span>) &#123;</span><br><span class="line">             <span class="keyword">if</span>(<span class="built_in">isdigit</span>((str[left]))) &#123;</span><br><span class="line">                 digitCount--;</span><br><span class="line">             &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                 charCount--;</span><br><span class="line">             &#125;</span><br><span class="line">             left++;</span><br><span class="line">         &#125;</span><br><span class="line">        right++;</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="keyword">return</span> maxCount;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    string str;</span><br><span class="line">    <span class="keyword">while</span>(cin &gt;&gt; str) &#123;</span><br><span class="line">        cout &lt;&lt; <span class="built_in">maxLength</span>(str) &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/recruitment-technology-review-2024/" rel="prev" title="技术面试问题回顾与总结">
+                  <i class="fa fa-angle-left"></i> 技术面试问题回顾与总结
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/game-guides-human-resource-machine/" rel="next" title="Human Resource Machine Completion Guide">
+                  Human Resource Machine Completion Guide <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">sitJac</span>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

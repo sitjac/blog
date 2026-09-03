@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.1.2">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/logo.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/logo.png">
+  <link rel="mask-icon" href="/blog/images/logo.png" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.css" integrity="sha256-gkQVf8UKZgQ0HyuxL/VnacadJ+D2Kox2TCEBuNQg5+w=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"sitjac.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":true},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/blog/search.json","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="对象存储是一种存储结构，它将数据作为对象进行管理，而不是文件或块，每个对象包括数据、元数据和唯一标识符。 在软件开发中，对象存储通常用于存储非结构化数据，如图片、视频、日志文件等。 使用对象存储，可以通过RESTful API从任何地方访问数据，这使得对象存储非常适合用于构建云原生应用，或者需要大规模数据存储和访问的应用。 国内外许多云服务提供商，都提供对象存储服务：  国内  阿里云OSS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="华为对象云存储OBS开发记录">
+<meta property="og:url" content="https://sitjac.github.io/blog/huawei-obs/index.html">
+<meta property="og:site_name" content="sitJac&#39;s Blog">
+<meta property="og:description" content="对象存储是一种存储结构，它将数据作为对象进行管理，而不是文件或块，每个对象包括数据、元数据和唯一标识符。 在软件开发中，对象存储通常用于存储非结构化数据，如图片、视频、日志文件等。 使用对象存储，可以通过RESTful API从任何地方访问数据，这使得对象存储非常适合用于构建云原生应用，或者需要大规模数据存储和访问的应用。 国内外许多云服务提供商，都提供对象存储服务：  国内  阿里云OSS">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-08-24T03:35:54.000Z">
+<meta property="article:modified_time" content="2026-08-29T07:51:17.473Z">
+<meta property="article:author" content="sitJac">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://sitjac.github.io/blog/huawei-obs/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://sitjac.github.io/blog/huawei-obs/","path":"huawei-obs/","title":"华为对象云存储OBS开发记录"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>华为对象云存储OBS开发记录 | sitJac's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.umd.js" integrity="sha256-a+H7FYzJv6oU2hfsfDGM2Ohw/cR9v+hPfxHCLdmCrE8=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.5.0/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+  <script src="/blog/js/third-party/fancybox.js" defer></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+  <script class="next-config" data-name="katex" type="application/json">{"copy_tex_js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/copy-tex.min.js","integrity":"sha256-Us54+rSGDSTvIhKKUs4kygE2ipA0RXpWWh0/zLqw3bs="}}</script>
+  <script src="/blog/js/third-party/math/katex.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">sitJac's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/blog/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/blog/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-photos"><a href="/blog/photos/" rel="section"><i class="fa fa-camera fa-fw"></i>Photos</a></li><li class="menu-item menu-item-categories"><a href="/blog/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-bookmarks"><a href="/blog/bookmarks/" rel="section"><i class="fa fa-bookmark fa-fw"></i>Bookmarks</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="Searching..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E5%8F%91%E6%8C%87%E5%8D%97"><span class="nav-number">1.</span> <span class="nav-text">开发指南</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E4%BE%9D%E8%B5%96"><span class="nav-number">2.</span> <span class="nav-text">安装依赖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%89%B4%E6%9D%83%E6%96%B9%E5%BC%8F"><span class="nav-number">3.</span> <span class="nav-text">鉴权方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%AE%B5%E4%B8%8A%E4%BC%A0"><span class="nav-number">4.</span> <span class="nav-text">分段上传</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96%E4%B8%8A%E4%BC%A0%E4%BB%BB%E5%8A%A1"><span class="nav-number">4.1.</span> <span class="nav-text">初始化上传任务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8A%E4%BC%A0%E6%AE%B5"><span class="nav-number">4.2.</span> <span class="nav-text">上传段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%88%E5%B9%B6%E6%AE%B5"><span class="nav-number">4.3.</span> <span class="nav-text">合并段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81"><span class="nav-number">4.4.</span> <span class="nav-text">完整代码</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">sitJac</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://sitjac.github.io/blog/huawei-obs/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="sitJac">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sitJac's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="华为对象云存储OBS开发记录 | sitJac's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          华为对象云存储OBS开发记录
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2022-08-24 11:35:54" itemprop="dateCreated datePublished" datetime="2022-08-24T11:35:54+08:00">2022-08-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/blog/categories/Works/" itemprop="url" rel="index"><span itemprop="name">Works</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><div class="note info">
+<ul>
+<li>对象存储是一种存储结构，它将数据作为对象进行管理，而不是文件或块，每个对象包括数据、元数据和唯一标识符。</li>
+<li>在软件开发中，对象存储通常用于存储非结构化数据，如图片、视频、日志文件等。</li>
+<li>使用对象存储，可以通过RESTful API从任何地方访问数据，这使得对象存储非常适合用于构建<a target="_blank" rel="noopener" href="https://c.biancheng.net/view/9857.html">云原生</a>应用，或者需要大规模数据存储和访问的应用。</li>
+<li>国内外许多云服务提供商，都提供对象存储服务：
+<ul>
+<li>国内
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.aliyun.com/product/oss/">阿里云OSS</a></li>
+<li><a target="_blank" rel="noopener" href="https://cloud.tencent.com/product/cos">腾讯云COS</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.huaweicloud.com/product/obs.html">华为云OBS</a></li>
+<li><a target="_blank" rel="noopener" href="https://cloud.baidu.com/product/bos.html">百度云BOS</a></li>
+</ul>
+</li>
+<li>国外
+<ul>
+<li><a target="_blank" rel="noopener" href="https://aws.amazon.com/cn/s3/">Amazon S3（Simple Storage Service）</a></li>
+<li><a target="_blank" rel="noopener" href="https://cloud.google.com/storage">Google Cloud Storage</a></li>
+<li><a target="_blank" rel="noopener" href="https://azure.microsoft.com/en-us/products/storage/blobs">Microsoft Azure Blob Storage</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.ibm.com/products/cloud-object-storage">IBM Cloud Object Storage</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>本文基于OBS Java API，从头开始实现了一个最简单的分段上传大文件的功能。</li>
+</ul>
+</div>
+<span id="more"></span>
+<h2 id="开发指南">开发指南</h2>
+<p><a target="_blank" rel="noopener" href="https://support.huaweicloud.com/obs/index.html">对象存储服务 开发指南</a></p>
+<p>OBS提供了REST（Representational State Transfer）风格API，支持通过HTTP/HTTPS请求调用，调用方法请参见<a target="_blank" rel="noopener" href="https://support.huaweicloud.com/api-obs/obs_04_0006.html">如何调用API</a>。</p>
+<p>同时OBS还提供多种编程语言的SDK，SDK的使用方法请参见<a target="_blank" rel="noopener" href="https://support.huaweicloud.com/sdkreference-obs/obs_02_0001.html">SDK参考</a>。</p>
+<h2 id="安装依赖">安装依赖</h2>
+<p>首先，需要在项目中添加华为云OBS的Java SDK依赖。如果项目是Maven项目，可以在pom.xml文件中添加以下依赖：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;com.moses.obs&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;spring-boot-start-obs&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;<span class="number">1.0</span><span class="number">.0</span>&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="鉴权方式">鉴权方式</h2>
+<p>OBS通过用户帐号中的AK和SK进行签名验证，确保通过授权的帐号才能访问指定的OBS资源。</p>
+<ul>
+<li>AK：Access Key ID，接入键标识，用户在对象存储服务系统中的接入键标识，一个接入键标识唯一对应一个用户，一个用户可以同时拥有多个接入键标识。对象存储服务系统通过接入键标识识别访问系统的用户。</li>
+<li>SK：Secret Access Key，安全接入键，用户在对象存储服务系统中的安全接入键，是用户访问对象存储服务系统的密钥，用户根据安全接入键和请求头域生成鉴权信息。安全接入键和接入键标识一一对应。</li>
+</ul>
+<h2 id="分段上传">分段上传</h2>
+<p>对于超过5G的大文件采用分段上传方式，分段上传分为如下3个步骤：</p>
+<ul>
+<li>步骤1 初始化分段上传任务（ObsClient.initiateMultipartUpload）。</li>
+<li>步骤2 逐个或并行上传段（ObsClient.uploadPart）。</li>
+<li>步骤3 合并段（ObsClient.completeMultipartUpload）或
+取消分段上传任务（ObsClient.abortMultipartUpload）。</li>
+</ul>
+<h3 id="初始化上传任务">初始化上传任务</h3>
+<ul>
+<li>使用分段上传方式传输数据前，必须先通知OBS初始化一个分段上传任务。该操作会返回一个OBS服务端创建的全局唯一标识（Upload ID），用于标识本次分段上传任务，可以根据这个唯一标识来发起相关的操作，如取消分段上传任务、列举分段上传任务、列举已上传的段等。</li>
+<li>通过ObsClient.initiateMultipartUpload初始化一个分段上传任务：</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Endpoint以北京四为例，其他地区请按实际情况填写。</span></span><br><span class="line"><span class="type">String</span> <span class="variable">endPoint</span> <span class="operator">=</span> <span class="string">&quot;https://obs.cn-north-4.myhuaweicloud.com&quot;</span>;</span><br><span class="line"><span class="type">String</span> <span class="variable">ak</span> <span class="operator">=</span> System.getenv(<span class="string">&quot;ACCESS_KEY_ID&quot;</span>);</span><br><span class="line"><span class="type">String</span> <span class="variable">sk</span> <span class="operator">=</span> System.getenv(<span class="string">&quot;SECRET_ACCESS_KEY_ID&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建ObsClient实例</span></span><br><span class="line"><span class="type">ObsClient</span> <span class="variable">obsClient</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObsClient</span>(ak, sk, endPoint);</span><br><span class="line"></span><br><span class="line"><span class="type">InitiateMultipartUploadRequest</span> <span class="variable">request</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">InitiateMultipartUploadRequest</span>(<span class="string">&quot;bucketname&quot;</span>, <span class="string">&quot;objectname&quot;</span>);</span><br><span class="line"><span class="type">ObjectMetadata</span> <span class="variable">metadata</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectMetadata</span>();</span><br><span class="line">metadata.addUserMetadata(<span class="string">&quot;property&quot;</span>, <span class="string">&quot;property-value&quot;</span>);</span><br><span class="line">metadata.setContentType(<span class="string">&quot;text/plain&quot;</span>);</span><br><span class="line">request.setMetadata(metadata);</span><br><span class="line"><span class="type">InitiateMultipartUploadResult</span> <span class="variable">result</span> <span class="operator">=</span> obsClient.initiateMultipartUpload(request);</span><br><span class="line"></span><br><span class="line"><span class="type">String</span> <span class="variable">uploadId</span> <span class="operator">=</span> result.getUploadId();</span><br><span class="line">System.out.println(<span class="string">&quot;\t&quot;</span> + uploadId);</span><br></pre></td></tr></table></figure>
+<h3 id="上传段">上传段</h3>
+<ul>
+<li>初始化一个分段上传任务之后，可以根据指定的对象名和Upload ID来分段上传数据。</li>
+<li>每一个上传的段都有一个标识它的号码——分段号（Part Number，范围是1~10000）。</li>
+<li>对于同一个Upload ID，该分段号不但唯一标识这一段数据，也标识了这段数据在整个对象内的相对位置。</li>
+<li>如果同一个分段号上传了新的数据，那么OBS上已有的这个段号的数据将被覆盖。除了最后一段以外，其他段的大小范围是100KB-5GB，最后段大小范围是0-5GB。</li>
+<li>每个段不需要按顺序上传，甚至可以在不同进程、不同机器上上传，OBS会按照分段号排序组成最终对象。</li>
+<li>通过ObsClient.uploadPart上传段：</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Endpoint以北京四为例，其他地区请按实际情况填写。</span></span><br><span class="line"><span class="type">String</span> <span class="variable">endPoint</span> <span class="operator">=</span> <span class="string">&quot;https://obs.cn-north-4.myhuaweicloud.com&quot;</span>;</span><br><span class="line"><span class="type">String</span> <span class="variable">ak</span> <span class="operator">=</span> System.getenv(<span class="string">&quot;ACCESS_KEY_ID&quot;</span>);</span><br><span class="line"><span class="type">String</span> <span class="variable">sk</span> <span class="operator">=</span> System.getenv(<span class="string">&quot;SECRET_ACCESS_KEY_ID&quot;</span>);</span><br><span class="line"><span class="type">String</span> <span class="variable">uploadId</span> <span class="operator">=</span> <span class="string">&quot;upload id from initiateMultipartUpload&quot;</span>;</span><br><span class="line"><span class="comment">// 创建ObsClient实例</span></span><br><span class="line"><span class="type">ObsClient</span> <span class="variable">obsClient</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObsClient</span>(ak, sk, endPoint);</span><br><span class="line"></span><br><span class="line">List&lt;PartEtag&gt; partEtags = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;PartEtag&gt;();</span><br><span class="line"><span class="comment">// 上传第一段</span></span><br><span class="line"><span class="type">UploadPartRequest</span> <span class="variable">request</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">UploadPartRequest</span>(<span class="string">&quot;bucketname&quot;</span>, <span class="string">&quot;objectname&quot;</span>);</span><br><span class="line"><span class="comment">// 设置Upload ID</span></span><br><span class="line">request.setUploadId(uploadId);</span><br><span class="line"><span class="comment">// 设置分段号，范围是1~10000，</span></span><br><span class="line">request.setPartNumber(<span class="number">1</span>);</span><br><span class="line"><span class="comment">// 设置将要上传的大文件</span></span><br><span class="line">request.setFile(<span class="keyword">new</span> <span class="title class_">File</span>(<span class="string">&quot;localfile&quot;</span>));</span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置分段大小</span></span><br><span class="line">request.setPartSize(<span class="number">5</span> * <span class="number">1024</span> * <span class="number">1024L</span>);</span><br><span class="line"><span class="type">UploadPartResult</span> <span class="variable">result</span> <span class="operator">=</span> obsClient.uploadPart(request);</span><br><span class="line">partEtags.add(<span class="keyword">new</span> <span class="title class_">PartEtag</span>(result.getEtag(), result.getPartNumber()));</span><br><span class="line"></span><br><span class="line"><span class="comment">// 上传第二段</span></span><br><span class="line">request = <span class="keyword">new</span> <span class="title class_">UploadPartRequest</span>(<span class="string">&quot;bucketname&quot;</span>, <span class="string">&quot;objectname&quot;</span>);</span><br><span class="line"><span class="comment">// 设置Upload ID</span></span><br><span class="line">request.setUploadId(uploadId);</span><br><span class="line"><span class="comment">// 设置分段号</span></span><br><span class="line">request.setPartNumber(<span class="number">2</span>);</span><br><span class="line"><span class="comment">// 设置将要上传的大文件</span></span><br><span class="line">request.setFile(<span class="keyword">new</span> <span class="title class_">File</span>(<span class="string">&quot;localfile&quot;</span>));</span><br><span class="line"><span class="comment">// 设置第二段的段偏移量</span></span><br><span class="line">request.setOffset(<span class="number">5</span> * <span class="number">1024</span> * <span class="number">1024L</span>);</span><br><span class="line"><span class="comment">// 设置分段大小</span></span><br><span class="line">request.setPartSize(<span class="number">5</span> * <span class="number">1024</span> * <span class="number">1024L</span>);</span><br><span class="line">result = obsClient.uploadPart(request);</span><br><span class="line">partEtags.add(<span class="keyword">new</span> <span class="title class_">PartEtag</span>(result.getEtag(), result.getPartNumber()));</span><br></pre></td></tr></table></figure>
+<h3 id="合并段">合并段</h3>
+<ul>
+<li>所有分段上传完成后，需要调用合并段接口来在OBS服务端生成最终对象。</li>
+<li>在执行该操作时，需要提供所有有效的分段列表（包括分段号和分段ETag值）；OBS收到提交的分段列表后，会逐一验证每个段的有效性。当所有段验证通过后，OBS将把这些分段组合成最终的对象。</li>
+<li>通过ObsClient.completeMultipartUpload合并段：</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Endpoint以北京四为例，其他地区请按实际情况填写。</span></span><br><span class="line"><span class="type">String</span> <span class="variable">endPoint</span> <span class="operator">=</span> <span class="string">&quot;https://obs.cn-north-4.myhuaweicloud.com&quot;</span>;</span><br><span class="line"><span class="type">String</span> <span class="variable">ak</span> <span class="operator">=</span> System.getenv(<span class="string">&quot;ACCESS_KEY_ID&quot;</span>);</span><br><span class="line"><span class="type">String</span> <span class="variable">sk</span> <span class="operator">=</span> System.getenv(<span class="string">&quot;SECRET_ACCESS_KEY_ID&quot;</span>);</span><br><span class="line"><span class="type">String</span> <span class="variable">uploadId</span> <span class="operator">=</span> <span class="string">&quot;upload id from initiateMultipartUpload&quot;</span>;</span><br><span class="line"><span class="comment">// 创建ObsClient实例</span></span><br><span class="line"><span class="type">ObsClient</span> <span class="variable">obsClient</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObsClient</span>(ak, sk, endPoint);</span><br><span class="line"></span><br><span class="line">List&lt;PartEtag&gt; partEtags = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;PartEtag&gt;();</span><br><span class="line"><span class="comment">// 第一段</span></span><br><span class="line"><span class="type">PartEtag</span> <span class="variable">part1</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">PartEtag</span>();</span><br><span class="line">part1.setPartNumber(<span class="number">1</span>);</span><br><span class="line">part1.seteTag(<span class="string">&quot;etag1&quot;</span>);</span><br><span class="line">partEtags.add(part1);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 第二段</span></span><br><span class="line"><span class="type">PartEtag</span> <span class="variable">part2</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">PartEtag</span>();</span><br><span class="line">part2.setPartNumber(<span class="number">2</span>);</span><br><span class="line">part2.setEtag(<span class="string">&quot;etag2&quot;</span>);</span><br><span class="line">partEtags.add(part2);</span><br><span class="line"></span><br><span class="line"><span class="type">CompleteMultipartUploadRequest</span> <span class="variable">request</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">CompleteMultipartUploadRequest</span>(<span class="string">&quot;bucketname&quot;</span>, <span class="string">&quot;objectname&quot;</span>, uploadId, partEtags);</span><br><span class="line"></span><br><span class="line">obsClient.completeMultipartUpload(request);</span><br></pre></td></tr></table></figure>
+<h3 id="完整代码">完整代码</h3>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> com.obs.services.ObsClient;</span><br><span class="line"><span class="keyword">import</span> com.obs.services.model.InitiateMultipartUploadRequest;</span><br><span class="line"><span class="keyword">import</span> com.obs.services.model.InitiateMultipartUploadResult;</span><br><span class="line"><span class="keyword">import</span> com.obs.services.model.UploadPartRequest;</span><br><span class="line"><span class="keyword">import</span> com.obs.services.model.UploadPartResult;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.File;</span><br><span class="line"><span class="keyword">import</span> java.io.FileInputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MultipartUploadSample</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">endPoint</span> <span class="operator">=</span> <span class="string">&quot;your-endpoint&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">accessKey</span> <span class="operator">=</span> <span class="string">&quot;your-access-key&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">secretKey</span> <span class="operator">=</span> <span class="string">&quot;your-secret-key&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">bucketName</span> <span class="operator">=</span> <span class="string">&quot;your-bucket-name&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">objectKey</span> <span class="operator">=</span> <span class="string">&quot;your-object-key&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">filePath</span> <span class="operator">=</span> <span class="string">&quot;your-file-path&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">partSize</span> <span class="operator">=</span> <span class="number">5</span> * <span class="number">1024</span> * <span class="number">1024</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">ObsClient</span> <span class="variable">obsClient</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObsClient</span>(accessKey, secretKey, endPoint);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// Step 1: Initialize.</span></span><br><span class="line">            <span class="type">InitiateMultipartUploadRequest</span> <span class="variable">request</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">InitiateMultipartUploadRequest</span>(bucketName, objectKey);</span><br><span class="line">            <span class="type">InitiateMultipartUploadResult</span> <span class="variable">result</span> <span class="operator">=</span> obsClient.initiateMultipartUpload(request);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// Step 2: Upload parts.</span></span><br><span class="line">            <span class="type">File</span> <span class="variable">file</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">File</span>(filePath);</span><br><span class="line">            <span class="type">long</span> <span class="variable">fileLength</span> <span class="operator">=</span> file.length();</span><br><span class="line">            <span class="type">long</span> <span class="variable">partCount</span> <span class="operator">=</span> fileLength % partSize == <span class="number">0</span> ? fileLength / partSize : fileLength / partSize + <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (partCount &gt; <span class="number">10000</span>) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(<span class="string">&quot;Total parts count should not exceed 10000&quot;</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                System.out.println(<span class="string">&quot;Total parts count &quot;</span> + partCount + <span class="string">&quot;\n&quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            List&lt;UploadPartResult&gt; parts = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; partCount; i++) &#123;</span><br><span class="line">                <span class="type">long</span> <span class="variable">offset</span> <span class="operator">=</span> i * partSize;</span><br><span class="line">                <span class="type">long</span> <span class="variable">currPartSize</span> <span class="operator">=</span> (i + <span class="number">1</span> == partCount) ? fileLength - offset : partSize;</span><br><span class="line">                uploadPart(obsClient, bucketName, objectKey, result.getUploadId(), file, offset, currPartSize, i + <span class="number">1</span>, parts);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// Step 3: Complete.</span></span><br><span class="line">            obsClient.completeMultipartUpload(bucketName, objectKey, result.getUploadId(), parts);</span><br><span class="line">            System.out.println(<span class="string">&quot;Multipart upload success. \n&quot;</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            obsClient.close();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">uploadPart</span><span class="params">(</span></span><br><span class="line"><span class="params">            ObsClient obsClient,</span></span><br><span class="line"><span class="params">            String bucketName,</span></span><br><span class="line"><span class="params">            String objectKey,</span></span><br><span class="line"><span class="params">            String uploadId,</span></span><br><span class="line"><span class="params">            File file,</span></span><br><span class="line"><span class="params">            <span class="type">long</span> offset,</span></span><br><span class="line"><span class="params">            <span class="type">long</span> partSize,</span></span><br><span class="line"><span class="params">            <span class="type">int</span> partNumber,</span></span><br><span class="line"><span class="params">            List&lt;UploadPartResult&gt; parts)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        <span class="type">FileInputStream</span> <span class="variable">fis</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FileInputStream</span>(file);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            fis.skip(offset);</span><br><span class="line">            <span class="type">UploadPartRequest</span> <span class="variable">uploadPartRequest</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">UploadPartRequest</span>();</span><br><span class="line">            uploadPartRequest.setBucketName(bucketName);</span><br><span class="line">            uploadPartRequest.setObjectKey(objectKey);</span><br><span class="line">            uploadPartRequest.setUploadId(uploadId);</span><br><span class="line">            uploadPartRequest.setFile(fis);</span><br><span class="line">            uploadPartRequest.setPartSize(partSize);</span><br><span class="line">            uploadPartRequest.setPartNumber(partNumber);</span><br><span class="line">            <span class="type">UploadPartResult</span> <span class="variable">uploadPartResult</span> <span class="operator">=</span> obsClient.uploadPart(uploadPartRequest);</span><br><span class="line">            parts.add(uploadPartResult);</span><br><span class="line">            System.out.println(<span class="string">&quot;Part#&quot;</span> + partNumber + <span class="string">&quot; done\n&quot;</span>);</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            fis.close();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/ota-diffpatch-algorithm/" rel="prev" title="OTA差分升级技术">
+                  <i class="fa fa-angle-left"></i> OTA差分升级技术
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/probability-preliminaries-2022/" rel="next" title="Probability Tutorial Zero">
+                  Probability Tutorial Zero <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">sitJac</span>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

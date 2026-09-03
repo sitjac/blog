@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.1.2">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/logo.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/logo.png">
+  <link rel="mask-icon" href="/blog/images/logo.png" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.css" integrity="sha256-gkQVf8UKZgQ0HyuxL/VnacadJ+D2Kox2TCEBuNQg5+w=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"sitjac.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":true},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/blog/search.json","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="DDS是一种为实时系统设计的发布-订阅通信协议，其特点是去中心化、支持多种QoS机制和实时通信，和SOME&#x2F;IP类似但不完全相同。 RTI Connext DDS和Fast DDS（以前称为Fast RTPS）都是实现了DDS规范的中间件，本文是对DDS相关概念的介绍，以及对RTI Connext DDS和Fast DDS的一些基本对比。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DDS 协议介绍">
+<meta property="og:url" content="https://sitjac.github.io/blog/dds-tips/index.html">
+<meta property="og:site_name" content="sitJac&#39;s Blog">
+<meta property="og:description" content="DDS是一种为实时系统设计的发布-订阅通信协议，其特点是去中心化、支持多种QoS机制和实时通信，和SOME&#x2F;IP类似但不完全相同。 RTI Connext DDS和Fast DDS（以前称为Fast RTPS）都是实现了DDS规范的中间件，本文是对DDS相关概念的介绍，以及对RTI Connext DDS和Fast DDS的一些基本对比。">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-11-16T01:17:06.000Z">
+<meta property="article:modified_time" content="2026-08-29T07:51:17.473Z">
+<meta property="article:author" content="sitJac">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://sitjac.github.io/blog/dds-tips/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://sitjac.github.io/blog/dds-tips/","path":"dds-tips/","title":"DDS 协议介绍"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>DDS 协议介绍 | sitJac's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.umd.js" integrity="sha256-a+H7FYzJv6oU2hfsfDGM2Ohw/cR9v+hPfxHCLdmCrE8=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.5.0/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+  <script src="/blog/js/third-party/fancybox.js" defer></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+  <script class="next-config" data-name="katex" type="application/json">{"copy_tex_js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/copy-tex.min.js","integrity":"sha256-Us54+rSGDSTvIhKKUs4kygE2ipA0RXpWWh0/zLqw3bs="}}</script>
+  <script src="/blog/js/third-party/math/katex.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">sitJac's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/blog/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/blog/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-photos"><a href="/blog/photos/" rel="section"><i class="fa fa-camera fa-fw"></i>Photos</a></li><li class="menu-item menu-item-categories"><a href="/blog/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-bookmarks"><a href="/blog/bookmarks/" rel="section"><i class="fa fa-bookmark fa-fw"></i>Bookmarks</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="Searching..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#DDS%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">DDS介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DDS%E7%89%B9%E7%82%B9"><span class="nav-number">2.</span> <span class="nav-text">DDS特点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E4%B8%AD%E5%BF%83%EF%BC%88Data-Centricity%EF%BC%89"><span class="nav-number">2.1.</span> <span class="nav-text">数据中心（Data Centricity）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%A8%E5%B1%80%E6%95%B0%E6%8D%AE%E7%A9%BA%E9%97%B4%EF%BC%88Global-Data-space%EF%BC%89"><span class="nav-number">2.2.</span> <span class="nav-text">全局数据空间（Global Data space）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E8%B4%A8%E9%87%8F%EF%BC%88Quality-of-service%EF%BC%89"><span class="nav-number">2.3.</span> <span class="nav-text">服务质量（Quality of service）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E5%8F%91%E7%8E%B0%EF%BC%88Dynamic-Discovery%EF%BC%89"><span class="nav-number">2.4.</span> <span class="nav-text">动态发现（Dynamic Discovery）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%AF%E6%89%A9%E5%B1%95%E6%9E%B6%E6%9E%84%EF%BC%88Scalable-Architecture%EF%BC%89"><span class="nav-number">2.5.</span> <span class="nav-text">可扩展架构（Scalable Architecture）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E5%85%A8%EF%BC%88Security%EF%BC%89"><span class="nav-number">2.6.</span> <span class="nav-text">安全（Security）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DDS%E4%B8%8ESOME-IP%E5%8C%BA%E5%88%AB"><span class="nav-number">3.</span> <span class="nav-text">DDS与SOME&#x2F;IP区别</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8%E9%A2%86%E5%9F%9F%E4%B8%8D%E5%90%8C"><span class="nav-number">3.1.</span> <span class="nav-text">主要应用领域不同</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%81%B5%E6%B4%BB%E6%80%A7%E5%92%8C%E5%8F%AF%E4%BC%B8%E7%BC%A9%E6%80%A7%E4%B8%8D%E5%90%8C"><span class="nav-number">3.2.</span> <span class="nav-text">灵活性和可伸缩性不同</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%A2%E9%98%85%E6%96%B9%E5%92%8C%E5%8F%91%E5%B8%83%E6%96%B9%E7%9A%84%E8%80%A6%E5%90%88%E7%A8%8B%E5%BA%A6%E4%B8%8D%E5%90%8C-%E2%AD%90"><span class="nav-number">3.3.</span> <span class="nav-text">订阅方和发布方的耦合程度不同 ⭐</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E7%AD%96%E7%95%A5%E4%B8%8D%E5%90%8C"><span class="nav-number">3.4.</span> <span class="nav-text">服务策略不同</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B8%8D%E5%90%8C"><span class="nav-number">3.5.</span> <span class="nav-text">应用场景不同</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94"><span class="nav-number">4.</span> <span class="nav-text">方案对比</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">4.1.</span> <span class="nav-text">概述</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%95%86%E4%B8%9A%E6%96%B9%E6%A1%88"><span class="nav-number">4.1.1.</span> <span class="nav-text">商业方案</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BC%80%E6%BA%90%E6%96%B9%E6%A1%88"><span class="nav-number">4.1.2.</span> <span class="nav-text">开源方案</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RTI-CONNXT-DDS"><span class="nav-number">4.2.</span> <span class="nav-text">RTI CONNXT DDS</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%98%E6%96%B9%E9%93%BE%E6%8E%A5"><span class="nav-number">4.2.1.</span> <span class="nav-text">官方链接</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E6%8E%A5%E5%8F%A3"><span class="nav-number">4.2.2.</span> <span class="nav-text">核心接口</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%86%85%E7%BD%AE%E5%B7%A5%E5%85%B7"><span class="nav-number">4.2.3.</span> <span class="nav-text">内置工具</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%94%AF%E6%8C%81%E5%B9%B3%E5%8F%B0"><span class="nav-number">4.2.4.</span> <span class="nav-text">支持平台</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#eProsima-Fast-DDS"><span class="nav-number">4.3.</span> <span class="nav-text">eProsima Fast DDS</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%98%E6%96%B9%E9%93%BE%E6%8E%A5-2"><span class="nav-number">4.3.1.</span> <span class="nav-text">官方链接</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E6%8E%A5%E5%8F%A3-2"><span class="nav-number">4.3.2.</span> <span class="nav-text">核心接口</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%94%AF%E6%8C%81%E5%B9%B3%E5%8F%B0-2"><span class="nav-number">4.3.3.</span> <span class="nav-text">支持平台</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AF%E8%AF%AD%E5%AE%9A%E4%B9%89"><span class="nav-number">5.</span> <span class="nav-text">术语定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">6.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">sitJac</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://sitjac.github.io/blog/dds-tips/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="sitJac">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sitJac's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="DDS 协议介绍 | sitJac's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          DDS 协议介绍
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2023-11-16 09:17:06" itemprop="dateCreated datePublished" datetime="2023-11-16T09:17:06+08:00">2023-11-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/blog/categories/Works/" itemprop="url" rel="index"><span itemprop="name">Works</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><div class="note info">
+<ul>
+<li>DDS是一种为实时系统设计的发布-订阅通信协议，其特点是去中心化、支持多种QoS机制和实时通信，和SOME/IP类似但不完全相同。</li>
+<li>RTI Connext DDS和Fast DDS（以前称为Fast
+RTPS）都是实现了DDS规范的中间件，本文是对DDS相关概念的介绍，以及对RTI Connext
+DDS和Fast DDS的一些基本对比。</li>
+</ul>
+</div>
+<span id="more"></span>
+<center>
+	<strong>
+		<font size="6">
+			Data Distribution Service
+		</font>
+	</strong>
+</center>
+<h2 id="DDS介绍">DDS介绍</h2>
+<p>DDS（Data Distribution Service）是由OMG（Object Management Group）发布的分布式通信规范。</p>
+<p>OMG成立于1989年，是一个国际性、开放性、非营利性的技术标准联盟，由供应商、终端用户、学术机构和政府机构推动。OMG工作组致力于制定企业集成标准和开发可为数千个垂直行业提供现实价值的技术标准，其中包括统一建模语言SYSML、UML，以及中间件标准CORBA、DDS等。</p>
+<p>DDS最早应用于美国海军系统，用于解决在军舰系统复杂网络环境中进行大量软件升级时的兼容性问题。随着DDS被ROS2和AUTOSAR引入，目前它已经广泛应用于航空、航天、船舶、国防、金融、通信、汽车等领域。</p>
+<p>目前，DDS已被多个车载中间件平台引入。AUTOSAR
+AP已完整地集成了DDS标准的网络绑定。另外，虽然AUTOSAR
+CP的标准规范本身不支持DDS，但通过一些变通方法也可以在CP上集成DDS。ROS2和CyberRT的底层都使用了开源的DDS作为最重要的通信机制。</p>
+<h2 id="DDS特点">DDS特点</h2>
+<h3 id="数据中心（Data-Centricity）">数据中心（Data Centricity）</h3>
+<p>DDS最重要的特性是以数据为中心，这与其他许多通信中间件不同。DDS的数据共享以Topic为单元，应用程序能够通过Topic判断包含的数据类型，而不必依赖其他上下文信息。同时，DDS能够按照用户定义的方式自动地存储、发布或订阅数据，使应用程序能够像访问本地数据一样进行数据的写入或读取。</p>
+<h3 id="全局数据空间（Global-Data-space）">全局数据空间（Global Data space）</h3>
+<p>DDS实现的数据共享可以被理解为一个抽象的全局数据空间，无论应用程序是用哪种开发语言编写，或者在哪种操作系统上运行，都可以以相同的方式访问这个全局数据空间，就像访问本地存储空间一样。当然，全局数据空间只是一个抽象概念，在实际实现中，数据仍然被分别存储在每个应用程序的本地空间中。在系统运行时，数据是按需传输或存储的，数据的发布者只发送订阅者需要的数据，而订阅者只接收并存储本地应用程序当前所需的数据。</p>
+<h3 id="服务质量（Quality-of-service）">服务质量（Quality of service）</h3>
+<p>DDS还提供了高度灵活的QoS（Quality of
+Service）策略，以满足用户对数据共享方式的不同需求，例如可靠性和故障处理等。对于对数据安全性要求较高的系统，DDS还提供了精细的数据安全控制，包括应用程序身份认证、权限控制和数据加密等。</p>
+<h3 id="动态发现（Dynamic-Discovery）">动态发现（Dynamic Discovery）</h3>
+<p>类似于SOME/IP-SD，DDS提供了数据发布者和订阅者的动态发现机制，这意味着用户无需手动配置通信节点的地址或其他属性信息，因为它们在运行过程中会自动发现对方并自动完成相关配置，实现了即插即用的功能。</p>
+<h3 id="可扩展架构（Scalable-Architecture）">可扩展架构（Scalable Architecture）</h3>
+<p>DDS可应用于边缘计算、云计算领域。在边缘计算中，DDS可以实现高速实时的设备间通信。在中间系统中，DDS提供健壮可靠的QoS和内容感知的信息流。DDS提供可扩展的信息访问和数据分发手段，用于集成信息系统，将各系统接入云端。OMG
+DDS的适用范围广泛，涵盖了从小型设备到云计算系统等超大型系统。DDS能够以超高速传输数据并同时管理数千个数据对象，提供极高的可用性和安全性，非常适用于物联网。通过提供一个标准的通信层，DDS屏蔽了底层复杂性，简化了分布式系统的开发。</p>
+<h3 id="安全（Security）">安全（Security）</h3>
+<p>DDS为关键任务的工业物联网环境提供了全面的安全保护机制，跨系统、跨供应商，覆盖从边缘设备到云端的安全性需求。DDS提供了身份验证、访问控制、数据加密和数据完整性等安全机制，以确保数据分发的安全性。这些安全机制是在点对点对等架构上实现的，不会影响实时通信的性能。</p>
+<h2 id="DDS与SOME-IP区别">DDS与SOME/IP区别</h2>
+<p>SOME/IP和DDS是目前在域控最常用的两类通信中间件，它们都是面向服务的通信协议，并采用以数据为中心的发布/订阅模式。然而，SOME/IP和DDS在许多方面也存在差异，主要区别如下：</p>
+<h3 id="主要应用领域不同">主要应用领域不同</h3>
+<p>SOME/IP专为汽车领域开发，针对汽车领域的需求定义了一套通信标准，并在汽车领域深耕已久；而DDS是一个工业级别的强实时通信标准，适应性较强，但在应用于汽车领域时需要进行专门的裁剪。</p>
+<h3 id="灵活性和可伸缩性不同">灵活性和可伸缩性不同</h3>
+<p>相比SOME/IP，DDS引入了许多标准内置特性，如基于内容和时间的过滤、与传输无关的可靠性、持久性、存活性、延迟/截止时间监视、可扩展类型等。当AUTOSAR
+AP与DDS一起构建通信框架时，该框架不仅与现有API和应用程序兼容，还在可靠性、性能、灵活性和可伸缩性等方面提供重要的好处。</p>
+<h3 id="订阅方和发布方的耦合程度不同-⭐">订阅方和发布方的耦合程度不同 ⭐</h3>
+<p>在SOME/IP中，订阅方在正常数据传输之前需要与发布方建立网络连接并询问发布方是否提供所需服务，即Service
+Discovery，从这个角度看，节点之间仍然存在一定的耦合性。而在DDS标准下每个订阅方或发布方只需要在自己的程序中订阅或发布数据，无需关心任何连接。因此，在DDS中，服务的订阅方和发布方更加彻底地解耦。</p>
+<h3 id="服务策略不同">服务策略不同</h3>
+<p>良好的服务质量（QoS）是DDS标准相对于SOME/IP最重要的特征。SOME/IP只有一个QoS，而RTI
+DDS和开源DDS分别提供了50多个和20多个QoS，这些QoS基本上涵盖了大多数可预见的业务场景。</p>
+<h3 id="应用场景不同">应用场景不同</h3>
+<p>从应用场景的角度来看，SOME/IP更适用于车载网络，并且只能在基于IP类型的网络环境中使用；而DDS在传输方式上没有特别的限制，可以支持基于非IP类型的网络，例如共享内存、跨核通信、PCIe等。此外，DDS还提供了完备的车联网解决方案，其独有的DDS
+Security和DDS Web功能为用户提供一站式的“车-云-移动端”解决方案。</p>
+<h2 id="方案对比">方案对比</h2>
+<h3 id="概述">概述</h3>
+<h4 id="商业方案">商业方案</h4>
+<ol>
+<li>
+<p><a target="_blank" rel="noopener" href="https://www.rti.com/en/">RTI - Connext DDS</a>
+RTI作为OMG组织董事会的成员，领导了DDS标准的制定，并开发了名为Connext的DDS品牌，因此也被称为Connext
+DDS，是业界领先的DDS供应商。</p>
+</li>
+<li>
+<p><a target="_blank" rel="noopener" href="http://www.twinoakscomputing.com/">Twin Oaks Computing, Inc. - CoreDX DDS</a> Twin Oaks
+Computing, Inc. 是一家致力于开发和提供优质软件解决方案的公司，其开发的CoreDX
+DDS是领先的DDS中间件，主要特点是体积小，速度快，适用于小型和嵌入式系统。</p>
+</li>
+<li>
+<p><a target="_blank" rel="noopener" href="http://www.remedy.nl/">Remedy IT</a> Remedy
+IT是一家致力于开放标准的技术服务/咨询/培训公司，为航空航天、国防、金融、电信和能源等不同领域的各种组织提供DDS软件解决方案和支持。</p>
+</li>
+</ol>
+<h4 id="开源方案">开源方案</h4>
+<p>开源DDS相对于商用的RTI Connext
+DDS等来说，也是根据OMG官方标准开发的，但源代码是开放的，主要包括Fast DDS和Open DDS等。</p>
+<ol>
+<li>
+<p><a target="_blank" rel="noopener" href="http://www.eprosima.com/">eProsima Fast DDS</a>
+在自动驾驶领域，由RTI原核心团队成员在欧洲创办的eProsima公司推出了影响力较大的开源DDS，名为Fast
+DDS。在eProsima将Fast DDS的源代码开放后，用户可以直接在GitHub上免费下载使用。</p>
+</li>
+<li>
+<p><a target="_blank" rel="noopener" href="https://objectcomputing.com/products/opendds">Object Computing OpenDDS</a> Open
+DDS由位于圣路易斯和凤凰城的Object Computing的ACE/TAO团队开发，与Fast
+DDS有一定的相似性，两者都基于RTPS实现，都是面向数据的通信框架，并遵循同一标准。上述两类开源方案都支持去中心化、支持QoS机制和实时通信等DDS标准。</p>
+</li>
+</ol>
+<p>尽管开源DDS对RTI的商用DDS形成一定的竞争，但开源DDS也存在一些不足之处：开源DDS的使用门槛较高，使用起来没有商业方案方便；开源DDS服务策略完整性远不及商业版本，RTI
+DDS的服务策略有50多个，而开源DDS只有23个；RTI的DDS已通过了ASIL-D认证，而开源DDS尚未达到这一认证水平。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Rti Connext DDS</th>
+<th>Fast DDS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>供应商</td>
+<td>Real-Time Innovations</td>
+<td>eProsima</td>
+</tr>
+<tr>
+<td>开源与否</td>
+<td>不开源，需要购买商业许可</td>
+<td>开源</td>
+</tr>
+<tr>
+<td>性能</td>
+<td>在数据吞吐量和延迟方面更优</td>
+<td>在内存使用和CPU使用方面更优</td>
+</tr>
+<tr>
+<td>特性</td>
+<td>提供了一些高级特性，如数据查询和持久化</td>
+<td>支持更多的平台和操作系统</td>
+</tr>
+<tr>
+<td>平台支持</td>
+<td>RTI Connext DDS 支持平台</td>
+<td>Fast DDS 支持平台</td>
+</tr>
+<tr>
+<td>社区支持</td>
+<td>庞大的用户社区和丰富的文档</td>
+<td>较弱</td>
+</tr>
+<tr>
+<td>安全性</td>
+<td>高，通过了ASIL-D认证</td>
+<td>较弱</td>
+</tr>
+<tr>
+<td>Qos服务策略</td>
+<td>多，50+</td>
+<td>较少，20+</td>
+</tr>
+<tr>
+<td>使用门槛</td>
+<td>使用门槛较低，接口、编译均可自动化处理</td>
+<td>使用门槛较高，接口封装、编译等均须手动配置</td>
+</tr>
+<tr>
+<td>便捷性</td>
+<td>提供丰富的工具和服务，使用较为便捷</td>
+<td>内置工具和服务较少，使用便捷性较弱</td>
+</tr>
+</tbody>
+</table>
+<h3 id="RTI-CONNXT-DDS">RTI CONNXT DDS</h3>
+<h4 id="官方链接">官方链接</h4>
+<ul>
+<li>官方网站：<a target="_blank" rel="noopener" href="https://www.rti.com/">https://www.rti.com/</a></li>
+<li>开发文档：<a target="_blank" rel="noopener" href="https://community.rti.com/documentation/rti-connext-720">https://community.rti.com/documentation/rti-connext-720</a></li>
+<li>最佳实践：<a target="_blank" rel="noopener" href="https://github.com/rticommunity/rticonnextdds-examples/tree/master/examples/connext_dds">Examples</a></li>
+<li>版本下载：<a target="_blank" rel="noopener" href="https://s3.amazonaws.com/RTI/Bundles/7.2.0/Evaluation/rti_connext_dds-7.2.0-lm-x64Linux4gcc7.3.0.run">RTI Connext DDS 7.2.0</a></li>
+</ul>
+<h4 id="核心接口">核心接口</h4>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Start communicating in a domain, usually one participant per application</span></span><br><span class="line">dds::<span class="function">domain::DomainParticipant <span class="title">participant</span><span class="params">(domain_id)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Create a Topic with a name and a datatype</span></span><br><span class="line">dds::<span class="function">topic::Topic&lt; ::OTACtrl_struct&gt; <span class="title">topic</span><span class="params">(participant, <span class="string">&quot;Example OTACtrl_struct&quot;</span>)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Create a Publisher</span></span><br><span class="line">dds::<span class="function">pub::Publisher <span class="title">publisher</span><span class="params">(participant)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Create a DataWriter with default QoS</span></span><br><span class="line">dds::<span class="function">pub::DataWriter&lt; ::OTACtrl_struct&gt; <span class="title">writer</span><span class="params">(publisher, topic)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Set the values</span></span><br><span class="line">::OTACtrl_struct data;</span><br><span class="line">data.<span class="built_in">ota_hmi_req</span>(OTA_HMI_Req::SetAppointmentTime);</span><br><span class="line">data.<span class="built_in">appointment_time</span>(std::<span class="built_in">to_string</span>(<span class="number">1704962170593</span>));</span><br><span class="line"></span><br><span class="line"><span class="comment">// write data</span></span><br><span class="line">writer.<span class="built_in">write</span>(data);</span><br></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Start communicating in a domain, usually one participant per application</span></span><br><span class="line">dds::<span class="function">domain::DomainParticipant <span class="title">participant</span><span class="params">(domain_id)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Create a Topic with a name and a datatype</span></span><br><span class="line">dds::<span class="function">topic::Topic&lt; ::OTACtrl_struct&gt; <span class="title">topic</span><span class="params">(participant, <span class="string">&quot;Example OTACtrl_struct&quot;</span>)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Create a Subscriber and DataReader with default Qos</span></span><br><span class="line">dds::<span class="function">sub::Subscriber <span class="title">subscriber</span><span class="params">(participant)</span></span>;</span><br><span class="line">dds::<span class="function">sub::DataReader&lt; ::OTACtrl_struct&gt; <span class="title">reader</span><span class="params">(subscriber, topic)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Create a ReadCondition for any data received on this reader and set a</span></span><br><span class="line"><span class="comment">// handler to process the data</span></span><br><span class="line"><span class="type">unsigned</span> <span class="type">int</span> samples_read = <span class="number">0</span>;</span><br><span class="line">dds::sub::<span class="function">cond::ReadCondition <span class="title">read_condition</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    reader,</span></span></span><br><span class="line"><span class="params"><span class="function">    dds::sub::status::DataState::any(),</span></span></span><br><span class="line"><span class="params"><span class="function">    [reader, &amp;samples_read]() &#123; samples_read += process_data(reader); &#125;)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// WaitSet will be woken when the attached condition is triggered</span></span><br><span class="line">dds::core::cond::WaitSet waitset;</span><br><span class="line">waitset += read_condition;</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (!application::shutdown_requested &amp;&amp; samples_read &lt; sample_count) &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;::OTACtrl_struct subscriber sleeping up to 1 sec...&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Run the handlers of the active conditions. Wait for up to 1 second.</span></span><br><span class="line">    waitset.<span class="built_in">dispatch</span>(dds::core::<span class="built_in">Duration</span>(<span class="number">1</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="内置工具">内置工具</h4>
+<ul>
+<li><code>rtiadminconsole</code>: 用于监视分析和配置正在运行的DDS系统的工具。</li>
+<li><code>rticlouddiscoveryservice</code>: 用于在云环境中发现DDS服务的工具。</li>
+<li><code>rticonverter</code>: 用于转换DDS数据的工具。</li>
+<li><code>rtiddsgen</code>: 用于从IDL文件生成DDS数据类型的工具。</li>
+<li><code>rtiddsgen_server</code>: rtiddsgen的服务器版本。</li>
+<li><code>rtiddsping</code>: 用于测试DDS网络连接的工具。</li>
+<li><code>rtiddsspy</code>: 用于监听DDS网络上的数据的工具。</li>
+<li><code>rtilauncher</code>: 一个图形界面工具，用于启动其他RTI工具。</li>
+<li><code>rtimonitor</code>: 用于监视DDS系统的工具。</li>
+<li><code>rtipersistenceservice</code>: 用于在DDS系统中提供数据持久化的服务。</li>
+<li><code>rtipkginstall</code>: 用于安装RTI软件包的工具。</li>
+<li><code>rtipssh</code>: 用于在DDS系统中提供安全的shell服务。</li>
+<li><code>rtirecordingindexer</code>: 用于索引DDS数据记录的工具。</li>
+<li><code>rtirecordingservice</code>: 用于记录DDS数据的服务。</li>
+<li><code>rtirecordingservice_list_tags</code>: 用于列出DDS数据记录标签的工具。</li>
+<li><code>rtireplayservice</code>: 用于回放DDS数据记录的服务。</li>
+<li><code>rtiroutingservice</code>: 用于在DDS系统中提供数据路由的服务。</li>
+<li><code>rtirssh</code>: 用于在DDS系统中提供安全的远程shell服务。</li>
+<li><code>rtishapesdemo</code>: 一个用于演示DDS功能的图形界面工具。</li>
+<li><code>rtisystemdesigner</code>: 一个用于设计DDS系统的图形界面工具。</li>
+<li><code>rtiwebintegrationservice</code>: 用于将DDS数据集成到Web应用的服务。</li>
+<li><code>rtixmlconverter</code>: 用于转换DDS XML配置文件的工具。</li>
+</ul>
+<h4 id="支持平台">支持平台</h4>
+<p><a target="_blank" rel="noopener" href="https://github.com/eProsima/Fast-DDS/blob/master/PLATFORM_SUPPORT.md#platform-support">Platform Support</a></p>
+<h3 id="eProsima-Fast-DDS">eProsima Fast DDS</h3>
+<h4 id="官方链接-2">官方链接</h4>
+<ul>
+<li>官方网站：<a target="_blank" rel="noopener" href="https://www.eprosima.com/index.php/products-all/eprosima-fast-dds">https://www.eprosima.com/index.php/products-all/eprosima-fast-dds</a></li>
+<li>开发文档：<a target="_blank" rel="noopener" href="https://github.com/eProsima/Fast-DDS-docs">https://github.com/eProsima/Fast-DDS-docs</a></li>
+<li>源码仓库：<a target="_blank" rel="noopener" href="https://github.com/eProsima/Fast-DDS">https://github.com/eProsima/Fast-DDS</a></li>
+<li>版本下载：<a target="_blank" rel="noopener" href="https://www.eprosima.com/index.php/component/ars/repository/eprosima-fast-dds/eprosima-fast-dds-2-13-0">eProsima Fast DDS 2.13.0</a></li>
+</ul>
+<h4 id="核心接口-2">核心接口</h4>
+<blockquote>
+<p><strong>DomainParticipant</strong>：充当所有其他实体对象的容器，并充当发布者、订阅者和主题对象的工厂。
+<strong>Publisher</strong>：是负责创建 DataWriter的对象。
+<strong>DataWriter</strong>：允许应用程序设置要在给定主题下发布的数据的值。
+<strong>TypeSupport</strong>：为participant提供序列化、反序列化和获取特定数据类型的key的函数。
+<strong>DataWriterListener</strong>：允许重新定义 DataWriterListener 的功能。</p>
+</blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建participant</span></span><br><span class="line">DomainParticipantQos participantQos;</span><br><span class="line">participantQos.<span class="built_in">name</span>(<span class="string">&quot;Participant_publisher&quot;</span>);</span><br><span class="line">participant_ = DomainParticipantFactory::<span class="built_in">get_instance</span>()-&gt;<span class="built_in">create_participant</span>(<span class="number">0</span>, participantQos);</span><br><span class="line"></span><br><span class="line"><span class="comment">// register数据类型并创建topic</span></span><br><span class="line">type_ = <span class="keyword">new</span> <span class="built_in">HelloWorldPubSubType</span>()</span><br><span class="line">type_.<span class="built_in">register_type</span>(participant_);</span><br><span class="line">topic_ = participant_-&gt;<span class="built_in">create_topic</span>(<span class="string">&quot;HelloWorldTopicName&quot;</span>, <span class="string">&quot;HelloWorld&quot;</span>, TOPIC_QOS_DEFAULT);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建publisher</span></span><br><span class="line">publisher_ = participant_-&gt;<span class="built_in">create_publisher</span>(PUBLISHER_QOS_DEFAULT, <span class="literal">nullptr</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建writer</span></span><br><span class="line">writer_ = publisher_-&gt;<span class="built_in">create_datawriter</span>(topic_, DATAWRITER_QOS_DEFAULT, &amp;listener_);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用Publisher对象发送数据</span></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">publish</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    hello_.<span class="built_in">index</span>(hello_.<span class="built_in">index</span>() + <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">if</span> (writer_-&gt;<span class="built_in">write</span>(&amp;hello_))</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><strong>DomainParticipant</strong>：充当所有其他实体对象的容器，并充当发布者、订阅者和主题对象的工厂。
+<strong>Subscriber</strong>：是负责创建 DataReader 的对象。
+<strong>DataReader</strong>：它是负责实际接收数据的对象。
+<strong>TypeSupport</strong>：为participant提供序列化、反序列化和获取特定数据类型的key的函数。
+<strong>DataReaderListener</strong>：这是分配给数据读取器的侦听器。</p>
+</blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建participant</span></span><br><span class="line">DomainParticipantQos participantQos;</span><br><span class="line">participantQos.<span class="built_in">name</span>(<span class="string">&quot;Participant_subscriber&quot;</span>);</span><br><span class="line">participant_ = DomainParticipantFactory::<span class="built_in">get_instance</span>()-&gt;<span class="built_in">create_participant</span>(<span class="number">0</span>, participantQos);</span><br><span class="line"></span><br><span class="line"><span class="comment">// register数据类型并创建topic</span></span><br><span class="line">type_ = <span class="keyword">new</span> <span class="built_in">HelloWorldPubSubType</span>()</span><br><span class="line">type_.<span class="built_in">register_type</span>(participant_);</span><br><span class="line">topic_ = participant_-&gt;<span class="built_in">create_topic</span>(<span class="string">&quot;HelloWorldTopicName&quot;</span>, <span class="string">&quot;HelloWorld&quot;</span>, TOPIC_QOS_DEFAULT);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建subscriber</span></span><br><span class="line">subscriber_ = participant_-&gt;<span class="built_in">create_subscriber</span>(SUBSCRIBER_QOS_DEFAULT, <span class="literal">nullptr</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建reader</span></span><br><span class="line">reader_ = subscriber_-&gt;<span class="built_in">create_datareader</span>(topic_, DATAREADER_QOS_DEFAULT, &amp;listener_);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用Subscriber对象接收数据</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">on_data_available</span><span class="params">(DataReader* reader)</span> <span class="keyword">override</span> <span class="comment">//当datareader接收到datawriter发送的新数据时，会触发该回调函数。</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    SampleInfo info;</span><br><span class="line">    <span class="keyword">if</span> (reader-&gt;<span class="built_in">take_next_sample</span>(&amp;hello_, &amp;info) == ReturnCode_t::RETCODE_OK)&#123;</span><br><span class="line">        <span class="keyword">if</span> (info.valid_data)&#123;</span><br><span class="line">            samples_++;</span><br><span class="line">            std::cout &lt;&lt; <span class="string">&quot;Message: &quot;</span> &lt;&lt; hello_.<span class="built_in">message</span>() &lt;&lt; <span class="string">&quot; with index: &quot;</span> &lt;&lt; hello_.<span class="built_in">index</span>()&lt;&lt; <span class="string">&quot; RECEIVED.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">        &#125;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="支持平台-2">支持平台</h4>
+<p><a target="_blank" rel="noopener" href="https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/release_notes/index.htm#release_notes/Supported_Operating_Systems.htm">Supported Platform</a></p>
+<h2 id="术语定义">术语定义</h2>
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>定义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DDS</td>
+<td>Data Distribution Service，数据分发服务，提供了一种数据中心的通信方式，提供丰富的服务质量策略，允许数据的发布者和订阅者在时间和空间上解耦，从而保障数据进行实时且高效的分发。</td>
+</tr>
+<tr>
+<td>ROS2</td>
+<td>Robot Operating System 2，是一个用于编写机器人软件的框架，ROS 2选择了DDS作为其底层的消息传递中间件，这意味着ROS 2的节点（即ROS中的进程）均使用DDS来发布或订阅主题，以及进行服务调用。</td>
+</tr>
+<tr>
+<td>OMG</td>
+<td>Object Management Group，对象管理组织，是一个国际性的、开放的、非盈利的标准化组织，致力于建立对程序、系统和业务流程的建模标准，它制定了DDS的中间件协议和API标准。</td>
+</tr>
+<tr>
+<td>AUTOSAR</td>
+<td>Automotive Open System Architecture，是一个全球的汽车工业联盟，它定义了一个开放的、标准的汽车软件架构。AUTOSAR规范自R22-11开始引入了DDS内容，去年发布的R23-11标准对于DDS有更加具体的描述，能够作为模块开发的一个参考。</td>
+</tr>
+<tr>
+<td>QoS</td>
+<td>Quality of Service，是一个广泛用于网络通信中的概念，用于描述网络的性能水平，包括数据传输的错误率、带宽、延迟、抖动等。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="参考链接">参考链接</h2>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/7c9dWrR1kCHn6F5Oan9eaA">SOA通信中间件常用的通信协议</a></li>
+<li><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/AazoBThS9xBi9KdBTeU3AQ">初识AUTOSAR CP平台下的DDS规范</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/someip-tips/" rel="prev" title="SOME&#x2F;IP协议介绍">
+                  <i class="fa fa-angle-left"></i> SOME/IP协议介绍
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/tmux-manual/" rel="next" title="Tmux 使用手册">
+                  Tmux 使用手册 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">sitJac</span>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

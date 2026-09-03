@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.1.2">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/logo.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/logo.png">
+  <link rel="mask-icon" href="/blog/images/logo.png" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.css" integrity="sha256-gkQVf8UKZgQ0HyuxL/VnacadJ+D2Kox2TCEBuNQg5+w=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"sitjac.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":true},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/blog/search.json","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="设计模式是针对常见问题的通用解决方案，目前最为经典的设计模式有 23 种。 学习设计模式不仅能开拓思路、写出更优质的代码、提高项目的开发和维护效率；还能更好地阅读和理解源码，甚至可以根据文件名称直接推断出源码的架构设计。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++ 设计模式学习路线">
+<meta property="og:url" content="https://sitjac.github.io/blog/cpp-design-patterns/index.html">
+<meta property="og:site_name" content="sitJac&#39;s Blog">
+<meta property="og:description" content="设计模式是针对常见问题的通用解决方案，目前最为经典的设计模式有 23 种。 学习设计模式不仅能开拓思路、写出更优质的代码、提高项目的开发和维护效率；还能更好地阅读和理解源码，甚至可以根据文件名称直接推断出源码的架构设计。">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-07-21T13:08:14.000Z">
+<meta property="article:modified_time" content="2026-08-29T07:51:17.469Z">
+<meta property="article:author" content="sitJac">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://sitjac.github.io/blog/cpp-design-patterns/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://sitjac.github.io/blog/cpp-design-patterns/","path":"cpp-design-patterns/","title":"C++ 设计模式学习路线"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>C++ 设计模式学习路线 | sitJac's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.umd.js" integrity="sha256-a+H7FYzJv6oU2hfsfDGM2Ohw/cR9v+hPfxHCLdmCrE8=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.5.0/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+  <script src="/blog/js/third-party/fancybox.js" defer></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+  <script class="next-config" data-name="katex" type="application/json">{"copy_tex_js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/copy-tex.min.js","integrity":"sha256-Us54+rSGDSTvIhKKUs4kygE2ipA0RXpWWh0/zLqw3bs="}}</script>
+  <script src="/blog/js/third-party/math/katex.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">sitJac's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/blog/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/blog/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-photos"><a href="/blog/photos/" rel="section"><i class="fa fa-camera fa-fw"></i>Photos</a></li><li class="menu-item menu-item-categories"><a href="/blog/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-bookmarks"><a href="/blog/bookmarks/" rel="section"><i class="fa fa-bookmark fa-fw"></i>Bookmarks</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="Searching..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9D%A5%E6%BA%90"><span class="nav-number">2.</span> <span class="nav-text">来源</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9F%A5%E8%AF%86"><span class="nav-number">3.</span> <span class="nav-text">知识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E8%A6%81%E6%A6%82%E8%BF%B0"><span class="nav-number">3.1.</span> <span class="nav-text">简要概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%A1%A8"><span class="nav-number">3.2.</span> <span class="nav-text">知识图表</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E5%BB%BA%E8%AE%AE"><span class="nav-number">4.</span> <span class="nav-text">学习建议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF"><span class="nav-number">5.</span> <span class="nav-text">学习路线</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%9F%BA%E7%A1%80%E5%AD%A6%E4%B9%A0"><span class="nav-number">5.1.</span> <span class="nav-text">一、基础学习</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E9%A1%BA%E5%BA%8F"><span class="nav-number">5.1.1.</span> <span class="nav-text">学习顺序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8E%A8%E8%8D%90%E8%B5%84%E6%BA%90"><span class="nav-number">5.1.2.</span> <span class="nav-text">推荐资源</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E7%BC%96%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="nav-number">5.2.</span> <span class="nav-text">二、编码实现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B5%84%E6%BA%90"><span class="nav-number">5.2.1.</span> <span class="nav-text">资源</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98"><span class="nav-number">5.3.</span> <span class="nav-text">三、项目实战</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E5%A4%87%E6%88%98%E9%9D%A2%E8%AF%95"><span class="nav-number">5.4.</span> <span class="nav-text">四、备战面试</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%8F%E5%85%B8%E9%9D%A2%E8%AF%95%E9%A2%98"><span class="nav-number">5.4.1.</span> <span class="nav-text">经典面试题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B5%84%E6%BA%90-2"><span class="nav-number">5.4.2.</span> <span class="nav-text">资源</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">sitJac</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://sitjac.github.io/blog/cpp-design-patterns/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="sitJac">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sitJac's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="C++ 设计模式学习路线 | sitJac's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C++ 设计模式学习路线
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2022-07-21 21:08:14" itemprop="dateCreated datePublished" datetime="2022-07-21T21:08:14+08:00">2022-07-21</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/blog/categories/C/" itemprop="url" rel="index"><span itemprop="name">C++</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><div class="note info">
+<ul>
+<li>设计模式是针对常见问题的通用解决方案，目前最为经典的设计模式有 23 种。</li>
+<li>学习设计模式不仅能开拓思路、写出更优质的代码、提高项目的开发和维护效率；还能更好地阅读和理解源码，甚至可以根据文件名称直接推断出源码的架构设计。</li>
+</ul>
+</div>
+<span id="more"></span>
+<h2 id="介绍">介绍</h2>
+<p>你是否在项目开发中思考过如下几个问题？</p>
+<ul>
+<li>同样都是写代码，为什么有些大佬的思路清晰、代码整洁，而我的代码却充满了重复和混乱，每次要修改时都无从下手、Bug 一堆？</li>
+<li>如何写代码，才能使得项目易于扩展和维护？</li>
+<li>我每天都在写重复的代码，如何提升水平？</li>
+<li>为什么我读不懂大佬写的源码？是不是缺少了什么知识？</li>
+</ul>
+<p>如果存在上述问题，那么我们一定要学习软件开发中的重要技能 —— <code>设计模式</code>！</p>
+<p>设计模式是软件开发人员在软件开发过程中面临的一般问题的 <strong>通用</strong>
+解决方案。这些解决方案是众多软件开发人员经过相当长的一段时间的试验和错误总结出来的。</p>
+<p>通俗地说就是前辈们在写代码时摸索出了一些不错的方法，可以用于解决一类问题、更好地开发和维护项目。于是其他软件开发者纷纷效仿，久而久之，就得出了一套优秀的软件开发方法总结。</p>
+<h2 id="来源">来源</h2>
+<p>在 1994 年，由 Erich Gamma、Richard Helm、Ralph Johnson 和 John
+Vlissides 四人合著出版了一本名为《Design Patterns - Elements of Reusable Object-Oriented
+Software》（中文译名：<a target="_blank" rel="noopener" href="https://book.douban.com/subject/1052241/">《设计模式 - 可复用的面向对象软件元素》</a>）的书，该书首次提到了软件开发中设计模式的概念。</p>
+<h2 id="知识">知识</h2>
+<h3 id="简要概述">简要概述</h3>
+<p>《Design Patterns: Element of Reusable Object Oriented Software》</p>
+<ul>
+<li>Creational Patterns:
+<ul>
+<li>Abstract Factory</li>
+<li>Builder</li>
+<li>Factory Method</li>
+<li>Prototype</li>
+<li>Singleton</li>
+</ul>
+</li>
+<li>Structural Patterns
+<ul>
+<li>Adapter</li>
+<li>Bridge</li>
+<li>Composite</li>
+<li>Decorator</li>
+<li>Facade</li>
+<li>Flyweight</li>
+<li>Proxy</li>
+</ul>
+</li>
+<li>Behivioural Patterns
+<ul>
+<li>Chain of Responsibility</li>
+<li>Command</li>
+<li>Interpreter</li>
+<li>Mediator</li>
+<li>Memento</li>
+<li>Observer</li>
+<li>State</li>
+<li>Strategy</li>
+<li>Template Method</li>
+<li>Visitor</li>
+</ul>
+</li>
+</ul>
+<p>编程7大原则</p>
+<ol>
+<li>单一指责原则 Single Responsibility Principle</li>
+<li>开闭原则 Open-CLosed Principle</li>
+<li>迪米特法则 Law of Demeter</li>
+<li>依赖倒置原则 Dependency Inversion Principle</li>
+<li>合成复用原则 Composite Reuse Principle</li>
+<li>接口隔离原则 Interface Segregation Principle</li>
+<li>里氏替换原则 Liskov Substitution Principle</li>
+</ol>
+<ul>
+<li>
+<p>设计模式分类</p>
+<ul>
+<li>根据作用范围：类 / 对象模式</li>
+<li>根据目的分类：创建型 / 结构型 / 行为型模式</li>
+</ul>
+</li>
+<li>
+<p>创建型模式：<strong>如何创建对象</strong></p>
+<ul>
+<li>单例模式（懒汉式、饿汉式、双检锁、线程唯一单例）</li>
+<li>工厂方法模式（类）</li>
+<li>抽象工厂模式</li>
+<li>建造者模式</li>
+<li>原型模式</li>
+</ul>
+</li>
+<li>
+<p>结构型模式：<strong>如何将类或对象结合在一起形成一个更强大的结构</strong></p>
+<ul>
+<li>适配器模式（类 / 对象）</li>
+<li>组合模式</li>
+<li>装饰器模式</li>
+<li>代理模式</li>
+<li>享元模式</li>
+<li>外观模式</li>
+<li>桥接模式</li>
+</ul>
+</li>
+<li>
+<p>行为型模式：<strong>类或对象间如何交互、如何划分职责，从而更好地完成任务</strong></p>
+<ul>
+<li>迭代器模式</li>
+<li>模板方法模式（类）</li>
+<li>策略模式</li>
+<li>命令模式</li>
+<li>状态模式</li>
+<li>责任链模式</li>
+<li>备忘录模式</li>
+<li>观察者模式</li>
+<li>访问者模式</li>
+<li>中介者模式</li>
+<li>解释器模式（类）</li>
+</ul>
+</li>
+</ul>
+<h3 id="知识图表">知识图表</h3>
+<blockquote>
+<p>表格来源：
+<a target="_blank" rel="noopener" href="https://www.cnblogs.com/zhangdezhang/p/16082901.html">GoF设计模式-23大设计模式（表格）-程序员必备+必背</a></p>
+</blockquote>
+<p>表一：GoF的23种设计模式一览表</p>
+<table>
+  <tr>
+    <td></td>
+    <td>创建型模式*5  <br> Creational</td>
+    <td>结构性模式*7  <br> Structural</td>
+    <td>行为型模式*11 <br> Behavioral</td>
+  </tr>
+  <tr>
+    <td>类模式</td>
+    <td>
+      <p>工厂方法模式 (Factory Method)</p>
+    </td>
+    <td>
+      <p>(类)适配器模式 (Class Adapter)</p>
+    </td>
+    <td>
+      <p>解释器模式 (Interpreter)</p>
+      <p>模板方法模式 (Template Method)</p>
+    </td>
+  </tr>
+  <tr>
+    <td>对象模式</td>
+    <td>
+      <p>抽象工厂模式 (Abstract Factory)</p>
+      <p>建造者模式 (Builder)</p>
+      <p>原型模式 (Prototype)</p>
+      <p>单例模式 (Singleton)</p>
+    </td>
+    <td>
+      <p>(对象)适配器模式 (Object Adapter)</p>
+      <p>桥接模式 (Bridge)</p>
+      <p>组合模式 (Composite)</p>
+      <p>装饰模式 (Decorator)</p>
+      <p>外观模式 (Facade)</p>
+      <p>享元模式 (Flyweight)</p>
+      <p>代理模式 (Proxy)</p>
+    </td>
+    <td>
+      <p>职责链模式 (Chain of Responsibility)</p>
+      <p>命令模式 (Command)</p>
+      <p>迭代器模式 (Iterator)</p>
+      <p>中介者模式 (Mediator)</p>
+      <p>备忘录模式 (Memento)</p>
+      <p>观察者模式 (Observer)</p>
+      <p>状态模式 (State)</p>
+      <p>策略模式 (Strategy)</p>
+      <p>访问者模式 (Visitor)</p>
+    </td>
+  </tr>
+</table>
+<p>表二：GoF的23种设计模式简要说明</p>
+<table>
+  <tr>
+    <th>模式类别</th>
+    <th>模式名称</th>
+    <th>模式说明</th>
+  </tr>
+  <tr>
+    <td rowspan="5">创建型模式*5 <br> Creational Pattern</td>
+    <td>抽象工厂模式 <br> Abstract Factory <br> Pattern</td>
+    <td>提供一个创建一系列相关或者相互依赖的对象的接口，而无需指定它们具体的类</td>
+  </tr>
+  <tr>
+    <td>工厂方法模式 <br> Factory Method <br> Pattern</td>
+    <td>定义一个用于创建对象的类型，但是让子类决定将哪一个类实例化；工厂方法模式让一个类的实例化延迟到子类</td>
+  </tr>
+  <tr>
+    <td>建造者模式 <br> Builder Pattern</td>
+    <td>将一个复杂对象的构建与它的表示分离，使得同样的构建过程可以创建不同的表示</td>
+  </tr>
+  <tr>
+    <td>原型模式 <br> Prototype Pattern</td>
+    <td>使用原型实例指定待创建对象的类型，并且通过复制这个原型来创建新的类</td>
+  </tr>
+  <tr>
+    <td>单例模式 <br> Singleton Pattern</td>
+    <td>确保一个类只有一个实例，并提供一个全局访问点来访问这个实例</td>
+  </tr>
+  <tr>
+    <td rowspan="7">结构型模式*7 <br> Structural Pattern</td>
+    <td>适配器模式 <br> Adapter Pattern</td>
+    <td>将一个类的接口转换成客户希望的另一个接口。适配器模式使得原本由于接口不兼容而不能一起工作的那些类可以一起工作</td>
+  </tr>
+  <tr>
+    <td>桥接模式 <br> Bridge Pattern</td>
+    <td>将抽象部分与它的实现部分解耦，使得两者都能够独立变化</td>
+  </tr>
+  <tr>
+    <td>组合模式 <br> Composite Pattern</td>
+    <td>组合多个对象形成树形结构以表示具有部分-整体关系的层次结构，组合模式让客户端可以统一对待单个对象的组合对象</td>
+  </tr>
+  <tr>
+    <td>装饰模式 <br> Decorator Pattern</td>
+    <td>动态的给一个对象增加一些额外的职责。就扩展功能而言，装饰模式提供了一种比使用子类更加灵活的替代方案；</td>
+  </tr>
+  <tr>
+    <td>外观模式 <br> Facade Pattern</td>
+    <td>为子系统中的一组接口提供一个统一的入口。外观模式定义了一个高层接口，这个接口使得这一子系统更容易使用</td>
+  </tr>
+  <tr>
+    <td>享元模式 <br> Flyweight Pattern</td>
+    <td>运用共享技术有效地支持大量细粒度对象的复用</td>
+  </tr>
+  <tr>
+    <td>代理模式 <br> Proxy Pattern</td>
+    <td>给某一个对象提供一个代理或占位符，并由代理对象来控制对原有对象的访问</td>
+  </tr>
+  <tr>
+    <td rowspan="11">行为型模式*11 <br> Behavioral Pattern</td>
+    <td>职责链模式 <br> Chain of <br> Responsibility Pattern</td>
+    <td>避免将一个请求的发送者与接收者耦合在一起，让多个对象都有机会处理请求；将接收请求的对象连接成一条链，并且沿着这条链传递请求，直到有一个对象能够处理它为止</td>
+  </tr>
+  <tr>
+    <td>命令模式 <br> Command Pattern</td>
+    <td>将一个请求封装为一个对象，从而可用不同的请求对客户进行参数化，对请求排队或者记录请求日志，以及支持可撤销的操作</td>
+  </tr>
+  <tr>
+    <td>迭代器模式 <br> Iterator Pattern</td>
+    <td>提供一种方法顺序访问一个聚合对象中的各个元素，而又不用暴露该对象的内部表示</td>
+  </tr>
+  <tr>
+    <td>中介者模式 <br> Mediator Pattern</td>
+    <td>定义一个对象来封装一系列对象的交互；中介者模式使各对象之间不需要显式的相互引用，从而使其耦合松散，而且让你可以独立的改变他们之间的交互</td>
+  </tr>
+  <tr>
+    <td>备忘录模式 <br> Memento Pattern</td>
+    <td>在不破坏封装的前提下，捕获一个对象的内部状态，并在该对象之外保存这个状态，这样可以在以后将对象恢复到原先保存的状态</td>
+  </tr>
+  <tr>
+    <td>观察者模式 <br> Observer Pattern</td>
+    <td>定义对象之间的一种一对多依赖关系，使得每当一个对象状态发生改变时，其相关依赖对象皆得到通知并被自动更新</td>
+  </tr>
+  <tr>
+    <td>状态模式 <br> State Pattern</td>
+    <td>允许一个对象在其内部状态改变时改变它的行为，对象看起来似乎修改了它的类</td>
+  </tr>
+  <tr>
+    <td>策略模式 <br> Strategy Pattern</td>
+    <td>定义一系列算法，将每一个算法封装起来，并让它们可以相互替换，策略模式让算法可以独立于使用它的客户变化</td>
+  </tr>
+  <tr>
+    <td>模板方法模式 <br> Template Method <br> Pattern</td>
+    <td>定义一个操作中算法的框架，而将一些步骤延迟到子类中；模板方法模式使得子类可以不改变一个算法的结构，即可重新定义该算法的某些特定步骤</td>
+  </tr>
+  <tr>
+    <td>访问者模式 <br> Visitor Pattern</td>
+    <td>表示一个作用于某对象结构中的各个元素的操作；访问者模式让你可以在不改变各个元素的类的前提下定义用于这些元素的新操作</td>
+  </tr>
+</table>
+<blockquote>
+<p>表格来源： <a target="_blank" rel="noopener" href="https://home.cnblogs.com/u/schips/">schips</a></p>
+</blockquote>
+<p>表三：GoF的23种设计模式的对比</p>
+<table>
+<thead>
+<tr>
+<th>设计模式</th>
+<th>适用层次</th>
+<th>引入时机</th>
+<th>复杂度</th>
+<th>变化</th>
+<th>实现</th>
+<th>体现的原则</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>工厂方法</td>
+<td>代码级</td>
+<td>编码时</td>
+<td>简单</td>
+<td>子类的实例化</td>
+<td>对象的创建工作延迟到子类</td>
+<td>开闭原则</td>
+</tr>
+<tr>
+<td>单例</td>
+<td>代码级、应用级</td>
+<td>设计时、编码时</td>
+<td>简单</td>
+<td>唯一实例</td>
+<td>封装对象产生的个数</td>
+<td></td>
+</tr>
+<tr>
+<td>门面</td>
+<td>应用级、构架级</td>
+<td>设计时、编码时</td>
+<td>简单</td>
+<td>子系统的高层接口</td>
+<td>封装子系统</td>
+<td>开闭原则</td>
+</tr>
+<tr>
+<td>模板方法</td>
+<td>代码级</td>
+<td>编码时、重构时</td>
+<td>简单</td>
+<td>算法子步骤的变化</td>
+<td>封装算法结构</td>
+<td>依赖倒置原则</td>
+</tr>
+<tr>
+<td>抽象工厂</td>
+<td>应用级</td>
+<td>设计时</td>
+<td>较复杂</td>
+<td>产品家族的扩展</td>
+<td>封装产品族系列内容的创建</td>
+<td>开闭原则</td>
+</tr>
+<tr>
+<td>组合</td>
+<td>代码级</td>
+<td>编码时、重构时</td>
+<td>较复杂</td>
+<td>复杂对象接口的统一</td>
+<td>统一复杂对象的接口</td>
+<td>里氏代换原则</td>
+</tr>
+<tr>
+<td>代理</td>
+<td>应用级、构架级</td>
+<td>设计时、编码时</td>
+<td>简单</td>
+<td>对象访问的变化</td>
+<td>封装对象的访问过程</td>
+<td>里氏代换原则</td>
+</tr>
+<tr>
+<td>命令</td>
+<td>应用级</td>
+<td>设计时、编码时</td>
+<td>较简单</td>
+<td>请求的变化</td>
+<td>封装行为对对象</td>
+<td>开闭原则</td>
+</tr>
+<tr>
+<td>观察者</td>
+<td>应用级、构架级</td>
+<td>设计时、编码时</td>
+<td>较简单</td>
+<td>通讯对象的变化</td>
+<td>封装对象通知</td>
+<td>开闭原则</td>
+</tr>
+<tr>
+<td>策略</td>
+<td>应用级</td>
+<td>设计时</td>
+<td>一般</td>
+<td>算法的变化</td>
+<td>封装算法</td>
+<td>里氏代换原则</td>
+</tr>
+<tr>
+<td>建造者</td>
+<td>代码级</td>
+<td>编码时</td>
+<td>一般</td>
+<td>对象组建的变化</td>
+<td>封装对象的组建过程</td>
+<td>开闭原则</td>
+</tr>
+<tr>
+<td>Adapter</td>
+<td>代码级</td>
+<td>重构时</td>
+<td>一般</td>
+<td>对象接口的变化</td>
+<td>接口的转换</td>
+<td></td>
+</tr>
+<tr>
+<td>桥接</td>
+<td>代码级</td>
+<td>设计时、编码时</td>
+<td>一般</td>
+<td>对象的多维度变化</td>
+<td>分离接口以及实现</td>
+<td>开闭原则</td>
+</tr>
+<tr>
+<td>装饰器</td>
+<td>代码级</td>
+<td>重构时</td>
+<td>较复杂</td>
+<td>对象的组合职责</td>
+<td>在稳定接口上扩展</td>
+<td>开闭原则</td>
+</tr>
+<tr>
+<td>迭代器</td>
+<td>代码级、应用级</td>
+<td>编码时、重构时</td>
+<td>较简单</td>
+<td>对象内部集合的变化</td>
+<td>封装对象内部集合的使用</td>
+<td>单一职责原则</td>
+</tr>
+<tr>
+<td>中介者</td>
+<td>应用级、构架级</td>
+<td>编码时、重构时</td>
+<td>一般</td>
+<td>对象交互的变化</td>
+<td>封装对象间的交互</td>
+<td>开闭原则</td>
+</tr>
+<tr>
+<td>备忘录</td>
+<td>代码级</td>
+<td>编码时</td>
+<td>较简单</td>
+<td>状态的辅助保存</td>
+<td>封装对象状态的变化</td>
+<td>接口隔离原则</td>
+</tr>
+<tr>
+<td>状态</td>
+<td>应用级</td>
+<td>设计时、编码时</td>
+<td>一般</td>
+<td>对象状态的变化</td>
+<td>封装与状态相关的行为</td>
+<td>单一职责原则</td>
+</tr>
+<tr>
+<td>访问者</td>
+<td>应用级</td>
+<td>设计时</td>
+<td>较复杂</td>
+<td>对象操作变化</td>
+<td>封装对象操作变化</td>
+<td>开闭原则</td>
+</tr>
+<tr>
+<td>原型</td>
+<td>应用级</td>
+<td>编码时、重构时</td>
+<td>较简单</td>
+<td>实例化的类</td>
+<td>封装对原型的拷贝</td>
+<td>依赖倒置原则</td>
+</tr>
+<tr>
+<td>享元</td>
+<td>代码级、应用级</td>
+<td>设计时</td>
+<td>一般</td>
+<td>系统开销的优化</td>
+<td>封装对象的获取</td>
+<td></td>
+</tr>
+<tr>
+<td>责任链</td>
+<td>应用级、构架级</td>
+<td>设计时、编码时</td>
+<td>较复杂</td>
+<td>对象的请求过程</td>
+<td>封装对象的责任范围</td>
+<td></td>
+</tr>
+<tr>
+<td>解释器</td>
+<td>应用级</td>
+<td>设计时</td>
+<td>较复杂</td>
+<td>领域问题的变化</td>
+<td>封装特定领域的变化</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>除了这 23 种主流设计模式外，还有一些其他设计模式，比如 Immutable 不可变模式等，了解即可。</p>
+<h2 id="学习建议">学习建议</h2>
+<ol>
+<li>对设计模式的学习和其他知识一样，先了解每种设计模式是什么？作用是什么？能够解决什么问题？适用于什么场景？有什么特点？类和对象的关系是什么（建议结合 UML 类图来理解）？再去考虑编码实现和进一步在项目中应用。</li>
+<li>一定要多写代码实践，最好每个设计模式都实现一遍，不要去背代码，用的多了自然就能写出代码了。</li>
+<li>每个设计模式都可以 <strong>独立学习</strong>
+，互相之间联系不大，因此可以根据自己的时间来选择性学习（比如先学重点的单例模式）。</li>
+<li>在学会基础的设计模式后，可以分析之前学过的框架源码（比如 Spring、MyBatis 等），参考别人是如何应用设计模式的。</li>
+<li><strong>不要过度依赖设计模式！！！！！！</strong>
+它并不是银弹，过分使用设计模式可能只会增加系统的复杂度。</li>
+</ol>
+<h2 id="学习路线">学习路线</h2>
+<p>主流的设计模式共有 23 种，建议大家按照以下四个阶段来学习：</p>
+<ol>
+<li>基础学习</li>
+<li>编码实现</li>
+<li>项目实战</li>
+<li>备战面试</li>
+</ol>
+<p>其中第一个阶段和第二个阶段 <strong>可以同时进行</strong>
+，即对于每个设计模式的学习都是：先了解、再编码实现。</p>
+<h3 id="一、基础学习">一、基础学习</h3>
+<p>本阶段的目标：依次了解每一种设计模式的应用场景、特点、UML 类图，能够对设计模式有个基础的印象。</p>
+<h4 id="学习顺序">学习顺序</h4>
+<p>根据使用频率、难易度、面试考察率等综合排序，仅供参考，并不绝对！</p>
+<p>优先：</p>
+<ol>
+<li>单例模式</li>
+<li>工厂方法模式</li>
+<li>迭代器模式</li>
+<li>策略模式</li>
+<li>建造者模式</li>
+<li>模板方法模式</li>
+<li>代理模式</li>
+<li>责任链模式</li>
+<li>抽象工厂模式</li>
+<li>适配器模式</li>
+<li>观察者模式</li>
+<li>外观模式</li>
+</ol>
+<p>一般：</p>
+<ol>
+<li>桥接模式</li>
+<li>组合模式</li>
+<li>装饰器模式</li>
+<li>状态模式</li>
+<li>访问者模式</li>
+<li>中介者模式</li>
+<li>命令模式</li>
+<li>备忘录模式</li>
+</ol>
+<p>低优先：</p>
+<ol>
+<li>原型模式</li>
+<li>享元模式</li>
+<li>解释器模式</li>
+</ol>
+<h4 id="推荐资源">推荐资源</h4>
+<blockquote>
+<p>以下资源看 1 - 2 个就足够入门了</p>
+</blockquote>
+<ul>
+<li>书籍
+<ul>
+<li>《图解设计模式》：<a target="_blank" rel="noopener" href="https://www.aliyundrive.com/s/jcQugLGNs1V">https://www.aliyundrive.com/s/jcQugLGNs1V</a>
+提取码: 5i9c（强烈推荐，用 Java 语言实现，图多、有示例代码、有习题和答案，很不错）</li>
+<li>《大话设计模式》：<a target="_blank" rel="noopener" href="https://www.aliyundrive.com/s/73jZWnfAtaA">https://www.aliyundrive.com/s/73jZWnfAtaA</a>
+提取码: 9gc7（比较有趣）</li>
+<li>《Head
+First 设计模式》：<a target="_blank" rel="noopener" href="https://www.aliyundrive.com/s/GnuQcruh7Us">https://www.aliyundrive.com/s/GnuQcruh7Us</a>
+提取码: 9gc7</li>
+<li>《设计模式：可复用面向对象软件的基础》：<a target="_blank" rel="noopener" href="https://www.aliyundrive.com/s/T9ECaPtxzg4">https://www.aliyundrive.com/s/T9ECaPtxzg4</a>
+提取码: 9gc7（大黑书，难度较大，有能力和时间才去读）</li>
+<li>《JavaScript 设计模式与开发实践》：<a target="_blank" rel="noopener" href="https://www.aliyundrive.com/s/tzcZCU8bqnR">https://www.aliyundrive.com/s/tzcZCU8bqnR</a>
+提取码: 9gc7（适合前端同学阅读）</li>
+<li>《Python 设计模式》：<a target="_blank" rel="noopener" href="https://www.aliyundrive.com/s/3RNoX31XqUy">https://www.aliyundrive.com/s/3RNoX31XqUy</a>
+提取码: 9gc7</li>
+</ul>
+</li>
+<li>视频
+<ul>
+<li>尚硅谷图解 Java 设计模式：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1G4411c7N4">https://www.bilibili.com/video/BV1G4411c7N4</a>
+（讲的很棒也很全面，也和一些主流框架相结合，系统学习 Java 的同学可以看）</li>
+<li>五分钟学设计模式：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1af4y1y7sS">https://www.bilibili.com/video/BV1af4y1y7sS</a>
+（小短快科普，比较轻松）</li>
+<li>黑马程序员Java设计模式详解：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1Np4y1z7BU">https://www.bilibili.com/video/BV1Np4y1z7BU</a>
+（很完整，最后讲解了 Spring 框架的部分设计）</li>
+<li>用一个项目讲解 23 种设计模式：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV19g411N7yx">https://www.bilibili.com/video/BV19g411N7yx</a>
+（和项目结合，思路不错，但其中有一些直播翻车，可部分跳过）</li>
+</ul>
+</li>
+<li>文档
+<ul>
+<li>菜鸟教程：<a target="_blank" rel="noopener" href="https://www.runoob.com/design-pattern/design-pattern-tutorial.html">https://www.runoob.com/design-pattern/design-pattern-tutorial.html</a>
+（还是比较推荐的，学过设计模式后如果忘记了，可以查看这个文档快速补回来）</li>
+<li>C++ 图说设计模式：<a target="_blank" rel="noopener" href="https://design-patterns.readthedocs.io/zh_CN/latest/">https://design-patterns.readthedocs.io/zh_CN/latest/</a></li>
+<li>Go 语言设计模式系列博客：<a target="_blank" rel="noopener" href="https://lailin.xyz/post/singleton.html">https://lailin.xyz/post/singleton.html</a></li>
+</ul>
+</li>
+</ul>
+<h3 id="二、编码实现">二、编码实现</h3>
+<p>本阶段的目标：依次编码实现每个设计模式，用任何支持面向对象的编程语言都可以，最好能够独立（不借助任何资料）从 0 写出每个设计模式的代码。</p>
+<h4 id="资源">资源</h4>
+<p>一些源码示例，仅供参考，更多的内容可以直接在 GitHub 搜索关键词 <code>Design Pattern</code> 或
+<code>设计模式</code> ：</p>
+<ul>
+<li>各语言设计模式示例代码：<a target="_blank" rel="noopener" href="https://github.com/wx-chevalier/design-pattern-examples">https://github.com/wx-chevalier/design-pattern-examples</a></li>
+<li>Java
+23 种设计模式全归纳：<a target="_blank" rel="noopener" href="https://github.com/youlookwhat/DesignPattern">https://github.com/youlookwhat/DesignPattern</a>
+（教程 + 源码）</li>
+<li>C++ 设计模式源码：<a target="_blank" rel="noopener" href="https://github.com/liu-jianhao/Cpp-Design-Patterns">https://github.com/liu-jianhao/Cpp-Design-Patterns</a>
+（设计模式介绍 + 源码）</li>
+<li>JavaScript 示例代码：
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/wchaowu/javascript">https://github.com/wchaowu/javascript</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/zy445566/design-pattern-in-javascript">https://github.com/zy445566/design-pattern-in-javascript</a></li>
+</ul>
+</li>
+<li>Python 示例代码：
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/wklken/py-patterns">https://github.com/wklken/py-patterns</a></li>
+</ul>
+</li>
+<li>Go 示例代码
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/mohuishou/go-design-pattern">https://github.com/mohuishou/go-design-pattern</a></li>
+</ul>
+</li>
+</ul>
+<h3 id="三、项目实战">三、项目实战</h3>
+<p>本阶段的目标：通过做项目或阅读项目源码来进一步强化每个设计模式的实际应用。做到能根据某个场景主动选出合适的设计模式来优化代码、灵活运用，并且能够通过文件命名、项目目录结构等途径来快速判断出某个框架是否使用了设计模式。</p>
+<p>可以先通过一个视频了解设计模式的实际应用：</p>
+<ul>
+<li>实际工作中，如何运用 Java 设计模式：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1tK4y1s7Uo">https://www.bilibili.com/video/BV1tK4y1s7Uo</a></li>
+</ul>
+<p>列举一些设计模式在框架源码中的应用：</p>
+<blockquote>
+<p>部分内容源于网络</p>
+</blockquote>
+<ul>
+<li>Spring
+<ul>
+<li>工厂模式：通过 BeanFactory 和 ApplicationContext 来创建对象</li>
+<li>单例模式：Spring Bean 默认为单例模式</li>
+<li>策略模式：例如 Resource 的实现类，针对不同的资源文件，实现了不同方式的资源获取策略</li>
+<li>代理模式：Spring 的 AOP 功能用到了 JDK 的动态代理和 CGLIB 字节码生成技术</li>
+<li>模板方法：可以将相同部分的代码放在父类中，而将不同的代码放入不同的子类中，用来解决代码重复的问题。比如RestTemplate、JmsTemplate、JpaTemplate</li>
+<li>适配器模式：Spring AOP 的增强或通知（Advice）使用到了适配器模式</li>
+<li>观察者模式：Spring 事件驱动模型</li>
+<li>桥接模式：可以根据客户的需求能够动态切换不同的数据源。比如我们的项目需要连接多个数据库，客户在每次访问中根据需要会去访问不同的数据库</li>
+</ul>
+</li>
+<li>Spring MVC
+<ul>
+<li>组合模式：WebMvcConfigurerComposite，树枝和树叶都实现了相同的抽象类或接口 WebMvcConfigurer</li>
+<li>责任链模式：DispatcherServlet 依次拦截和处理请求</li>
+<li>适配器模式：HandlerAdapter 处理器适配</li>
+</ul>
+</li>
+<li>MyBatis（参考：<a target="_blank" rel="noopener" href="https://blog.csdn.net/aha_jasper/article/details/108701785">https://blog.csdn.net/aha_jasper/article/details/108701785</a>
+）
+<ul>
+<li>Builder + Factory 模式：创建 SqlSession 工厂和 SqlSession</li>
+<li>模板方法模式：BaseExecutor 定义执行器基本流程</li>
+<li>解释器模式：SqlNode 动态解析 SQL</li>
+<li>单例模式：ErrorContext 线程唯一</li>
+<li>装饰器模式：Cache 的实现用组合而非继承实现更灵活地缓存方式结合</li>
+<li>迭代器模式：PropertyTokenizer 利用迭代器模式实现属性解析器</li>
+<li>适配器模式：Log 适配不同的日志框架</li>
+</ul>
+</li>
+<li>Google
+Guava（参考：<a target="_blank" rel="noopener" href="https://blog.csdn.net/aha_jasper/article/details/108695561">https://blog.csdn.net/aha_jasper/article/details/108695561</a>
+）
+<ul>
+<li>Builder 模式：更方便地构建内存缓存</li>
+<li>Wrapper 模式（代理模式、装饰器、适配器模式）：轻松实现对类的扩展</li>
+<li>Immutable 模式：不可变集合实现，如 ImmutableList、ImmutableSet、ImmutableMap 等</li>
+</ul>
+</li>
+<li>更多可以自行学习：
+<ul>
+<li>Netty</li>
+<li>SpringBoot</li>
+<li>Tomcat</li>
+<li>Dubbo</li>
+<li>Spring Cloud</li>
+</ul>
+</li>
+</ul>
+<h3 id="四、备战面试">四、备战面试</h3>
+<p>面试时对设计模式的考察主要有 4 种形式：</p>
+<ol>
+<li>直接问你某个设计模式的作用和大致的原理，考察你对设计模式的了解程度</li>
+<li>让你手写某个设计模式的代码，考察你对设计模式的熟悉程度和编码能力</li>
+<li>给你一个实际的业务场景，让你去设计系统，考察你对设计模式的理解应用能力和逻辑思维</li>
+<li>问你某个框架（轮子）的核心设计和源码细节，考察你对设计模式的理解应用能力</li>
+</ol>
+<h4 id="经典面试题">经典面试题</h4>
+<ol>
+<li>理论：简单介绍一下软件开发原则？</li>
+<li>理论：设计模式如何分类？</li>
+<li>你用过哪些设计模式？举例说明设计模式在你的项目或是某个框架源码中的应用。</li>
+<li>说出某个设计模式的优缺点？什么时候使用它？</li>
+<li>单例模式有哪些实现方式？分别有哪些优缺点？请手写其中一种</li>
+<li>原型模式和单例模式的区别是什么？</li>
+<li>简单工厂、工厂方法和抽象工厂三者有什么区别？</li>
+<li>介绍一下代理模式，说一下静态代理和动态代理（比如 Spring AOP 就用到了）的区别？</li>
+</ol>
+<h4 id="资源-2">资源</h4>
+<ul>
+<li>设计模式面试题汇总：<a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1tjIGc7pnHjgiFPo0fhcKXw">https://pan.baidu.com/s/1tjIGc7pnHjgiFPo0fhcKXw</a>, 提取码: wuan</li>
+<li>面试官最爱问的13道&quot;设计模式&quot;题（视频）：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1fR4y1N74H">https://www.bilibili.com/video/BV1fR4y1N74H</a></li>
+<li>设计模式图解与各语言实例代码 ： <a target="_blank" rel="noopener" href="https://refactoringguru.cn/design-patterns">https://refactoringguru.cn/design-patterns</a></li>
+<li>图说设计模式，使用图形和C++代码结合的方式来解析设计模式 ：<a target="_blank" rel="noopener" href="https://design-patterns.readthedocs.io/zh-cn/latest/index.html">https://design-patterns.readthedocs.io/zh-cn/latest/index.html</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/recruitment-bytedance-2022-04-10/" rel="prev" title="字节跳动2022春招研发笔试第六场4.10-算法方向">
+                  <i class="fa fa-angle-left"></i> 字节跳动2022春招研发笔试第六场4.10-算法方向
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/ota-diffpatch-algorithm/" rel="next" title="OTA差分升级技术">
+                  OTA差分升级技术 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">sitJac</span>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

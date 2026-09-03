@@ -1,0 +1,1609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.1.2">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/logo.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/logo.png">
+  <link rel="mask-icon" href="/blog/images/logo.png" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.css" integrity="sha256-gkQVf8UKZgQ0HyuxL/VnacadJ+D2Kox2TCEBuNQg5+w=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"sitjac.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":true},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/blog/search.json","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="GDB 是类 Unix 系统下的调试工具，可以用来深入分析程序的运行过程，或者排查程序崩溃的原因。 相比于在 IDE 中封装好图形化界面的调试工具，GDB 一般直接通过命令行操作，只需要一些简单的命令就可以完成大部分调试任务。 本文面向 Linux 下的 C&#x2F;C++ 程序，介绍 GDB 的基本命令、进阶用法、工程实践及调试原理，作为速查手册以供工程实践过程中随时查阅。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GDB 使用手册">
+<meta property="og:url" content="https://sitjac.github.io/blog/gdb-tutorial/index.html">
+<meta property="og:site_name" content="sitJac&#39;s Blog">
+<meta property="og:description" content="GDB 是类 Unix 系统下的调试工具，可以用来深入分析程序的运行过程，或者排查程序崩溃的原因。 相比于在 IDE 中封装好图形化界面的调试工具，GDB 一般直接通过命令行操作，只需要一些简单的命令就可以完成大部分调试任务。 本文面向 Linux 下的 C&#x2F;C++ 程序，介绍 GDB 的基本命令、进阶用法、工程实践及调试原理，作为速查手册以供工程实践过程中随时查阅。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://sitjac.github.io/blog/images/others/cpu-structure.png">
+<meta property="og:image" content="https://sitjac.github.io/blog/images/others/stack-frame.png">
+<meta property="article:published_time" content="2024-11-05T02:57:24.000Z">
+<meta property="article:modified_time" content="2026-08-29T07:51:17.473Z">
+<meta property="article:author" content="sitJac">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://sitjac.github.io/blog/images/others/cpu-structure.png">
+
+
+<link rel="canonical" href="https://sitjac.github.io/blog/gdb-tutorial/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://sitjac.github.io/blog/gdb-tutorial/","path":"gdb-tutorial/","title":"GDB 使用手册"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>GDB 使用手册 | sitJac's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.umd.js" integrity="sha256-a+H7FYzJv6oU2hfsfDGM2Ohw/cR9v+hPfxHCLdmCrE8=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.5.0/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+  <script src="/blog/js/third-party/fancybox.js" defer></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+  <script class="next-config" data-name="katex" type="application/json">{"copy_tex_js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/copy-tex.min.js","integrity":"sha256-Us54+rSGDSTvIhKKUs4kygE2ipA0RXpWWh0/zLqw3bs="}}</script>
+  <script src="/blog/js/third-party/math/katex.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">sitJac's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/blog/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/blog/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-photos"><a href="/blog/photos/" rel="section"><i class="fa fa-camera fa-fw"></i>Photos</a></li><li class="menu-item menu-item-categories"><a href="/blog/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-bookmarks"><a href="/blog/bookmarks/" rel="section"><i class="fa fa-bookmark fa-fw"></i>Bookmarks</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="Searching..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%9F%E8%83%BD%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">功能介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%83%E8%AF%95%E5%8E%9F%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">调试原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#register"><span class="nav-number">2.1.</span> <span class="nav-text">register</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ptrace"><span class="nav-number">2.2.</span> <span class="nav-text">ptrace</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#core-dump"><span class="nav-number">2.3.</span> <span class="nav-text">core dump</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#debug-info"><span class="nav-number">2.4.</span> <span class="nav-text">debug info</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#stack-frame"><span class="nav-number">2.5.</span> <span class="nav-text">stack frame</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#application-binary-interface"><span class="nav-number">2.6.</span> <span class="nav-text">application binary interface</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E5%85%A5%E9%97%A8"><span class="nav-number">3.</span> <span class="nav-text">简单入门</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%E7%A8%8B%E5%BA%8F"><span class="nav-number">3.1.</span> <span class="nav-text">编译程序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9B%E5%85%A5-GDB"><span class="nav-number">3.2.</span> <span class="nav-text">进入 GDB</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B0%83%E8%AF%95%E7%A8%8B%E5%BA%8F"><span class="nav-number">3.3.</span> <span class="nav-text">调试程序</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E7%BC%A9%E5%86%99"><span class="nav-number">4.</span> <span class="nav-text">命令缩写</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E8%AF%A6%E8%A7%A3"><span class="nav-number">5.</span> <span class="nav-text">命令详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8%E7%A8%8B%E5%BA%8F"><span class="nav-number">5.1.</span> <span class="nav-text">启动程序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%AE%E5%8A%A9%E4%BF%A1%E6%81%AF"><span class="nav-number">5.2.</span> <span class="nav-text">帮助信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%AD%E7%82%B9%E8%AE%BE%E7%BD%AE"><span class="nav-number">5.3.</span> <span class="nav-text">断点设置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E7%A8%8B%E5%BA%8F"><span class="nav-number">5.4.</span> <span class="nav-text">运行程序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%88%E5%B8%A7%E6%93%8D%E4%BD%9C"><span class="nav-number">5.5.</span> <span class="nav-text">栈帧操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E6%9F%A5%E7%9C%8B"><span class="nav-number">5.6.</span> <span class="nav-text">代码查看</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%8F%E8%A7%88%E6%95%B0%E6%8D%AE"><span class="nav-number">5.7.</span> <span class="nav-text">浏览数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C"><span class="nav-number">5.8.</span> <span class="nav-text">文件操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E6%8E%A7%E5%88%B6"><span class="nav-number">5.9.</span> <span class="nav-text">信号控制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E8%B0%83%E8%AF%95"><span class="nav-number">5.10.</span> <span class="nav-text">线程调试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E8%B0%83%E8%AF%95"><span class="nav-number">5.11.</span> <span class="nav-text">进程调试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B1%87%E7%BC%96%E8%B0%83%E8%AF%95"><span class="nav-number">5.12.</span> <span class="nav-text">汇编调试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%86%E5%8F%B2%E4%BF%A1%E6%81%AF"><span class="nav-number">5.13.</span> <span class="nav-text">历史信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E5%91%BD%E4%BB%A4"><span class="nav-number">5.14.</span> <span class="nav-text">其他命令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E9%98%B6%E7%94%A8%E6%B3%95"><span class="nav-number">6.</span> <span class="nav-text">进阶用法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">7.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">sitJac</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://sitjac.github.io/blog/gdb-tutorial/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="sitJac">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sitJac's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="GDB 使用手册 | sitJac's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          GDB 使用手册
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-11-05 10:57:24" itemprop="dateCreated datePublished" datetime="2024-11-05T10:57:24+08:00">2024-11-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/blog/categories/Tools/" itemprop="url" rel="index"><span itemprop="name">Tools</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><div class="note info">
+<ul>
+<li>GDB 是类 Unix 系统下的调试工具，可以用来深入分析程序的运行过程，或者排查程序崩溃的原因。</li>
+<li>相比于在 IDE 中封装好图形化界面的调试工具，GDB 一般直接通过命令行操作，只需要一些简单的命令就可以完成大部分调试任务。</li>
+<li>本文面向 Linux 下的 C/C++ 程序，介绍 GDB 的基本命令、进阶用法、工程实践及调试原理，作为速查手册以供工程实践过程中随时查阅。</li>
+</ul>
+</div>
+<span id="more"></span>
+<h2 id="功能介绍">功能介绍</h2>
+<p>GDB主要有以下功能：</p>
+<ul>
+<li>运行程序，可以按照自定义的要求随心所欲的运行程序，比如设定断点，单步执行，逐过程执行等等。</li>
+<li>中断程序，可以在指定的地方中断程序的运行，然后检查此时程序中的变量的值。</li>
+<li>改变程序，可以改变程序的执行状态，比如改变临时变量的值，测试程序在不同的条件下的执行情况。</li>
+<li>崩溃分析，可以在程序崩溃时查看完整的调用栈，分析程序崩溃的原因。</li>
+</ul>
+<p>在日常研发过程中的使用场景：</p>
+<ul>
+<li>程序发生 coredump，需要用 GDB 来排查，找出程序崩溃的原因。</li>
+<li>开发过程中调试程序，使用 GDB 来打断点，逐行执行，查看变量值，效率高于日志打印输出。</li>
+</ul>
+<h2 id="调试原理">调试原理</h2>
+<h3 id="register">register</h3>
+<p><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Processor_register"><strong>寄存器</strong></a>
+是 CPU 内部的一组存储单元。</p>
+<p><img src="/blog/images/others/cpu-structure.png" alt="CPU结构"></p>
+<p>在程序运行时，寄存器中会存储多种信息，如指令、数据、地址等，这些信息对于程序的执行和状态管理至关重要，GDB 可以查看和修改寄存器的值，进而控制程序的运行。</p>
+<p>常见的寄存器包括：</p>
+<ul>
+<li>程序计数器（PC）：存储下一条要执行的指令的地址。指示 CPU 正在执行的指令，控制程序的执行流程。</li>
+<li>基址寄存器（BP）：存储栈帧的基地址。用于访问函数参数、局部变量、返回地址等，帮助管理堆栈帧。</li>
+<li>堆栈指针（SP）：存储栈顶的地址。用于管理函数调用和局部变量的存储。</li>
+<li>通用寄存器（GP）：存储临时数据。执行算术运算、逻辑运算、存储中间结果和临时变量等。</li>
+<li>状态寄存器（SR）：存储 CPU 的状态信息。包括条件码、中断使能、特权级别等，控制 CPU 的运行状态。</li>
+<li>中断寄存器（IR）：存储中断处理程序的地址。在发生中断时，指示 CPU 跳转到中断处理程序的地址。</li>
+<li>...</li>
+</ul>
+<h3 id="ptrace">ptrace</h3>
+<p>GDB 是通过 <code>ptrace</code> 系统调用来实现对被调试程序的控制的，利用 <code>ptrace</code>
+系统调用，在被调试程序和 GDB 之间建立跟踪关系。然后所有发送给被调试程序的信号(除SIGKILL)都会被 GDB 截获，GDB 根据截获的信号，查看被调试程序相应的内存地址，寄存器等信息，从而实现调试功能。</p>
+<p><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/ptrace.2.html">ptrace</a>
+允许一个进程控制另一个进程的执行，用于调试器跟踪进程的执行，可以实现断点、单步执行、查看寄存器等功能，函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/ptrace.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @request: 指示 ptrace() 要执行的操作类型</span></span><br><span class="line"><span class="comment"> * @pid:     要操作的进程的进程 ID</span></span><br><span class="line"><span class="comment"> * @addr:    要监控的内存地址</span></span><br><span class="line"><span class="comment"> * @data:    存放要写入或读取的数据</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">long</span> <span class="title function_">ptrace</span><span class="params">(<span class="keyword">enum</span> __ptrace_request request, <span class="type">pid_t</span> pid, <span class="type">void</span> *addr, <span class="type">void</span> *data)</span>;</span><br></pre></td></tr></table></figure>
+<!-- prettier-ignore -->
+<table>
+<thead>
+<tr>
+<th>request</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PTRACE_TRACEME、PTRACE_ATTACH</td>
+<td>建立进程间的追踪关系</td>
+</tr>
+<tr>
+<td>PTRACE_PEEKTEXT、PTRACE_PEEKDATA、PTRACE_PEEKUSER</td>
+<td>读取子进程内存/寄存器中保留的数据</td>
+</tr>
+<tr>
+<td>PTRACE_POKETEXT、PTRACE_POKEDATA、PTRACE_POKEUSER</td>
+<td>修改子进程内存/寄存器中保留的数据</td>
+</tr>
+<tr>
+<td>PTRACE_CONT、PTRACE_SYSCALL、PTRACE_SINGLESTEP</td>
+<td>控制被跟踪进程以不同方式继续执行</td>
+</tr>
+<tr>
+<td>PTRACE_DETACH、PTRACE_KILL</td>
+<td>终止进程间的跟踪关系</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core-dump">core dump</h3>
+<p>当进程崩溃时，会向操作系统发送一个信号操作系统会将进程的内存映像和寄存器状态信息保存到核心转储文件中，叫做 core
+dump 文件，默认名称为 core（名字来源与一种很古老的<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Magnetic-core_memory">磁芯存储器</a>，用于存储程序的状态信息）。</p>
+<p>默认情况下，Linux 系统不会生成 core dump 文件，可以通过 <code>ulimit -c</code> 命令查看 core
+dump 文件的限制，如果为 0 表示系统不会生成 core dump 文件，可以通过
+<code>ulimit -c unlimited</code> 命令设置为无限制。</p>
+<p>默认情况下，core
+dump 文件会生成在可执行文件运行命令的同一路径下，且所有核心转储文件的名称都为 core，新的 core 文件生成将覆盖原来的 core 文件。</p>
+<p>可以通过修改 Linux 特有的 <code>/proc/sys/kernel/core_pattern</code>
+文件所包含的格式化字符串来控制对系统上生成的所有核心转储文件的命名和存储路径，如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">➜  <span class="built_in">sudo</span> sysctl -w kernel.core_pattern=/corefile/core.%e.%p.%t</span><br><span class="line">➜  <span class="built_in">sudo</span> sysctl -p</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>格式符</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>%c</code></td>
+<td>对核心文件大小的资源软限制（字节数）</td>
+</tr>
+<tr>
+<td><code>%e</code></td>
+<td>可执行文件名（不含路径前缀）</td>
+</tr>
+<tr>
+<td><code>%g</code></td>
+<td>遭转储进程的实际组 ID</td>
+</tr>
+<tr>
+<td><code>%h</code></td>
+<td>主机系统的名称</td>
+</tr>
+<tr>
+<td><code>%p</code></td>
+<td>遭转储进程的进程 ID</td>
+</tr>
+<tr>
+<td><code>%s</code></td>
+<td>导致进程终止的信号编号</td>
+</tr>
+<tr>
+<td><code>%t</code></td>
+<td>转储时间，始于 Epoch，以秒为单位</td>
+</tr>
+<tr>
+<td><code>%u</code></td>
+<td>遭转储进程的实际用户 ID</td>
+</tr>
+<tr>
+<td><code>%%</code></td>
+<td>单个%字符</td>
+</tr>
+</tbody>
+</table>
+<p>核心转储文件是一个ELF格式的二进制文件，可能产生 core
+dump 的代码问题如下，使用 GDB 可以快速的定位以下问题：</p>
+<ul>
+<li>Segmentation fault, 段错误
+<ul>
+<li>Null Pointer Dereference, 空指针解引用</li>
+<li>Stack Overflow / Buffer Overflow, 栈溢出/缓冲区溢出</li>
+<li>Use After Free, 释放后使用</li>
+<li>Double Free, 重复释放</li>
+<li>Out of Memory, 内存溢出</li>
+</ul>
+</li>
+</ul>
+<p>特定信号也会引发进程创建一个核心转储文件并终止运行，如下表所示。</p>
+<!-- prettier-ignore -->
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>信号值</th>
+<th>描述</th>
+<th>名称</th>
+<th>信号值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SIGABRT</td>
+<td>6</td>
+<td>中止进程</td>
+<td>SIGFPE</td>
+<td>8</td>
+<td>算术异常</td>
+</tr>
+<tr>
+<td>SIGALRM</td>
+<td>14</td>
+<td>实时定时器过期</td>
+<td>SIGHUP</td>
+<td>1</td>
+<td>挂起</td>
+</tr>
+<tr>
+<td>SIGBUS</td>
+<td>7</td>
+<td>内存访问错误</td>
+<td>SIGILL</td>
+<td>4</td>
+<td>非法指令</td>
+</tr>
+<tr>
+<td>SIGCHLD</td>
+<td>17</td>
+<td>终止或者停止子进程</td>
+<td>SIGINT</td>
+<td>2</td>
+<td>终端中断</td>
+</tr>
+<tr>
+<td>SIGCONT</td>
+<td>18</td>
+<td>若停止则继续</td>
+<td>SIGIO</td>
+<td>29</td>
+<td>I/O 时可能产生</td>
+</tr>
+<tr>
+<td>SIGEMT</td>
+<td>undef</td>
+<td>硬件错误</td>
+<td>SIGKILL</td>
+<td>9</td>
+<td>必杀（确保杀死）</td>
+</tr>
+<tr>
+<td>SIGPIPE</td>
+<td>13</td>
+<td>管道断开</td>
+<td>SIGPROF</td>
+<td>27</td>
+<td>性能分析定时器过期</td>
+</tr>
+<tr>
+<td>SIGPWR</td>
+<td>30</td>
+<td>电量行将耗尽</td>
+<td>SIGQUIT</td>
+<td>3</td>
+<td>终端退出</td>
+</tr>
+<tr>
+<td>SIGSEGV</td>
+<td>11</td>
+<td>无效的内存引用</td>
+<td>SIGSTKFLT</td>
+<td>16</td>
+<td>协处理器栈错误</td>
+</tr>
+<tr>
+<td>SIGSTOP</td>
+<td>19</td>
+<td>确保停止</td>
+<td>SIGSYS</td>
+<td>31</td>
+<td>无效的系统调用</td>
+</tr>
+<tr>
+<td>SIGTERM</td>
+<td>15</td>
+<td>终止进程</td>
+<td>SIGTRAP</td>
+<td>5</td>
+<td>跟踪/断点陷阱</td>
+</tr>
+<tr>
+<td>SIGTSTP</td>
+<td>20</td>
+<td>终端停止</td>
+<td>SIGTTIN</td>
+<td>21</td>
+<td>从终端读取</td>
+</tr>
+<tr>
+<td>SIGTTOU</td>
+<td>22</td>
+<td>向终端写</td>
+<td>SIGURG</td>
+<td>23</td>
+<td>套接字上的紧急数据</td>
+</tr>
+<tr>
+<td>SIGUSR1</td>
+<td>10</td>
+<td>用户自定义信号 1</td>
+<td>SIGUSR2</td>
+<td>12</td>
+<td>用户自定义信号 2</td>
+</tr>
+<tr>
+<td>SIGVTALRM</td>
+<td>26</td>
+<td>虚拟定时器过期</td>
+<td>SIGWINCH</td>
+<td>28</td>
+<td>终端窗口尺寸发生变化</td>
+</tr>
+<tr>
+<td>SIGXCPU</td>
+<td>24</td>
+<td>突破对 CPU 时间的限制</td>
+<td>SIGXFSZ</td>
+<td>25</td>
+<td>突破对文件大小的限制</td>
+</tr>
+</tbody>
+</table>
+<h3 id="debug-info">debug info</h3>
+<p>GDB 调试程序时，需要程序的调试信息，编译时加上 <code>-g</code>
+选项，这样生成的 ELF 格式的可执行文件中就会包含源代码的调试信息。</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Executable_and_Linkable_Format"><strong>ELF</strong></a>
+用于存储可执行文件、目标文件、共享库和核心转储文件，是 Linux 平台上通用的二进制文件格式，它包括可执行文件、可重定位的目标文件（包括.o和.a文件）、core文件和共享对象（.so文件）等。</p>
+</blockquote>
+<p>调试信息以 DWARF 格式被保存在 ELF 格式文件的几个 section 中，如果没有调试信息，GDB 会提示
+<code>No symbol table is loaded</code>，无法查看变量名、函数名等信息，也无法打断点或打印函数调用栈。</p>
+<blockquote>
+<p>调试信息格式主要面向开发者用以指导如何生成调试信息以及如何使用调试信息，<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Debug_With_Arbitrary_Record_Format"><strong>DWARF</strong></a>是类Unix操作系统下的调试信息格式。<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Program_database"><strong>PDB</strong></a>是Windows平台调试信息的主要格式。</p>
+</blockquote>
+<p>ELF 文件由多个 section 组成，每个 section 用于存储不同的信息，DWARF 调试信息根据描述对象的不同，存储到不同的 section，名称均以前缀<code>.debug_</code>开头，下面是一些常见的调试信息：</p>
+<!-- prettier-ignore -->
+<table>
+<thead>
+<tr>
+<th>Section</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>.debug_info</td>
+<td>存储<strong>核心</strong>DWARF数据，包含了描述变量、代码等的DIEs</td>
+</tr>
+<tr>
+<td>.debug_abbrev</td>
+<td>存储.debug_info中使用的缩写信息</td>
+</tr>
+<tr>
+<td>.debug_arranges</td>
+<td>存储一个加速访问的查询表，通过内存地址查询对应编译单元信息</td>
+</tr>
+<tr>
+<td>.debug_frame</td>
+<td>存储调用堆栈信息，包括函数调用、返回地址等</td>
+</tr>
+<tr>
+<td>.debug_line</td>
+<td>存储源代码行号信息</td>
+</tr>
+<tr>
+<td>.debug_loc</td>
+<td>存储变量的位置信息</td>
+</tr>
+<tr>
+<td>.debug_pubnames</td>
+<td>存储一个加速访问的查询表，通过名称查询全局对象和函数</td>
+</tr>
+<tr>
+<td>.debug_pubtypes</td>
+<td>存储一个加速访问的查询表，通过名称查询全局类型信息</td>
+</tr>
+<tr>
+<td>.debug_ranges</td>
+<td>存储一个加速访问的查询表，通过内存地址查询对应编译单元信息</td>
+</tr>
+<tr>
+<td>.debug_str</td>
+<td>存储字符串信息</td>
+</tr>
+<tr>
+<td>.debug_types</td>
+<td>存储类型信息</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Ref：DWARF Debugging Information Format <a target="_blank" rel="noopener" href="https://www.dwarfstd.org/">1</a>
+<a target="_blank" rel="noopener" href="https://www.hitzhangjie.pro/debugger101.io/8-dwarf/">2</a>
+<a target="_blank" rel="noopener" href="https://devillove084.xyz/2024/06/15/Debug-1/">3</a></p>
+</blockquote>
+<p>可以使用<code>readelf -S</code>命令或者<code>objdump -h</code>命令查看 ELF 文件的 section 信息，如下以<code>.debug_</code>开头的 section 是 DWARF 调试信息：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">28 .debug_aranges 000002a0  0000000000000000  0000000000000000  0000303b  2**0</span><br><span class="line">                 CONTENTS, READONLY, DEBUGGING, OCTETS</span><br><span class="line">29 .debug_info   000051d2  0000000000000000  0000000000000000  000032db  2**0</span><br><span class="line">                 CONTENTS, READONLY, DEBUGGING, OCTETS</span><br><span class="line">30 .debug_abbrev 000009a8  0000000000000000  0000000000000000  000084ad  2**0</span><br><span class="line">                 CONTENTS, READONLY, DEBUGGING, OCTETS</span><br><span class="line">31 .debug_line   00000a77  0000000000000000  0000000000000000  00008e55  2**0</span><br><span class="line">                 CONTENTS, READONLY, DEBUGGING, OCTETS</span><br><span class="line">32 .debug_str    00003fea  0000000000000000  0000000000000000  000098cc  2**0</span><br><span class="line">                 CONTENTS, READONLY, DEBUGGING, OCTETS</span><br><span class="line">33 .debug_ranges 00000290  0000000000000000  0000000000000000  0000d8b6  2**0</span><br><span class="line">                 CONTENTS, READONLY, DEBUGGING, OCTETS</span><br></pre></td></tr></table></figure>
+<p>GDB就是根据这些调试信息从可执行程序中获取源代码的信息，然后进行调试的，关于调试器具体如何解析需要的信息，可参考<a target="_blank" rel="noopener" href="https://hanfeng.ink/post/gdb_debug_info/">这篇文章</a>。</p>
+<h3 id="stack-frame">stack frame</h3>
+<p>在程序执行过程中，现代计算机系统使用栈来管理函数调用的过程，<strong>调用栈（call
+stack）<strong>是函数调用时分配的栈空间，它被分成若干个</strong>栈帧（stack
+frame）</strong>，每个栈帧对应一个函数调用和相关的所有数据，包括：</p>
+<ul>
+<li>函数实参和局部变量：这些变量都是在调用函数时自动创建的，函数返回时将自动销毁这些变量（因为栈帧会被释放）。</li>
+<li>函数调用的链接信息：每个函数都会用到一些 CPU 寄存器，比如程序计数器，其指向下一条将要执行的机器语言指令。每当一个函数调用另一函数时，会在被调用函数的栈帧中保存这些寄存器的副本，以便函数返回时能为函数调用者将寄存器恢复原状。</li>
+</ul>
+<p>程序启动时只有一个栈帧，即 main 函数，又称初始栈帧或最外层栈帧。每次调用函数时，会在栈上新分配一帧，每当函数返回时，再从栈上将此帧移去。当前执行的函数所对应的栈帧又称最内层栈帧。</p>
+<p><img src="/blog/images/others/stack-frame.png" alt="一个程序调用栈的示意图"></p>
+<p>GDB 给每个栈帧分配了一个数字，最内层栈帧的编号是 0，外层栈帧依次加 1。可以通过 <code>bt</code>
+命令展示所有栈帧，只有在当前栈帧中的变量才能被访问，如果要访问其他栈帧的变量，需要先切换到对应的栈帧，可以通过
+<code>f</code> 命令加上编号进入到对应的栈帧。</p>
+<h3 id="application-binary-interface">application binary interface</h3>
+<p>应用程序二进制接口（ABI）是一套规则，规定了二进制可执行文件在运行时应如何与某些服务（诸如内核或函数库所提供的服务）交换信息。ABI 特别规定了使用哪些寄存器和栈地址来交换信息以及所交换值的含义，一旦针对某个特定 ABI 进行了编译，其二进制可执行文件应能在 ABI 相同的任何系统上运行。</p>
+<h2 id="简单入门">简单入门</h2>
+<p>当应用程序异常退出时，操作系统会生成 coredump 文件，记录程序退出时的所有内存状态。GDB 可以读取这个文件，查看程序退出时的变量值或者寄存器值，但是无法执行程序。即只能使用静态命令，如 p、bt、i 打印发生异常时的信息。</p>
+<p>GDB 也可以直接加载一个二进制程序并执行。在这种情况下，GDB 不仅可以随时查看程序当前的变量值或其他内存状态，还可以控制程序的运行，如设置断点、单步执行、反向执行等。即不仅可以使用静态命令，还可以使用 r、b、c 等动态命令。</p>
+<p>下面是一个简单的示例，展示如何使用 GDB 调试一个程序。</p>
+<h3 id="编译程序">编译程序</h3>
+<p>现在有这么一个采用质数筛法求解小于 n 的所有质数个数的程序，代码如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">countPrimes</span><span class="params">(<span class="type">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="type">int</span> res = <span class="number">0</span>;</span><br><span class="line">        <span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">isPrime</span><span class="params">(n, <span class="number">1</span>)</span></span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">2</span>; i &lt; n; ++i) &#123;</span><br><span class="line">            <span class="keyword">if</span> (isPrime[i]) &#123;</span><br><span class="line">                res++;</span><br><span class="line">                <span class="keyword">if</span> ((<span class="type">long</span> <span class="type">long</span>) i * i &gt;= n) &#123;</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">for</span> (<span class="type">int</span> j = i * i; j &lt; n; j += i) &#123;</span><br><span class="line">                    isPrime[j] = <span class="number">0</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Solution s;</span><br><span class="line">    <span class="type">int</span> n = <span class="number">10</span>;</span><br><span class="line">    <span class="type">int</span> res = s.<span class="built_in">countPrimes</span>(n);</span><br><span class="line">    cout &lt;&lt; res &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>编译这个程序，生成可执行文件，同时加上 <code>-g</code> 选项，生成调试信息：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">➜  gdb-demo <span class="built_in">ls</span></span><br><span class="line">count_primes.cpp</span><br><span class="line">➜  gdb-demo g++ count_primes.cpp -o count_primes_without_debuginfo.out</span><br><span class="line">➜  gdb-demo g++ -g count_primes.cpp -o count_primes_with_debuginfo.out</span><br><span class="line">➜  gdb-demo <span class="built_in">ls</span></span><br><span class="line">count_primes.cpp  count_primes_with_debuginfo.out  count_primes_without_debuginfo.out</span><br></pre></td></tr></table></figure>
+<h3 id="进入-GDB">进入 GDB</h3>
+<p>使用 GDB 打开一个二进制文件，可以直接输入 <code>gdb</code> 命令，然后在 GDB 中输入 <code>file</code>
+命令加载二进制文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">➜  gdb-demo gdb count_primes_without_debuginfo.out</span><br><span class="line">GNU gdb (Ubuntu 15.0.50.20240403-0ubuntu1) 15.0.50.20240403-git</span><br><span class="line">Copyright (C) 2024 Free Software Foundation, Inc.</span><br><span class="line">License GPLv3+: GNU GPL version 3 or later &lt;http://gnu.org/licenses/gpl.html&gt;</span><br><span class="line">This is free software: you are free to change and redistribute it.</span><br><span class="line">There is NO WARRANTY, to the extent permitted by law.</span><br><span class="line">Type <span class="string">&quot;show copying&quot;</span> and <span class="string">&quot;show warranty&quot;</span> <span class="keyword">for</span> details.</span><br><span class="line">This GDB was configured as <span class="string">&quot;x86_64-linux-gnu&quot;</span>.</span><br><span class="line">Type <span class="string">&quot;show configuration&quot;</span> <span class="keyword">for</span> configuration details.</span><br><span class="line">For bug reporting instructions, please see:</span><br><span class="line">&lt;https://www.gnu.org/software/gdb/bugs/&gt;.</span><br><span class="line">Find the GDB manual and other documentation resources online at:</span><br><span class="line">    &lt;http://www.gnu.org/software/gdb/documentation/&gt;.</span><br><span class="line"></span><br><span class="line">For <span class="built_in">help</span>, <span class="built_in">type</span> <span class="string">&quot;help&quot;</span>.</span><br><span class="line">Type <span class="string">&quot;apropos word&quot;</span> to search <span class="keyword">for</span> commands related to <span class="string">&quot;word&quot;</span>...</span><br><span class="line">Reading symbols from count_primes_without_debuginfo.out...</span><br><span class="line"></span><br><span class="line">This GDB supports auto-downloading debuginfo from the following URLs:</span><br><span class="line">  &lt;https://debuginfod.ubuntu.com&gt;</span><br><span class="line">Enable debuginfod <span class="keyword">for</span> this session? (y or [n]) y</span><br><span class="line">Debuginfod has been enabled.</span><br><span class="line">To make this setting permanent, add <span class="string">&#x27;set debuginfod enabled on&#x27;</span> to .gdbinit.</span><br><span class="line">Downloading separate debug info <span class="keyword">for</span> /home/xiejunjie/Work/PersonalCodes/gdb-demo/count_primes_without_debuginfo.out</span><br><span class="line">(No debugging symbols found <span class="keyword">in</span> count_primes_without_debuginfo.out)</span><br></pre></td></tr></table></figure>
+<p>如果二进制文件没有调试信息，GDB 会提示
+<code>No debugging symbols found in xxx</code>，无法查看变量名、函数名以及backtrace等信息。</p>
+<p>或者直接在命令行中指定二进制文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">➜  gdb-demo gdb</span><br><span class="line">GNU gdb (Ubuntu 15.0.50.20240403-0ubuntu1) 15.0.50.20240403-git</span><br><span class="line">Copyright (C) 2024 Free Software Foundation, Inc.</span><br><span class="line">License GPLv3+: GNU GPL version 3 or later &lt;http://gnu.org/licenses/gpl.html&gt;</span><br><span class="line">This is free software: you are free to change and redistribute it.</span><br><span class="line">There is NO WARRANTY, to the extent permitted by law.</span><br><span class="line">Type <span class="string">&quot;show copying&quot;</span> and <span class="string">&quot;show warranty&quot;</span> <span class="keyword">for</span> details.</span><br><span class="line">This GDB was configured as <span class="string">&quot;x86_64-linux-gnu&quot;</span>.</span><br><span class="line">Type <span class="string">&quot;show configuration&quot;</span> <span class="keyword">for</span> configuration details.</span><br><span class="line">For bug reporting instructions, please see:</span><br><span class="line">&lt;https://www.gnu.org/software/gdb/bugs/&gt;.</span><br><span class="line">Find the GDB manual and other documentation resources online at:</span><br><span class="line">    &lt;http://www.gnu.org/software/gdb/documentation/&gt;.</span><br><span class="line"></span><br><span class="line">For <span class="built_in">help</span>, <span class="built_in">type</span> <span class="string">&quot;help&quot;</span>.</span><br><span class="line">Type <span class="string">&quot;apropos word&quot;</span> to search <span class="keyword">for</span> commands related to <span class="string">&quot;word&quot;</span>.</span><br><span class="line">&gt;&gt;&gt; file count_primes_with_debuginfo.out</span><br><span class="line">Reading symbols from count_primes_with_debuginfo.out...</span><br><span class="line">&gt;&gt;&gt;</span><br></pre></td></tr></table></figure>
+<p>如果二进制文件有调试信息，GDB 会自动加载调试信息，<code>Reading symbols from xxx</code>
+表示调试信息加载成功。</p>
+<h3 id="调试程序">调试程序</h3>
+<p>在 GDB 中，使用 <code>break</code> 命令设置断点，然后使用 <code>run</code>
+命令运行程序，程序会在断点处停下来，可以使用 <code>next</code> 命令单步执行，使用 <code>step</code>
+命令进入函数内部，使用 <code>print</code> 命令打印变量的值，使用 <code>backtrace</code> 命令打印函数调用栈。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; b count_primes.cpp:28</span><br><span class="line">Breakpoint 1 at 0x128b: file count_primes.cpp, line 28.</span><br><span class="line">&gt;&gt;&gt; r</span><br><span class="line">Starting program: /home/xiejunjie/Work/PersonalCodes/gdb-demo/count_primes_with_debuginfo.out</span><br><span class="line">Breakpoint 1, main () at count_primes.cpp:28</span><br><span class="line">28	    int res = s.countPrimes(n);</span><br><span class="line">&gt;&gt;&gt; s</span><br><span class="line">Solution::countPrimes (this=0x7fffffffd62f, n=10) at count_primes.cpp:7</span><br><span class="line">7	    int countPrimes(int n) &#123;</span><br><span class="line">&gt;&gt;&gt; n 3</span><br><span class="line">10	        <span class="keyword">for</span> (int i = 2; i &lt; n; ++i) &#123;</span><br><span class="line">&gt;&gt;&gt; p isPrime</span><br><span class="line"><span class="variable">$1</span> = std::vector of length 10, capacity 10 = &#123;[0] = 1, [1] = 1, [2] = 1, [3] = 1, [4] = 1, [5] = 1, [6] = 1, [7] = 1, [8] = 1, [9] = 1&#125;</span><br><span class="line">&gt;&gt;&gt; bt</span><br><span class="line"><span class="comment">#0  Solution::countPrimes (this=0x7fffffffd62f, n=10) at count_primes.cpp:10</span></span><br><span class="line"><span class="comment">#1  0x000055555555529c in main () at count_primes.cpp:28</span></span><br><span class="line">&gt;&gt;&gt; c</span><br><span class="line">4</span><br><span class="line">[Inferior 1 (process 75796) exited normally]</span><br><span class="line">&gt;&gt;&gt; q</span><br></pre></td></tr></table></figure>
+<p><code> continue</code>
+命令继续执行程序，直到遇到下一个断点，这里没有下一个断点了，所以程序执行完毕，退出，<code>quit</code>
+命令退出 GDB。</p>
+<h2 id="命令缩写">命令缩写</h2>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>简写</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>run</td>
+<td>r</td>
+<td>运行程序</td>
+</tr>
+<tr>
+<td>break</td>
+<td>b</td>
+<td>设置断点</td>
+</tr>
+<tr>
+<td>next</td>
+<td>n</td>
+<td>单步执行，执行完当前函数，停在函数后下一行（step over）</td>
+</tr>
+<tr>
+<td>step</td>
+<td>s</td>
+<td>单步执行，进入函数内部，停在函数内第一行（step into）</td>
+</tr>
+<tr>
+<td>continue</td>
+<td>c</td>
+<td>继续执行程序，直到遇到下一个断点</td>
+</tr>
+<tr>
+<td>print</td>
+<td>p</td>
+<td>打印变量的值，支持数字、字符串、结构体、指针、表达式等</td>
+</tr>
+<tr>
+<td>backtrace</td>
+<td>bt</td>
+<td>打印函数调用栈，显示从程序开始执行到当前位置的函数调用关系</td>
+</tr>
+<tr>
+<td>frame</td>
+<td>f</td>
+<td>切换栈帧，进入到指定的栈帧</td>
+</tr>
+<tr>
+<td>list</td>
+<td>l</td>
+<td>显示源代码，可以指定行号或函数名</td>
+</tr>
+<tr>
+<td>info</td>
+<td>i</td>
+<td>显示程序信息，如断点、栈帧、寄存器等</td>
+</tr>
+<tr>
+<td>set</td>
+<td></td>
+<td>设置变量的值</td>
+</tr>
+<tr>
+<td>watch</td>
+<td></td>
+<td>设置监视点，当变量的值发生变化时，停止程序执行</td>
+</tr>
+<tr>
+<td>until</td>
+<td>u</td>
+<td>执行程序直到达到指定行</td>
+</tr>
+</tbody>
+</table>
+<h2 id="命令详解">命令详解</h2>
+<h3 id="启动程序">启动程序</h3>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>gdb object</td>
+<td>正常启动，加载可执行</td>
+</tr>
+<tr>
+<td>gdb object core</td>
+<td>对可执行 + core 文件进行调试</td>
+</tr>
+<tr>
+<td>gdb object pid</td>
+<td>对正在执行的进程进行调试</td>
+</tr>
+<tr>
+<td>gdb</td>
+<td>正常启动，启动后需要 file 命令手动加载</td>
+</tr>
+<tr>
+<td>gdb -tui</td>
+<td>启用 gdb 的文本界面（或 ctrl-x ctrl-a 更换 CLI/TUI）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="帮助信息">帮助信息</h3>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>help</td>
+<td>列出命令分类</td>
+</tr>
+<tr>
+<td>help running</td>
+<td>查看某个类别的帮助信息</td>
+</tr>
+<tr>
+<td>help run</td>
+<td>查看命令 run 的帮助</td>
+</tr>
+<tr>
+<td>help info</td>
+<td>列出查看程序运行状态相关的命令</td>
+</tr>
+<tr>
+<td>help info line</td>
+<td>列出具体的一个运行状态命令的帮助</td>
+</tr>
+<tr>
+<td>help show</td>
+<td>列出 GDB 状态相关的命令</td>
+</tr>
+<tr>
+<td>help show commands</td>
+<td>列出 show 命令的帮助</td>
+</tr>
+</tbody>
+</table>
+<h3 id="断点设置">断点设置</h3>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>break main</td>
+<td>对函数 main 设置一个断点，可简写为 b main</td>
+</tr>
+<tr>
+<td>break 101</td>
+<td>对源代码的行号设置断点，可简写为 b 101</td>
+</tr>
+<tr>
+<td>break basic.c:101</td>
+<td>对源代码和行号设置断点</td>
+</tr>
+<tr>
+<td>break basic.c:foo</td>
+<td>对源代码和函数名设置断点</td>
+</tr>
+<tr>
+<td>break *0x00400448</td>
+<td>对内存地址 0x00400448 设置断点</td>
+</tr>
+<tr>
+<td>info breakpoints</td>
+<td>列出当前的所有断点信息，可简写为 info break</td>
+</tr>
+<tr>
+<td>delete 1</td>
+<td>按编号删除一个断点</td>
+</tr>
+<tr>
+<td>delete</td>
+<td>删除所有断点</td>
+</tr>
+<tr>
+<td>clear</td>
+<td>删除在当前行的断点</td>
+</tr>
+<tr>
+<td>clear function</td>
+<td>删除函数断点</td>
+</tr>
+<tr>
+<td>clear line</td>
+<td>删除行号断点</td>
+</tr>
+<tr>
+<td>clear basic.c:101</td>
+<td>删除文件名和行号的断点</td>
+</tr>
+<tr>
+<td>clear basic.c:main</td>
+<td>删除文件名和函数名的断点</td>
+</tr>
+<tr>
+<td>clear *0x00400448</td>
+<td>删除内存地址的断点</td>
+</tr>
+<tr>
+<td>disable 2</td>
+<td>禁用某断点，但是不删除</td>
+</tr>
+<tr>
+<td>enable 2</td>
+<td>允许某个之前被禁用的断点，让它生效</td>
+</tr>
+<tr>
+<td>rbreak {regexpr}</td>
+<td>匹配正则的函数前断点，如 ex** 将断点 ex* 开头的函数</td>
+</tr>
+<tr>
+<td>tbreak function | line</td>
+<td>临时断点</td>
+</tr>
+<tr>
+<td>hbreak function | line</td>
+<td>硬件断点</td>
+</tr>
+<tr>
+<td>ignore {id} {count}</td>
+<td>忽略某断点 N-1 次</td>
+</tr>
+<tr>
+<td>condition {id} {expr}</td>
+<td>条件断点，只有在条件生效时才发生</td>
+</tr>
+<tr>
+<td>condition 2 i == 20</td>
+<td>2号断点只有在 i == 20 条件为真时才生效</td>
+</tr>
+<tr>
+<td>watch {expr}</td>
+<td>对变量设置监视点</td>
+</tr>
+<tr>
+<td>info watchpoints</td>
+<td>显示所有观察点</td>
+</tr>
+<tr>
+<td>catch exec</td>
+<td>断点在exec事件，即子进程的入口地址</td>
+</tr>
+</tbody>
+</table>
+<h3 id="运行程序">运行程序</h3>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>run</td>
+<td>运行程序</td>
+</tr>
+<tr>
+<td>run {args}</td>
+<td>以某参数运行程序</td>
+</tr>
+<tr>
+<td>run &lt; file</td>
+<td>以某文件为标准输入运行程序</td>
+</tr>
+<tr>
+<td>run &lt; &lt;(cmd)</td>
+<td>以某命令的输出作为标准输入运行程序</td>
+</tr>
+<tr>
+<td>run &lt;&lt;&lt; $(cmd)</td>
+<td>以某命令的输出作为标准输入运行程序</td>
+</tr>
+<tr>
+<td>set args {args} ...</td>
+<td>设置运行的参数</td>
+</tr>
+<tr>
+<td>show args</td>
+<td>显示当前的运行参数</td>
+</tr>
+<tr>
+<td>continue</td>
+<td>继续运行，可简写为 c 或 cont</td>
+</tr>
+<tr>
+<td>step</td>
+<td>单步进入，碰到函数会进去（Step in）</td>
+</tr>
+<tr>
+<td>step {count}</td>
+<td>单步多少次</td>
+</tr>
+<tr>
+<td>next</td>
+<td>单步跳过，碰到函数不会进入（Step Over）</td>
+</tr>
+<tr>
+<td>next {count}</td>
+<td>单步多少次</td>
+</tr>
+<tr>
+<td>finish</td>
+<td>运行到当前函数结束（Step Out）</td>
+</tr>
+<tr>
+<td>until</td>
+<td>持续执行直到代码行号大于当前行号（跳出循环）</td>
+</tr>
+<tr>
+<td>until {line}</td>
+<td>持续执行直到执行到某行</td>
+</tr>
+<tr>
+<td>CTRL+C</td>
+<td>发送 SIGINT 信号，中断程序执行</td>
+</tr>
+<tr>
+<td>attach {process-id}</td>
+<td>链接上当前正在运行的进程，开始调试</td>
+</tr>
+<tr>
+<td>detach</td>
+<td>断开进程链接</td>
+</tr>
+<tr>
+<td>kill</td>
+<td>杀死当前运行的函数</td>
+</tr>
+</tbody>
+</table>
+<h3 id="栈帧操作">栈帧操作</h3>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bt</td>
+<td>打印 backtrace （命令 where 是 bt 的别名）</td>
+</tr>
+<tr>
+<td>frame</td>
+<td>显示当前运行的栈帧</td>
+</tr>
+<tr>
+<td>up</td>
+<td>向上移动栈帧（向着 main 函数）</td>
+</tr>
+<tr>
+<td>down</td>
+<td>向下移动栈帧（远离 main 函数）</td>
+</tr>
+<tr>
+<td>info locals</td>
+<td>打印帧内的相关变量</td>
+</tr>
+<tr>
+<td>info args</td>
+<td>打印函数的参数</td>
+</tr>
+</tbody>
+</table>
+<h3 id="代码查看">代码查看</h3>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>list 101</td>
+<td>显示第 101 行周围 10 行代码</td>
+</tr>
+<tr>
+<td>list 1,10</td>
+<td>显示 1 到 10 行代码</td>
+</tr>
+<tr>
+<td>list main</td>
+<td>显示函数周围代码</td>
+</tr>
+<tr>
+<td>list basic.c:main</td>
+<td>显示另外一个源代码文件的函数周围代码</td>
+</tr>
+<tr>
+<td>list -</td>
+<td>重复之前 10 行代码</td>
+</tr>
+<tr>
+<td>list *0x22e4</td>
+<td>显示特定地址的代码</td>
+</tr>
+<tr>
+<td>cd dir</td>
+<td>切换当前目录</td>
+</tr>
+<tr>
+<td>pwd</td>
+<td>显示当前目录</td>
+</tr>
+<tr>
+<td>search {regexpr}</td>
+<td>向前进行正则搜索</td>
+</tr>
+<tr>
+<td>reverse-search {regexp}</td>
+<td>向后进行正则搜索</td>
+</tr>
+<tr>
+<td>dir {dirname}</td>
+<td>增加源代码搜索路径</td>
+</tr>
+<tr>
+<td>dir</td>
+<td>复位源代码搜索路径（清空）</td>
+</tr>
+<tr>
+<td>show directories</td>
+<td>显示源代码路径</td>
+</tr>
+</tbody>
+</table>
+<h3 id="浏览数据">浏览数据</h3>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>print {expression}</td>
+<td>打印表达式，并且增加到打印历史</td>
+</tr>
+<tr>
+<td>print /x {expression}</td>
+<td>十六进制输出，print 可以简写为 p</td>
+</tr>
+<tr>
+<td>print array[i]@count</td>
+<td>打印数组范围</td>
+</tr>
+<tr>
+<td>print $</td>
+<td>打印之前的变量</td>
+</tr>
+<tr>
+<td>print *$-&gt;next</td>
+<td>打印 list</td>
+</tr>
+<tr>
+<td>print $1</td>
+<td>输出打印历史里第一条</td>
+</tr>
+<tr>
+<td>print ::gx</td>
+<td>将变量可视范围（scope）设置为全局</td>
+</tr>
+<tr>
+<td>print 'basic.c'::gx</td>
+<td>打印某源代码里的全局变量，(gdb 4.6)</td>
+</tr>
+<tr>
+<td>print /x &amp;main</td>
+<td>打印函数地址</td>
+</tr>
+<tr>
+<td>x *0x11223344</td>
+<td>显示给定地址的内存数据</td>
+</tr>
+<tr>
+<td>x /nfu {address}</td>
+<td>打印内存数据，n 是多少个，f 是格式，u 是单位大小</td>
+</tr>
+<tr>
+<td>x /10xb *0x11223344</td>
+<td>按十六进制打印内存地址 0x11223344 处的十个字节</td>
+</tr>
+<tr>
+<td>x/x &amp;gx</td>
+<td>按十六进制打印变量 gx，x 和斜杆后参数可以连写</td>
+</tr>
+<tr>
+<td>x/4wx &amp;main</td>
+<td>按十六进制打印位于 main 函数开头的四个 long</td>
+</tr>
+<tr>
+<td>x/gf &amp;gd1</td>
+<td>打印 double 类型</td>
+</tr>
+<tr>
+<td>help x</td>
+<td>查看关于 x 命令的帮助</td>
+</tr>
+<tr>
+<td>info locals</td>
+<td>打印本地局部变量</td>
+</tr>
+<tr>
+<td>info functions {regexp}</td>
+<td>打印函数名称</td>
+</tr>
+<tr>
+<td>info variables {regexp}</td>
+<td>打印全局变量名称</td>
+</tr>
+<tr>
+<td>ptype name</td>
+<td>查看类型定义，比如 ptype FILE，查看 FILE 结构体定义</td>
+</tr>
+<tr>
+<td>whatis {expression}</td>
+<td>查看表达式的类型</td>
+</tr>
+<tr>
+<td>set var = {expression}</td>
+<td>变量赋值</td>
+</tr>
+<tr>
+<td>display {expression}</td>
+<td>在单步指令后查看某表达式的值</td>
+</tr>
+<tr>
+<td>undisplay</td>
+<td>删除单步后对某些值的监控</td>
+</tr>
+<tr>
+<td>info display</td>
+<td>显示监视的表达式</td>
+</tr>
+<tr>
+<td>show values</td>
+<td>查看记录到打印历史中的变量的值 (gdb 4.0)</td>
+</tr>
+<tr>
+<td>info history</td>
+<td>查看打印历史的帮助 (gdb 3.5)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="文件操作">文件操作</h3>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>file {object}</td>
+<td>加载新的可执行文件供调试</td>
+</tr>
+<tr>
+<td>file</td>
+<td>放弃可执行和符号表信息</td>
+</tr>
+<tr>
+<td>symbol-file {object}</td>
+<td>仅加载符号表</td>
+</tr>
+<tr>
+<td>exec-file {object}</td>
+<td>指定用于调试的可执行文件（非符号表）</td>
+</tr>
+<tr>
+<td>core-file {core}</td>
+<td>加载 core 用于分析</td>
+</tr>
+</tbody>
+</table>
+<h3 id="信号控制">信号控制</h3>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>info signals</td>
+<td>打印信号设置</td>
+</tr>
+<tr>
+<td>handle {signo} {actions}</td>
+<td>设置信号的调试行为</td>
+</tr>
+<tr>
+<td>handle INT print</td>
+<td>信号发生时打印信息</td>
+</tr>
+<tr>
+<td>handle INT noprint</td>
+<td>信号发生时不打印信息</td>
+</tr>
+<tr>
+<td>handle INT stop</td>
+<td>信号发生时中止被调试程序</td>
+</tr>
+<tr>
+<td>handle INT nostop</td>
+<td>信号发生时不中止被调试程序</td>
+</tr>
+<tr>
+<td>handle INT pass</td>
+<td>调试器接获信号，不让程序知道</td>
+</tr>
+<tr>
+<td>handle INT nopass</td>
+<td>调试器不接获信号</td>
+</tr>
+<tr>
+<td>signal signo</td>
+<td>继续并将信号转移给程序</td>
+</tr>
+<tr>
+<td>signal 0</td>
+<td>继续但不把信号给程序</td>
+</tr>
+</tbody>
+</table>
+<h3 id="线程调试">线程调试</h3>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>info threads</td>
+<td>查看当前线程和 id</td>
+</tr>
+<tr>
+<td>thread {id}</td>
+<td>切换当前调试线程为指定 id 的线程</td>
+</tr>
+<tr>
+<td>break {line} thread all</td>
+<td>所有线程在指定行号处设置断点</td>
+</tr>
+<tr>
+<td>thread apply {id..} cmd</td>
+<td>指定多个线程共同执行 gdb 命令</td>
+</tr>
+<tr>
+<td>thread apply all cmd</td>
+<td>所有线程共同执行 gdb 命令</td>
+</tr>
+<tr>
+<td>set schedule-locking ?</td>
+<td>调试一个线程时，其他线程是否执行，off | on | step</td>
+</tr>
+<tr>
+<td>set non-stop on/off</td>
+<td>调试一个线程时，其他线程是否运行</td>
+</tr>
+<tr>
+<td>set pagination on/off</td>
+<td>调试一个线程时，分页是否停止</td>
+</tr>
+<tr>
+<td>set target-async on/off</td>
+<td>同步或者异步调试，是否等待线程中止的信息</td>
+</tr>
+</tbody>
+</table>
+<h3 id="进程调试">进程调试</h3>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>info inferiors</td>
+<td>查看当前进程和 id</td>
+</tr>
+<tr>
+<td>inferior {id}</td>
+<td>切换某个进程</td>
+</tr>
+<tr>
+<td>kill inferior {id...}</td>
+<td>杀死某个进程</td>
+</tr>
+<tr>
+<td>set detach-on-fork on/off</td>
+<td>设置当进程调用 fork 时 gdb 是否同时调试父子进程</td>
+</tr>
+<tr>
+<td>set follow-fork-mode parent/child</td>
+<td>设置当进程调用 fork 时是否进入子进程</td>
+</tr>
+</tbody>
+</table>
+<h3 id="汇编调试">汇编调试</h3>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>info registers</td>
+<td>打印普通寄存器</td>
+</tr>
+<tr>
+<td>info all-registers</td>
+<td>打印所有寄存器</td>
+</tr>
+<tr>
+<td>print/x $pc</td>
+<td>打印单个寄存器</td>
+</tr>
+<tr>
+<td>stepi</td>
+<td>指令级别单步进入，可以简写为 si</td>
+</tr>
+<tr>
+<td>nexti</td>
+<td>指令级别单步跳过，可以简写为 ni</td>
+</tr>
+<tr>
+<td>display/i $pc</td>
+<td>监控寄存器（每条单步完以后会自动打印值）</td>
+</tr>
+<tr>
+<td>x/x &amp;gx</td>
+<td>十六进制打印变量</td>
+</tr>
+<tr>
+<td>info line 22</td>
+<td>打印行号为 22 的内存地址信息</td>
+</tr>
+<tr>
+<td>info line *0x2c4e</td>
+<td>打印给定内存地址对应的源代码和行号信息</td>
+</tr>
+<tr>
+<td>disassemble {addr}</td>
+<td>对地址进行反汇编，比如 disassemble 0x2c4e</td>
+</tr>
+</tbody>
+</table>
+<h3 id="历史信息">历史信息</h3>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>show commands</td>
+<td>显示历史命令 (gdb 4.0)</td>
+</tr>
+<tr>
+<td>info editing</td>
+<td>显示历史命令 (gdb 3.5)</td>
+</tr>
+<tr>
+<td>ESC-CTRL-J</td>
+<td>切换到 Vi 命令行编辑模式</td>
+</tr>
+<tr>
+<td>set history expansion on</td>
+<td>允许类 c-shell 的历史</td>
+</tr>
+<tr>
+<td>break class::member</td>
+<td>在类成员处设置断点</td>
+</tr>
+<tr>
+<td>list class:member</td>
+<td>显示类成员代码</td>
+</tr>
+<tr>
+<td>ptype class</td>
+<td>查看类包含的成员</td>
+</tr>
+<tr>
+<td>print *this</td>
+<td>查看 this 指针</td>
+</tr>
+</tbody>
+</table>
+<h3 id="其他命令">其他命令</h3>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>define command ... end</td>
+<td>定义用户命令</td>
+</tr>
+<tr>
+<td>{return}</td>
+<td>直接按回车执行上一条指令</td>
+</tr>
+<tr>
+<td>shell {command} [args]</td>
+<td>执行 shell 命令</td>
+</tr>
+<tr>
+<td>source {file}</td>
+<td>从文件加载 gdb 命令</td>
+</tr>
+<tr>
+<td>quit</td>
+<td>退出 gdb</td>
+</tr>
+</tbody>
+</table>
+<h2 id="进阶用法">进阶用法</h2>
+<p>GitHub 上有一些很好的插件和工具，可以帮助我们更好地使用 GDB，提高调试效率。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/cyrus-and/gdb-dashboard"><strong>gdb-dashboard</strong></a>：可视化的调试信息仪表板拓展，帮助用户更直观地查看寄存器、堆栈、内存等信息。</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/gdbinit/Gdbinit"><strong>GdbInit</strong></a>： 允许用户通过 .gdbinit 文件自动加载常用命令和配置，简化 GDB 的使用。</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/pwndbg/pwndbg"><strong>pwndbg</strong></a>：用于 CTF 和二进制安全研究的 GDB 插件，提供诸如反汇编、堆栈分析、ROP 链生成等功能。</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/hugsy/gef"><strong>gef</strong></a>：提供多种增强功能，如可视化堆栈、寄存器和内存信息，特别是在安全研究和逆向工程中常用。</li>
+</ul>
+<h2 id="参考资料">参考资料</h2>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.gnu.org/software/gdb/documentation/">GDB Documentation</a></li>
+<li><a target="_blank" rel="noopener" href="https://sourceware.org/gdb/current/onlinedocs/gdb.html/">Debugging with GDB</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.brendangregg.com/blog/2016-08-09/gdb-example-ncurses.html">GDB Debugging Full Example</a></li>
+<li><a target="_blank" rel="noopener" href="https://wizardforcel.gitbooks.io/100-gdb-tips/content/index.html">100 GDB Tips</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.onlinegdb.com/">Online GDB</a></li>
+<li><a target="_blank" rel="noopener" href="http://skywind.me/blog/archives/2036">GDB UIs</a></li>
+<li><a target="_blank" rel="noopener" href="https://imageslr.com/2023/gdb">imageslr's GDB Tutorial</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/skywind3000/awesome-cheatsheets/blob/master/tools/gdb.txt">GDB Cheatsheet</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.tartanllama.xyz/writing-a-linux-debugger-setup/">Build your own debugger</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/stem100-20241019/" rel="prev" title="思维100 奥数竞赛题">
+                  <i class="fa fa-angle-left"></i> 思维100 奥数竞赛题
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/euler-angles-and-quaternion/" rel="next" title="姿态、旋转、欧拉角和四元数">
+                  姿态、旋转、欧拉角和四元数 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">sitJac</span>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

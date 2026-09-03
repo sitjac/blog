@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.1.2">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/logo.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/logo.png">
+  <link rel="mask-icon" href="/blog/images/logo.png" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.css" integrity="sha256-gkQVf8UKZgQ0HyuxL/VnacadJ+D2Kox2TCEBuNQg5+w=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"sitjac.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":true},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/blog/search.json","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="自然语言处理和文本分析是研究和应用的热点领域，在深入实践之前需要掌握一些基本的字符串操作和处理技巧，本文来梳理总结一下一些基本的Python处理字符串的操作。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python String Processing Tips &amp; Tricks">
+<meta property="og:url" content="https://sitjac.github.io/blog/python-string-tips/index.html">
+<meta property="og:site_name" content="sitJac&#39;s Blog">
+<meta property="og:description" content="自然语言处理和文本分析是研究和应用的热点领域，在深入实践之前需要掌握一些基本的字符串操作和处理技巧，本文来梳理总结一下一些基本的Python处理字符串的操作。">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-03-28T11:51:47.000Z">
+<meta property="article:modified_time" content="2026-08-29T07:51:17.473Z">
+<meta property="article:author" content="sitJac">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://sitjac.github.io/blog/python-string-tips/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://sitjac.github.io/blog/python-string-tips/","path":"python-string-tips/","title":"Python String Processing Tips & Tricks"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Python String Processing Tips & Tricks | sitJac's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.umd.js" integrity="sha256-a+H7FYzJv6oU2hfsfDGM2Ohw/cR9v+hPfxHCLdmCrE8=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.5.0/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+  <script src="/blog/js/third-party/fancybox.js" defer></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+  <script class="next-config" data-name="katex" type="application/json">{"copy_tex_js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/copy-tex.min.js","integrity":"sha256-Us54+rSGDSTvIhKKUs4kygE2ipA0RXpWWh0/zLqw3bs="}}</script>
+  <script src="/blog/js/third-party/math/katex.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">sitJac's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/blog/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/blog/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-photos"><a href="/blog/photos/" rel="section"><i class="fa fa-camera fa-fw"></i>Photos</a></li><li class="menu-item menu-item-categories"><a href="/blog/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-bookmarks"><a href="/blog/bookmarks/" rel="section"><i class="fa fa-bookmark fa-fw"></i>Bookmarks</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="Searching..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A9%BA%E6%A0%BC%E5%89%A5%E7%A6%BB"><span class="nav-number">1.</span> <span class="nav-text">空格剥离</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%8B%86%E5%88%86"><span class="nav-number">2.</span> <span class="nav-text">字符串拆分</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%97%E8%A1%A8%E5%85%83%E7%B4%A0%E5%90%88%E5%B9%B6%E6%88%90%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="nav-number">3.</span> <span class="nav-text">列表元素合并成字符串</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8F%8D%E8%BD%AC"><span class="nav-number">4.</span> <span class="nav-text">字符串反转</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%A7%E5%B0%8F%E5%86%99%E8%BD%AC%E6%8D%A2"><span class="nav-number">5.</span> <span class="nav-text">大小写转换</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A3%80%E6%9F%A5%E6%98%AF%E5%90%A6%E6%9C%89%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%88%90%E5%91%98"><span class="nav-number">6.</span> <span class="nav-text">检查是否有字符串成员</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%9B%BF%E6%8D%A2"><span class="nav-number">7.</span> <span class="nav-text">字符串替换</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%84%E5%90%88%E5%A4%9A%E4%B8%AA%E5%88%97%E8%A1%A8%E7%9A%84%E8%BE%93%E5%87%BA"><span class="nav-number">8.</span> <span class="nav-text">组合多个列表的输出</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%8C%E5%AD%97%E6%AF%8D%E5%BC%82%E5%BA%8F%E8%AF%8D%E6%A3%80%E6%9F%A5"><span class="nav-number">9.</span> <span class="nav-text">同字母异序词检查</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9B%9E%E6%96%87%E6%A3%80%E6%9F%A5"><span class="nav-number">10.</span> <span class="nav-text">回文检查</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">sitJac</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://sitjac.github.io/blog/python-string-tips/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="sitJac">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sitJac's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Python String Processing Tips &amp; Tricks | sitJac's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Python String Processing Tips & Tricks
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2022-03-28 19:51:47" itemprop="dateCreated datePublished" datetime="2022-03-28T19:51:47+08:00">2022-03-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/blog/categories/Uncategorized/" itemprop="url" rel="index"><span itemprop="name">Uncategorized</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><div class="note info">
+<p><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86">自然语言处理</a>和文本分析是研究和应用的热点领域，在深入实践之前需要掌握一些基本的字符串操作和处理技巧，本文来梳理总结一下一些基本的<code>Python处理字符串</code>的操作。</p>
+</div>
+<span id="more"></span>
+<p>必须掌握两种字符串处理技巧：首先是正则表达式，<strong>一种基于模式的文本匹配方法</strong>。关于正则表达式有许多精彩的介绍，但是喜欢通过视频学习的朋友仍然可以从这个视频中受益良多：<a target="_blank" rel="noopener" href="https://youtu.be/Q1zLqfnEXdw?list=PLtmWHNX-gukKocXQOkQjuVxglSDYWsSh9&amp;t=630">fast.ai代码 -初涉自然语言处理</a></p>
+<p>另一个必备的字符串处理技能是：<strong>能够利用给定编程语言的标准库进行基本的字符串操作</strong>。为此，本文便是一个简短的Python字符串处理入门教程，旨在为那些以文本分析作为职业的人士寻求更为深入的研究，抛砖引玉。</p>
+<p>注意，有实际意义的文本分析远远超出字符串处理的范畴，那些更先进的核心技术可能不需要你频繁的亲自对文本进行操作。然而，对于一个成功的文本分析项目来说，文本数据预处理是非常重要而耗时的环节，所以，本文涵盖的字符串处理技能将很有价值。在基础层面上理解文本的计算处理对于理解更为先进的文本分析技术同样重要。</p>
+<p>文中的一些示例使用Python标准库：string module字符串模块，为此，最好准备好string
+module以备参考。</p>
+<p>string module字符串模块链接：<a target="_blank" rel="noopener" href="https://docs.Python.org/2/library/string.html">https://docs.Python.org/2/library/string.html</a></p>
+<h4 id="空格剥离">空格剥离</h4>
+<p>lstrip() 剥离前导空格 rstrip() 剥离尾随空格 strip() 剥离前导和尾随空格</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">s = <span class="string">&#x27;     This is a sentence with whitespace.     \n&#x27;</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;&#123;&#125;&#x27;</span>.<span class="built_in">format</span>(s.lstrip()))</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;&#123;&#125;&#x27;</span>.<span class="built_in">format</span>(s.rstrip()))</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;&#123;&#125;&#x27;</span>.<span class="built_in">format</span>(s.strip()))</span><br></pre></td></tr></table></figure>
+<p>剥离除空格以外的字符只需传递要剥离的字符即可</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">s = <span class="string">&#x27;This is a sentence with unwanted characters.AAA&#x27;</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;&#123;&#125;&#x27;</span>.<span class="built_in">format</span>(s.rstrip(<span class="string">&#x27;A)))</span></span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://docs.Python.org/3/library/stdtypes.html#str.format">format()文档</a></p>
+<h4 id="字符串拆分">字符串拆分</h4>
+<p>split()将字符串拆分成较小的子字符串列表</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">s = <span class="string">&#x27;This is a sentence&#x27;</span></span><br><span class="line"><span class="built_in">print</span>(s.split())</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://docs.Python.org/3/library/stdtypes.html#str.split">split()文档</a></p>
+<h4 id="列表元素合并成字符串">列表元素合并成字符串</h4>
+<p>join()与split()互为逆方法</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">s = [<span class="string">&#x27;This&#x27;</span>, <span class="string">&#x27;is&#x27;</span>, <span class="string">&#x27;a&#x27;</span>, <span class="string">&#x27;sentence&#x27;</span>]</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27; &#x27;</span>.join(s))</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://docs.Python.org/3/library/stdtypes.html#str.join">join()文档</a></p>
+<h4 id="字符串反转">字符串反转</h4>
+<p>Python无内置字符串反转方法,可以先将字符串看做是字符的列表,再利用反转列表元素的方式进行反转。</p>
+<h4 id="大小写转换">大小写转换</h4>
+<p>用upper(), lower(), 和swapcase()方法可以进行大小写之间的转换。
+<a target="_blank" rel="noopener" href="https://docs.Python.org/3/library/stdtypes.html#str.upper">upper()文档</a>
+<a target="_blank" rel="noopener" href="https://docs.Python.org/3/library/stdtypes.html#str.lower">lower()文档</a>
+<a target="_blank" rel="noopener" href="https://docs.Python.org/3/library/stdtypes.html#str.swapcase">swapcase()文档</a></p>
+<h4 id="检查是否有字符串成员">检查是否有字符串成员</h4>
+<p>在Python中检查字符串成员的最简单方法是使用in运算符，语法与自然语言非常类似。如果对找到字符串中子字符串的位置更感兴趣（而不是简单地检查是否包含子字符串），则利用find()方法更为有效。</p>
+<h4 id="字符串替换">字符串替换</h4>
+<p>找到子字符串之后，如果想替换这一子字符串，该怎么办？Python 中的replace()字符串方法将解决这一问题。
+<a target="_blank" rel="noopener" href="https://docs.Python.org/3/library/stdtypes.html#str.replace">replace()文档</a></p>
+<h4 id="组合多个列表的输出">组合多个列表的输出</h4>
+<p>zip()将多个字符串列表组合在一起</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">countries = [<span class="string">&#x27;China&#x27;</span>, <span class="string">&#x27;USA&#x27;</span>]</span><br><span class="line">cities = [<span class="string">&#x27;Shanghai&#x27;</span>, <span class="string">&#x27;NewYork&#x27;</span>]</span><br><span class="line"><span class="keyword">for</span> x, y <span class="keyword">in</span> <span class="built_in">zip</span>(countries,cities):</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&#x27;The biggest cit of &#123;&#125; is &#123;&#125;&#x27;</span>.<span class="built_in">format</span>(x, y))</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://docs.Python.org/3/library/functions.html#zip">zip文档</a></p>
+<h4 id="同字母异序词检查">同字母异序词检查</h4>
+<p>想检查一对字符串中，其中一个字符串是否是另一个字符串的同字母异序词？从算法上来讲，需要做的是对每个字符串中每个字母的出现次数进行计数，再检查二者计数值是否相等，直接使用collections模块的Counter类便可实现。
+<a target="_blank" rel="noopener" href="https://docs.Python.org/3/library/collections.html#collections.Counter">collections模块的Counter类</a></p>
+<h4 id="回文检查">回文检查</h4>
+<p>如果想检查给定的单词是否是回文，怎么办？从算法上看，需要创建一个单词的反转，然后利用 == 运算符来检查这2个字符串（原始字符串和反向字符串）是否相等。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">is_palindrome</span>(<span class="params">s</span>):</span><br><span class="line">    reverse = s[::-<span class="number">1</span>]</span><br><span class="line">    <span class="keyword">if</span>(s == reverse)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">False</span></span><br></pre></td></tr></table></figure>
+<p>虽然掌握这些字符串处理“技巧”之后，并不意味着你已经成为了文本分析或自然语言处理专家，但这些技巧可能会激发出深入探究自然语言处理领域的兴趣，并掌握最终成为专家所必备的技能。</p>
+<p><a target="_blank" rel="noopener" href="https://www.kdnuggets.com/2018/03/text-data-preprocessing-walkthrough-Python.html">文本数据预处理：Python演练</a>
+<a target="_blank" rel="noopener" href="https://www.kdnuggets.com/2018/11/text-preprocessing-Python.html">Python中的·文本预处理：步骤、工具和示例</a>
+<a target="_blank" rel="noopener" href="https://www.kdnuggets.com/2019/05/complete-exploratory-data-analysis-visualization-text-data.html">文本数据分析完整探索与可视化：可视化与NLP相结合</a></p>
+<p>原文链接：<a target="_blank" rel="noopener" href="https://www.kdnuggets.com/2020/01/Python-string-processing-primer.html">10 Python String Processing Tips &amp; Tricks</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/code-segment/" rel="prev" title="A collection of code snippets">
+                  <i class="fa fa-angle-left"></i> A collection of code snippets
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/ecnu-dase-postgraduate-entrance-exam-contest/" rel="next" title="ECNU Dase Postgraduate Entrance Examination">
+                  ECNU Dase Postgraduate Entrance Examination <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">sitJac</span>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

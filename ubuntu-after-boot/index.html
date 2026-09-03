@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.1.2">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/logo.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/logo.png">
+  <link rel="mask-icon" href="/blog/images/logo.png" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.css" integrity="sha256-gkQVf8UKZgQ0HyuxL/VnacadJ+D2Kox2TCEBuNQg5+w=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"sitjac.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":true},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/blog/search.json","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="本文主要记录了在安装完 Ubuntu 后，一些常用的软件安装，以及一些常用的配置。 本文以 Ubuntu 24.04.1 LTS 桌面版发行版为例，其他版本可能会有些许差异。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="新系统安装后的一些配置工作">
+<meta property="og:url" content="https://sitjac.github.io/blog/ubuntu-after-boot/index.html">
+<meta property="og:site_name" content="sitJac&#39;s Blog">
+<meta property="og:description" content="本文主要记录了在安装完 Ubuntu 后，一些常用的软件安装，以及一些常用的配置。 本文以 Ubuntu 24.04.1 LTS 桌面版发行版为例，其他版本可能会有些许差异。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://sitjac.github.io/blog/images/others/lmdg-example.png">
+<meta property="og:image" content="https://sitjac.github.io/blog/images/others/ubuntu-network-proxy.png">
+<meta property="article:published_time" content="2024-08-30T13:42:42.000Z">
+<meta property="article:modified_time" content="2026-08-29T07:51:17.473Z">
+<meta property="article:author" content="sitJac">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://sitjac.github.io/blog/images/others/lmdg-example.png">
+
+
+<link rel="canonical" href="https://sitjac.github.io/blog/ubuntu-after-boot/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://sitjac.github.io/blog/ubuntu-after-boot/","path":"ubuntu-after-boot/","title":"新系统安装后的一些配置工作"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>新系统安装后的一些配置工作 | sitJac's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.umd.js" integrity="sha256-a+H7FYzJv6oU2hfsfDGM2Ohw/cR9v+hPfxHCLdmCrE8=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.5.0/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+  <script src="/blog/js/third-party/fancybox.js" defer></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+  <script class="next-config" data-name="katex" type="application/json">{"copy_tex_js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/copy-tex.min.js","integrity":"sha256-Us54+rSGDSTvIhKKUs4kygE2ipA0RXpWWh0/zLqw3bs="}}</script>
+  <script src="/blog/js/third-party/math/katex.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">sitJac's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/blog/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/blog/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-photos"><a href="/blog/photos/" rel="section"><i class="fa fa-camera fa-fw"></i>Photos</a></li><li class="menu-item menu-item-categories"><a href="/blog/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-bookmarks"><a href="/blog/bookmarks/" rel="section"><i class="fa fa-bookmark fa-fw"></i>Bookmarks</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="Searching..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BE%93%E5%85%A5%E6%B3%95"><span class="nav-number">1.</span> <span class="nav-text">输入法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85-ibus-rime"><span class="nav-number">1.1.</span> <span class="nav-text">安装 ibus-rime</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8Plum%E5%AE%89%E8%A3%85%E9%9B%BE%E5%87%87%E6%8B%BC%E9%9F%B3"><span class="nav-number">1.2.</span> <span class="nav-text">使用Plum安装雾凇拼音</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0LLM%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E6%94%AF%E6%8C%81"><span class="nav-number">1.3.</span> <span class="nav-text">添加LLM语言模型支持</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">1.4.</span> <span class="nav-text">参考链接</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E4%BB%A3%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">网络代理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B7%A5%E5%85%B7%E5%AE%89%E8%A3%85"><span class="nav-number">2.1.</span> <span class="nav-text">工具安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E4%BB%A3%E7%90%86"><span class="nav-number">2.2.</span> <span class="nav-text">系统代理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF"><span class="nav-number">2.3.</span> <span class="nav-text">开机自启</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5-2"><span class="nav-number">2.4.</span> <span class="nav-text">参考链接</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%88%E7%8E%87%E8%BD%AF%E4%BB%B6"><span class="nav-number">3.</span> <span class="nav-text">效率软件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#deb"><span class="nav-number">3.1.</span> <span class="nav-text">deb</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Appimage"><span class="nav-number">3.2.</span> <span class="nav-text">Appimage</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#snap"><span class="nav-number">3.3.</span> <span class="nav-text">snap</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Flatpak"><span class="nav-number">3.4.</span> <span class="nav-text">Flatpak</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Appimage-2"><span class="nav-number">3.5.</span> <span class="nav-text">Appimage</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">sitJac</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://sitjac.github.io/blog/ubuntu-after-boot/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="sitJac">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sitJac's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="新系统安装后的一些配置工作 | sitJac's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          新系统安装后的一些配置工作
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-08-30 21:42:42" itemprop="dateCreated datePublished" datetime="2024-08-30T21:42:42+08:00">2024-08-30</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/blog/categories/Uncategorized/" itemprop="url" rel="index"><span itemprop="name">Uncategorized</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><div class="note info">
+<ul>
+<li>本文主要记录了在安装完 Ubuntu 后，一些常用的软件安装，以及一些常用的配置。</li>
+<li>本文以 <span title="使用cat /etc/os-release查看发行版">Ubuntu 24.04.1 LTS</span>
+桌面版发行版为例，其他版本可能会有些许差异。</li>
+</ul>
+</div>
+<span id="more"></span>
+<h2 id="输入法">输入法</h2>
+<p>开源输入法引擎<a target="_blank" rel="noopener" href="https://github.com/rime">RIME</a>，配合<a target="_blank" rel="noopener" href="https://github.com/iDvel/rime-ice">雾凇拼音</a>输入方案，并添加语言模型支持，可以实现智能输入，提高输入效率。</p>
+<h3 id="安装-ibus-rime">安装 ibus-rime</h3>
+<blockquote>
+<p>使用Fcitx框架或者ibus框架都可以安装 RIME，这里使用ibus框架。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install ibus      <span class="comment"># 安装 ibus</span></span><br><span class="line"><span class="built_in">sudo</span> apt install ibus-rime <span class="comment"># 安装 ibus-rime</span></span><br><span class="line">ibus-daemon -drx           <span class="comment"># 启动 ibus 服务</span></span><br><span class="line">ibus-setup                 <span class="comment"># 打开 ibus 配置界面</span></span><br></pre></td></tr></table></figure>
+<h3 id="使用Plum安装雾凇拼音">使用Plum安装雾凇拼音</h3>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://github.com/rime/plum">Plum</a>
+是 Rime 的输入法管理工具，可以用来安装、升级、卸载输入方案。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> -p ~/ProgramFiles/Plum</span><br><span class="line">git <span class="built_in">clone</span> --depth 1 https://github.com/rime/plum ~/ProgramFiles/Plum</span><br><span class="line"><span class="built_in">cd</span> ~/ProgramFiles/Plum</span><br></pre></td></tr></table></figure>
+<p>如果是Fcitx</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rime_frontend=fcitx5-rime bash rime-install iDvel/rime-ice:others/recipes/full</span><br></pre></td></tr></table></figure>
+<p>如果是ibus</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bash rime-install iDvel/rime-ice:others/recipes/full</span><br></pre></td></tr></table></figure>
+<p>然后重新部署下Rime，使用 Ctrl + ` 切换到雾凇拼音输入法。</p>
+<h3 id="添加LLM语言模型支持">添加LLM语言模型支持</h3>
+<p>前往 <a target="_blank" rel="noopener" href="https://github.com/amzxyz/RIME-LMDG">RIME-LMDG</a>
+发布页来下载合适的模型，存放在 Rime 配置文件夹中。</p>
+<p>如果是Fcitx</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">~/.local/share/fcitx5/rime</span><br></pre></td></tr></table></figure>
+<p>如果是ibus</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">~/.config/ibus/rime</span><br></pre></td></tr></table></figure>
+<p>记住要下载的语言模型的文件名，比如<code>amz-v1n3m1-zh-hans.gram</code>, 然后在
+<code>default.custom.yaml</code> 中添加如下内容：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">patch:</span></span><br><span class="line">  <span class="attr">grammar:</span></span><br><span class="line">    <span class="attr">language:</span> <span class="string">amz-v1n3m1-zh-hans</span></span><br><span class="line">    <span class="attr">collocation_max_length:</span> <span class="number">5</span></span><br><span class="line">    <span class="attr">collocation_min_length:</span> <span class="number">2</span></span><br><span class="line">  <span class="attr">translator/contextual_suggestions:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">translator/max_homophones:</span> <span class="number">7</span></span><br><span class="line">  <span class="attr">translator/max_homographs:</span> <span class="number">7</span></span><br></pre></td></tr></table></figure>
+<p>注意ymal中指定的文件名要和下载的文件名一致，不带后缀。</p>
+<p>之后重新部署下Rime，即可使用语言模型支持，让输入法更加智能，高频词汇和长难句的输入更加方便。</p>
+<p><img src="/blog/images/others/lmdg-example.png" alt=""></p>
+<h3 id="参考链接">参考链接</h3>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://bbs.saraba1st.com/2b/thread-2210738-1-1.html">https://bbs.saraba1st.com/2b/thread-2210738-1-1.html</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.v2ex.com/t/1097614">https://www.v2ex.com/t/1097614</a></li>
+</ul>
+<h2 id="网络代理">网络代理</h2>
+<h3 id="工具安装">工具安装</h3>
+<p><a target="_blank" rel="noopener" href="https://github.com/lantongxue/clash_for_windows_pkg/releases">CFW 下载地址</a></p>
+<blockquote>
+<p>CFW 只适用于<span title="使用uname -m 如果输出是 x86_64，则表示你的系统是 64 位。如果输出是 i686 或 i386，则表示你的系统是 32 位。">x64位系统，32位系统</span>请需要参考<a target="_blank" rel="noopener" href="https://docs.gtk.pw/contents/linux/clash-cli.html#%E5%AE%89%E8%A3%85-installation">Here</a>下载原版Clash。</p>
+</blockquote>
+<p>虽然名字中带有 Windows，但 CFW 实际上是全平台的，不是 Windows 专属的。相比于 Clash 命令行，CFW 有更好的 UI 界面和用户体验，推荐使用。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> su</span><br><span class="line">wget https://github.com/lantongxue/clash_for_windows_pkg/releases/download/0.20.39/Clash.for.Windows-0.20.39-x64-linux.tar.gz</span><br><span class="line">tar -zxvf Clash.for.Windows-0.20.39-x64-linux.tar.gz</span><br><span class="line"><span class="built_in">mv</span> <span class="string">&#x27;Clash.for.Windows-0.20.39-x64-linux&#x27;</span> clash</span><br><span class="line"><span class="built_in">cd</span> clash/</span><br><span class="line">./cfw</span><br></pre></td></tr></table></figure>
+<p>下载对应版本的 CFW，解压后执行 <code>./cfw</code> 即可启动UI界面，导入订阅地址即可使用。</p>
+<h3 id="系统代理">系统代理</h3>
+<p>打开系统设置，选择网络，点击网络代理，选择手动，填写 HTTP 和 HTTPS 代理为
+<code>127.0.0.1:7890</code>，填写 Socks 主机为 <code>127.0.0.1:7891</code>，即可启用系统代理。</p>
+<p><img src="/blog/images/others/ubuntu-network-proxy.png" alt=""></p>
+<blockquote>
+<p>⚠️注意：关闭CFW后，务必关闭系统代理，否则会导致网络无法连接。</p>
+</blockquote>
+<h3 id="开机自启">开机自启</h3>
+<p>在 <code>~/.config/autostart</code> 目录下创建一个 <code>clash.desktop</code> 文件，内容如下：</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[Desktop Entry]</span></span><br><span class="line"><span class="attr">Name</span>=Clash</span><br><span class="line"><span class="attr">Exec</span>=/home/username/clash/cfw</span><br><span class="line"><span class="attr">Type</span>=Application</span><br></pre></td></tr></table></figure>
+<p>然后执行 <code>chmod +x ~/.config/autostart/clash.desktop</code>，即可实现开机自启。</p>
+<h3 id="参考链接-2">参考链接</h3>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://docs.gtk.pw/contents/linux/linux-clash-gui.html">https://docs.gtk.pw/contents/linux/linux-clash-gui.html</a></li>
+</ul>
+<h2 id="效率软件">效率软件</h2>
+<p>该章节主要介绍一些即装即用，无需额外配置的效率软件，目前工作中用到的大多数主流的即时通信和提升办公效率软件都支持 Linux 平台，具体可以参考官网下载安装。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://linux.weixin.qq.com/">微信</a></li>
+<li><a target="_blank" rel="noopener" href="https://im.qq.com/linuxqq/index.shtml">QQ</a></li>
+<li><a target="_blank" rel="noopener" href="https://meeting.tencent.com/download/">腾讯会议</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.feishu.cn/download">飞书</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.dingtalk.com/download#/">钉钉</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.wps.cn/product/wpslinux">WPS</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.snipaste.com/download.html#">Snipaste</a></li>
+</ul>
+<p>上面列举的大部分软件，开发商基本都会针对主流发行版提供对应的软件包(deb、rpm、AppImage...)，安装起来非常简单了，直接下载对应发行版和对应架构的软件包安装即可。</p>
+<details>
+    <summary>
+        那么这些软件包的区别是什么呢？
+    </summary>
+<h3 id="deb"><code>deb</code></h3>
+<p>deb 是debian 系列传统的打包方式，取自 debian 的前三个字母，deb 包可以认为就是一个压缩包，同时还包含了一个元数据部分，声明了这个包的依赖，所以通过包管理系统就可以很方便的安装 deb 以及相关的依赖项了，这也是 debian 系列简化 Linux 软件安装方案做的巨大的贡献，debian 是第一个将包管理系统引入 Linux 系列的发行版，Ubuntu 也是基于 debian 的，所以 Ubuntu 也继承了 debian 的包管理系统，所以 Ubuntu 也可以使用 deb 包进行安装。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt add-repository xxx  <span class="comment"># 添加软件源</span></span><br><span class="line"><span class="built_in">sudo</span> apt update              <span class="comment"># 更新软件源</span></span><br><span class="line"><span class="built_in">sudo</span> apt install xxx         <span class="comment"># 安装软件</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">sudo</span> dpkg -i xxx.deb <span class="comment"># 安装下载的 deb 包</span></span><br><span class="line"><span class="built_in">sudo</span> dpkg -r xxx     <span class="comment"># 卸载软件</span></span><br><span class="line"><span class="built_in">sudo</span> dpkg -P xxx     <span class="comment"># 卸载软件及其配置文件</span></span><br></pre></td></tr></table></figure>
+<p>deb 包通常需要结合包管理器一起使用，安装的时候会自动解决依赖，所以会出现不符合目标操作系统的安装包混入搞坏依赖，甚至因为卸载了底层依赖导致删掉上层应用的现象，这也就是依赖的问题，windows 的安装包通常都会将自己的运行环境一并打包进入安装包，以规避依赖问题，缺点是安装包通常很大，好处就是规避了依赖问题。</p>
+<h3 id="Appimage"><code>Appimage</code></h3>
+<p>某种程度上可以理解为 Windows 某些软件的“便携版”，它的做法有点类似于 Docker 镜像，把软件运行的所有依赖环境都打包在一起，包装成一个 Appimage，运行的时候会将打包到一起的内容释放到/tmp/下运行，运行完毕之后通常会自动清理。</p>
+<p><code>snap</code>、<code>flatpak</code>
+要解决的是一类问题，Linux 的包管理系统很大程度上简化了软件部署安装的操作，通过包依赖可以最大限度的减少系统冗余，减少了操作系统软件的容量，有好处也有坏处，繁杂的依赖方式也让底层依赖的软件包变得难以迁移，牵一发而动全身，比如经常有人因为手工升级了底层的 python/gtk/openGL 导致整个系统上层应用全挂的问题，依赖问题最终变成了严重问题，比如也有用户因为误删或者误升级某个软件包导致依赖的 dde 被一并删除，结果，桌面就没了。</p>
+<h3 id="snap"><code>snap</code></h3>
+<p>Ubuntu 于2016年前后推出的新型包管理方案，用于替代传统的 apt 方案，在Ubuntu
+16.04及以上版本内置支持，它提供了沙箱运行环境，一定程度上隔离“依赖地狱”的问题，可以理解为 Windows 的 msi 安装包的方案，Windows 的软件安装包通常很大，但一定程度上也避免了“依赖地狱”的问题，通常不会因为一两个软件包卸载搞崩溃其他应用，但是 snap 最大的问题就是它的软件仓库协议上不允许镜像，只能通过官方软件仓库 Snappy 走，并且支持私有收费的软件部署，所以目前并未大规模使用，因为官方仓库实在太慢了，而且不允许镜像。</p>
+<h3 id="Flatpak"><code>Flatpak</code></h3>
+<p>Ubuntu 推出 snap 当年也正式宣布推出的新型包管理方案，这俩的路数大同小异。不过无论是snap还是Flatpak 都是比较新的包管理方案，目前支持的软件包并不多，一定程度上也限制了推广和使用。</p>
+<h3 id="Appimage-2"><code>Appimage</code></h3>
+<p>是 snap 和 flatpak 还没出现的一种替代方案，可以把它当做“便携版”来看待，对于不需要持久化存储的应用程序来说，有那么点用途，对于一些需要持久化存储数据的应用来说，需要单独为 Appimage 做一些特殊的逻辑处理，所以也并非能做到绝对的无侵入性。同时可以把它当成自解压包，运行前将压缩文件释放到/tmp，然后cd
+/tmp/xxxx.appimage/目录之后执行可执行权限，所以启动速度也不算太快，越大的文件越需要更长的解压缩时间，对于运行速度敏感的程序体验不是太好。</p>
+</details>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/mathematics-in-computer-vision/" rel="prev" title="深度学习和计算机视觉中的基础数学知识">
+                  <i class="fa fa-angle-left"></i> 深度学习和计算机视觉中的基础数学知识
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/camera-and-image/" rel="next" title="相机与图像">
+                  相机与图像 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">sitJac</span>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>
