@@ -20,13 +20,15 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"sitjac.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":true},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/blog/search.json","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/blog/js/config.js" defer></script>
 
-    <meta property="og:type" content="article">
-<meta property="og:title" content="深度学习入门拾遗">
+    <meta name="description" content="张量 几何代数中定义的张量是基于向量和矩阵的推广，比如可以将标量视为零阶张量，矢量可以视为一阶张量，矩阵就是二阶张量。    张量维度 代表含义     0维张量 代表的是标量（数字）   1维张量 代表的是向量   2维张量 代表的是矩阵   3维张量 时间序列数据 股价 文本数据 单张彩色图片(RGB)    张量是现代机器学习的基础。它的核心是一个数据容器，多数情况下，它包含数字，有时候它也">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深入浅出深度学习">
 <meta property="og:url" content="https://sitjac.github.io/blog/deep-learning-tutorial/index.html">
 <meta property="og:site_name" content="sitJac&#39;s Blog">
+<meta property="og:description" content="张量 几何代数中定义的张量是基于向量和矩阵的推广，比如可以将标量视为零阶张量，矢量可以视为一阶张量，矩阵就是二阶张量。    张量维度 代表含义     0维张量 代表的是标量（数字）   1维张量 代表的是向量   2维张量 代表的是矩阵   3维张量 时间序列数据 股价 文本数据 单张彩色图片(RGB)    张量是现代机器学习的基础。它的核心是一个数据容器，多数情况下，它包含数字，有时候它也">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2024-07-09T10:17:06.000Z">
-<meta property="article:modified_time" content="2026-08-29T07:51:17.469Z">
+<meta property="article:modified_time" content="2026-09-07T07:23:15.740Z">
 <meta property="article:author" content="sitJac">
 <meta name="twitter:card" content="summary">
 
@@ -34,10 +36,10 @@
 <link rel="canonical" href="https://sitjac.github.io/blog/deep-learning-tutorial/">
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://sitjac.github.io/blog/deep-learning-tutorial/","path":"deep-learning-tutorial/","title":"深度学习入门拾遗"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://sitjac.github.io/blog/deep-learning-tutorial/","path":"deep-learning-tutorial/","title":"深入浅出深度学习"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>深度学习入门拾遗 | sitJac's Blog</title>
+<title>深入浅出深度学习 | sitJac's Blog</title>
   
 
 
@@ -151,7 +153,7 @@
   
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           Table of Contents
@@ -164,6 +166,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%A0%E9%87%8F"><span class="nav-number">1.</span> <span class="nav-text">张量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E5%BC%A0%E9%87%8F"><span class="nav-number">1.1.</span> <span class="nav-text">创建张量</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E5%BC%A0%E9%87%8F"><span class="nav-number">2.</span> <span class="nav-text">操作张量</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -222,12 +225,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="深度学习入门拾遗 | sitJac's Blog">
+      <meta itemprop="name" content="深入浅出深度学习 | sitJac's Blog">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          深度学习入门拾遗
+          深入浅出深度学习
         </h1>
 
         <div class="post-meta-container">
@@ -259,7 +262,95 @@
     
     
     
-    <div class="post-body" itemprop="articleBody">
+    <div class="post-body" itemprop="articleBody"><h2 id="张量">张量</h2>
+<p>几何代数中定义的张量是基于向量和矩阵的推广，比如可以将标量视为零阶张量，矢量可以视为一阶张量，矩阵就是二阶张量。</p>
+<table>
+<thead>
+<tr>
+<th>张量维度</th>
+<th>代表含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0维张量</td>
+<td>代表的是标量（数字）</td>
+</tr>
+<tr>
+<td>1维张量</td>
+<td>代表的是向量</td>
+</tr>
+<tr>
+<td>2维张量</td>
+<td>代表的是矩阵</td>
+</tr>
+<tr>
+<td>3维张量</td>
+<td>时间序列数据 股价 文本数据 单张彩色图片(<strong>RGB</strong>)</td>
+</tr>
+</tbody>
+</table>
+<p>张量是现代机器学习的基础。它的核心是一个数据容器，多数情况下，它包含数字，有时候它也包含字符串，但这种情况比较少。因此可以把它想象成一个数字的水桶。</p>
+<p>这里有一些存储在各种类型张量的公用数据集类型：</p>
+<ul>
+<li><strong>3维 = 时间序列</strong></li>
+<li><strong>4维 = 图像</strong></li>
+<li><strong>5维 = 视频</strong></li>
+</ul>
+<h3 id="创建张量">创建张量</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:right">函数</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">Tensor(sizes)</td>
+<td>基础构造函数</td>
+</tr>
+<tr>
+<td style="text-align:right">tensor(data)</td>
+<td>类似于np.array</td>
+</tr>
+<tr>
+<td style="text-align:right">ones(sizes)</td>
+<td>全1</td>
+</tr>
+<tr>
+<td style="text-align:right">zeros(sizes)</td>
+<td>全0</td>
+</tr>
+<tr>
+<td style="text-align:right">eye(sizes)</td>
+<td>对角为1，其余为0</td>
+</tr>
+<tr>
+<td style="text-align:right">arange(s,e,step)</td>
+<td>从s到e，步长为step</td>
+</tr>
+<tr>
+<td style="text-align:right">linspace(s,e,steps)</td>
+<td>从s到e，均匀分成step份</td>
+</tr>
+<tr>
+<td style="text-align:right">rand/randn(sizes)</td>
+<td>rand是[0,1)均匀分布；randn是服从N(0，1)的正态分布</td>
+</tr>
+<tr>
+<td style="text-align:right">normal(mean,std)</td>
+<td>正态分布(均值为mean，标准差是std)</td>
+</tr>
+<tr>
+<td style="text-align:right">randperm(m)</td>
+<td>随机排列</td>
+</tr>
+</tbody>
+</table>
+<h2 id="操作张量">操作张量</h2>
+<p>PyTorch中的 Tensor 支持超过一百种操作，包括转置、索引、切片、数学运算、线性代数、随机数等等，具体使用方法可参考<a target="_blank" rel="noopener" href="https://pytorch.org/docs/stable/tensors.html">官方文档</a>。</p>
+
     </div>
 
     
