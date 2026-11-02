@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.1.2">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/logo.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/logo.png">
+  <link rel="mask-icon" href="/blog/images/logo.png" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.css" integrity="sha256-gkQVf8UKZgQ0HyuxL/VnacadJ+D2Kox2TCEBuNQg5+w=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"sitjac.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null,"show_result":true},"fold":{"enable":false,"height":500},"language":false,"highlight_theme":"normal"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/blog/search.json","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="当调用一个大语言模型时，调用方实际上是在选择一种与模型协作的方式，不同的 API 不仅仅是接口参数不同，它们背后是对&quot;应用程序应该如何使用语言模型&quot;这个问题的不同回答。 Chat Completions、Messages API 和 Responses API 这三种不同的 API 反映了三种不同的应用架构理念，本文深入分析它们的设计哲学、核心差异以及选型策略。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="大语言模型服务接口设计解析">
+<meta property="og:url" content="https://sitjac.github.io/blog/llm-gateway-api-explanation/index.html">
+<meta property="og:site_name" content="sitJac&#39;s Blog">
+<meta property="og:description" content="当调用一个大语言模型时，调用方实际上是在选择一种与模型协作的方式，不同的 API 不仅仅是接口参数不同，它们背后是对&quot;应用程序应该如何使用语言模型&quot;这个问题的不同回答。 Chat Completions、Messages API 和 Responses API 这三种不同的 API 反映了三种不同的应用架构理念，本文深入分析它们的设计哲学、核心差异以及选型策略。">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-05-13T14:54:27.000Z">
+<meta property="article:modified_time" content="2026-11-02T10:11:29.041Z">
+<meta property="article:author" content="sitJac">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://sitjac.github.io/blog/llm-gateway-api-explanation/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://sitjac.github.io/blog/llm-gateway-api-explanation/","path":"llm-gateway-api-explanation/","title":"大语言模型服务接口设计解析"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>大语言模型服务接口设计解析 | sitJac's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.umd.js" integrity="sha256-a+H7FYzJv6oU2hfsfDGM2Ohw/cR9v+hPfxHCLdmCrE8=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.5.0/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+  <script src="/blog/js/third-party/fancybox.js" defer></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+  <script class="next-config" data-name="katex" type="application/json">{"copy_tex_js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/copy-tex.min.js","integrity":"sha256-Us54+rSGDSTvIhKKUs4kygE2ipA0RXpWWh0/zLqw3bs="}}</script>
+  <script src="/blog/js/third-party/math/katex.js" defer></script>
+
+
+<script>
+(function () {
+  var theme = 'light';
+  try {
+    var saved = localStorage.getItem('blog-theme');
+    if (saved === 'light' || saved === 'dark') {
+      theme = saved;
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      theme = 'dark';
+    }
+  } catch (e) {}
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">sitJac's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/blog/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/blog/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-photos"><a href="/blog/photos/" rel="section"><i class="fa fa-camera fa-fw"></i>Photos</a></li><li class="menu-item menu-item-categories"><a href="/blog/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-bookmarks"><a href="/blog/bookmarks/" rel="section"><i class="fa fa-bookmark fa-fw"></i>Bookmarks</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="Searching..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Chat-Completions"><span class="nav-number">2.</span> <span class="nav-text">Chat Completions</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E8%83%8C%E6%99%AF"><span class="nav-number">2.1.</span> <span class="nav-text">设计背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8B%E5%AE%9E%E6%A0%87%E5%87%86"><span class="nav-number">2.2.</span> <span class="nav-text">事实标准</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%B1%80%E9%99%90"><span class="nav-number">2.3.</span> <span class="nav-text">使用局限</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E7%A4%BA%E4%BE%8B"><span class="nav-number">2.4.</span> <span class="nav-text">代码示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Messages-API"><span class="nav-number">3.</span> <span class="nav-text">Messages API</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E8%83%8C%E6%99%AF-2"><span class="nav-number">3.1.</span> <span class="nav-text">设计背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E8%AE%BE%E8%AE%A1"><span class="nav-number">3.2.</span> <span class="nav-text">核心设计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E7%A4%BA%E4%BE%8B-2"><span class="nav-number">3.3.</span> <span class="nav-text">代码示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Responses-API"><span class="nav-number">4.</span> <span class="nav-text">Responses API</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E8%83%8C%E6%99%AF-3"><span class="nav-number">4.1.</span> <span class="nav-text">设计背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E8%AE%BE%E8%AE%A1-2"><span class="nav-number">4.2.</span> <span class="nav-text">核心设计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E7%A4%BA%E4%BE%8B-3"><span class="nav-number">4.3.</span> <span class="nav-text">代码示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%AA%E5%90%91%E5%AF%B9%E6%AF%94"><span class="nav-number">5.</span> <span class="nav-text">横向对比</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E5%B7%AE%E5%BC%82%E6%80%BB%E8%A7%88"><span class="nav-number">5.1.</span> <span class="nav-text">核心差异总览</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%88%86%E5%B8%83"><span class="nav-number">5.2.</span> <span class="nav-text">复杂度分布</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%98%BE%E5%BC%8F-vs-%E9%9A%90%E5%BC%8F"><span class="nav-number">5.3.</span> <span class="nav-text">显式 vs 隐式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%89%E5%9E%8B%E6%8C%87%E5%8D%97"><span class="nav-number">5.4.</span> <span class="nav-text">选型指南</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BC%94%E5%8C%96%E8%B7%AF%E5%BE%84"><span class="nav-number">5.5.</span> <span class="nav-text">演化路径</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3"><span class="nav-number">6.</span> <span class="nav-text">参考文档</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">sitJac</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">42</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://sitjac.github.io/blog/llm-gateway-api-explanation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="sitJac">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sitJac's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="大语言模型服务接口设计解析 | sitJac's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          大语言模型服务接口设计解析
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2026-05-13 22:54:27" itemprop="dateCreated datePublished" datetime="2026-05-13T22:54:27+08:00">2026-05-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/blog/categories/LLM/" itemprop="url" rel="index"><span itemprop="name">LLM</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><div class="note info">
+<ul>
+<li>当调用一个大语言模型时，调用方实际上是在选择一种<strong>与模型协作的方式</strong>，不同的 API 不仅仅是接口参数不同，它们背后是对&quot;<strong>应用程序应该如何使用语言模型</strong>&quot;这个问题的不同回答。</li>
+<li>Chat Completions、Messages API 和 Responses API 这三种不同的 API 反映了三种不同的应用架构理念，本文深入分析它们的设计哲学、核心差异以及选型策略。</li>
+</ul>
+</div>
+<span id="more"></span>
+<h2 id="概述">概述</h2>
+<p>目前(2026-05-13)主流的三套 API 对比：</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Endpoint</th>
+<th>设计者</th>
+<th>发布时间</th>
+<th>核心隐喻</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://openai.com/index/introducing-chatgpt-and-whisper-apis">Chat Completions</a></td>
+<td><code>v1/chat/completions</code></td>
+<td>OpenAI</td>
+<td>2023.03</td>
+<td>对话补全</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://platform.claude.com/docs/en/api/messages">Messages API</a></td>
+<td><code>v1/messages</code></td>
+<td>Anthropic</td>
+<td>2024 初</td>
+<td>内容编排</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://developers.openai.com/blog/responses-api">Responses API</a></td>
+<td><code>v1/responses</code></td>
+<td>OpenAI</td>
+<td>2025.03</td>
+<td>任务委托</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="Chat-Completions">Chat Completions</h2>
+<h3 id="设计背景">设计背景</h3>
+<p>2023 年 3 月，OpenAI 随 GPT-3.5-turbo 发布了 Chat Completions API(<code>v1/chat/completions</code>)。</p>
+<blockquote>
+<p>它的前身是 Text CompletionsAPI(<code>v1/completions</code>)，一个&quot;给我续写这段文字&quot;的接口，专门为单轮文本补全设计的，适用于 text-davinci-003 等较早的模型。</p>
+</blockquote>
+<p>Chat Completions 的核心转变是：<strong>把续写的对象从&quot;文本&quot;变成了&quot;对话&quot;</strong>。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 之前：续写文本</span></span><br><span class="line">f(text) → text</span><br><span class="line"></span><br><span class="line"><span class="comment"># 之后：续写对话</span></span><br><span class="line">f(messages[]) → message</span><br></pre></td></tr></table></figure>
+<p>角色三元组（<code>system / user / assistant</code>）是这套设计最成功的地方——简单到不需要文档，人人都能直觉理解&quot;对话&quot;是什么。</p>
+<h3 id="事实标准">事实标准</h3>
+<p>任何想兼容 OpenAI 生态的模型，只需实现最小 schema，就能几乎零成本接入：</p>
+<pre><code>`messages[]` 进，`choices[0].message.content` 出，
+</code></pre>
+<p>这是 HTTP/1.1 式的胜利：不是最优雅的，但协调成本最低，摩擦最小，网络效应使其成为事实上的行业标准。</p>
+<h3 id="使用局限">使用局限</h3>
+<p><strong>1. 随着对话历史的增长，请求负载会变得庞大，</strong></p>
+<p>以下是一个典型的 Chat Completions API 请求示例：</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;model&quot;</span><span class="punctuation">:</span> <span class="string">&quot;gpt-4o&quot;</span><span class="punctuation">,</span>     <span class="comment">// 模型名称，指定使用的语言模型</span></span><br><span class="line">    <span class="attr">&quot;messages&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;role&quot;</span><span class="punctuation">:</span> <span class="string">&quot;system&quot;</span><span class="punctuation">,</span>  <span class="comment">// 系统角色，定义模型的行为和身份等约束</span></span><br><span class="line">        <span class="attr">&quot;content&quot;</span><span class="punctuation">:</span> <span class="string">&quot;你是一个专业的技术顾问。&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;role&quot;</span><span class="punctuation">:</span> <span class="string">&quot;user&quot;</span><span class="punctuation">,</span>    <span class="comment">// 用户角色，外部输入的提问或多模态内容</span></span><br><span class="line">        <span class="attr">&quot;content&quot;</span><span class="punctuation">:</span> <span class="string">&quot;解释一下 API 是什么？&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;role&quot;</span><span class="punctuation">:</span> <span class="string">&quot;assistant&quot;</span><span class="punctuation">,</span><span class="comment">// 模型在历史对话中生成的回复</span></span><br><span class="line">        <span class="attr">&quot;content&quot;</span><span class="punctuation">:</span> <span class="string">&quot;API（应用程序编程接口）是...&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;role&quot;</span><span class="punctuation">:</span> <span class="string">&quot;user&quot;</span><span class="punctuation">,</span>     <span class="comment">// 用户角色，继续提问</span></span><br><span class="line">        <span class="attr">&quot;content&quot;</span><span class="punctuation">:</span> <span class="string">&quot;有哪些常见的认证方式？&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;temperature&quot;</span><span class="punctuation">:</span> <span class="number">0.7</span><span class="punctuation">,</span>     <span class="comment">// 控制生成文本的随机性，值越高越具有创造性</span></span><br><span class="line">    <span class="attr">&quot;max_tokens&quot;</span><span class="punctuation">:</span> <span class="number">150</span><span class="punctuation">,</span>      <span class="comment">// 限制生成的最大 token 数量</span></span><br><span class="line">    <span class="attr">&quot;stream&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span>         <span class="comment">// 是否启用流式输出，类似逐字输出的打字机效果</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>这种结构要求开发者负责跟踪和管理整个对话历史，随着对话的进行，每次请求都要传完整的 <code>messages[]</code>，随着对话轮次增加，请求体会越来越大，网络传输和 Token 消耗都会显著增加。</p>
+<p><strong>2. 结构化输出仍然是字符串，必须手动解析</strong></p>
+<p>在现代软件工程中，系统之间的数据传递依赖于强类型对象，LLM 的底层本质是一个 Text Completer，它唯一的输出格式就是概率性的字符串流，早期的结构化约束输出完全靠 Prompt Engineering 去告诉模型&quot;请输出合法的 JSON&quot;，即使后来推出了 <code>response_format</code>，模型底层仍然在逐个 token 吐出字符串，OpenAI 是在模型的输出端加了一个语法拦截器，如果模型下一个 Token 敢吐出不符合 JSON 规范的字符，就强行把它的嘴捂住，逼它选择符合 Schema 的下一个字符。</p>
+<p>这依然不是真正的类型化对象，而是通过高密度的工程护栏，硬生生把一个概率性的文本流裁剪成了看起来合规的字符串。后端依然需要做一次手动反序列化，去承受字符串解析失败的风险。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 结构化输出：格式约束 → 字符串</span></span><br><span class="line">r = client.chat.completions.create(</span><br><span class="line">    model=<span class="string">&quot;gpt-5.4&quot;</span>,</span><br><span class="line">    messages=[...],</span><br><span class="line">    response_format=&#123;<span class="string">&quot;type&quot;</span>: <span class="string">&quot;json_schema&quot;</span>, <span class="string">&quot;json_schema&quot;</span>: &#123;<span class="string">&quot;schema&quot;</span>: SCHEMA&#125;&#125;,</span><br><span class="line">)</span><br><span class="line">data = json.loads(r.choices[<span class="number">0</span>].message.content)   <span class="comment"># 字符串 → dict，手动转换</span></span><br></pre></td></tr></table></figure>
+<p><strong>3. 工具调用的角色错位，把&quot;工具执行结果&quot;硬塞进&quot;对话消息&quot;的隐喻中</strong></p>
+<p>最初的 Chat Completions 设计中，大模型被隐喻为一个对话参与者。角色极其简单，只有两种：</p>
+<ul>
+<li>user（提问的真实人类）</li>
+<li>assistant（回答问题的大模型）</li>
+</ul>
+<p>当引入 Function Calling 时，大模型不再只是“说话”，它开始需要干活，比如查天气、跑代码、预览文件等。但在现有的 Chat 隐喻里，没有一个&quot;外部系统执行引擎&quot;的位置。为了不颠覆原有的代码框架，使用这套 API 把外部程序执行返回的数据，伪装成第三个&quot;说话者&quot; (role: &quot;tool&quot;)。</p>
+<p>这就使得结构化输出是&quot;格式合规的字符串&quot;而非真正的类型化对象。新需求被迫挤进旧隐喻里。</p>
+<h3 id="代码示例">代码示例</h3>
+<details>
+	<summary>
+		点击展开
+	</summary>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> openai <span class="keyword">import</span> OpenAI</span><br><span class="line">client = OpenAI(base_url=<span class="string">&quot;...&quot;</span>, api_key=<span class="string">&quot;...&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># ── 基础对话 ────────────────────────────────────────────────</span></span><br><span class="line">r = client.chat.completions.create(</span><br><span class="line">    model=<span class="string">&quot;gpt-5.4&quot;</span>,</span><br><span class="line">    messages=[</span><br><span class="line">        &#123;<span class="string">&quot;role&quot;</span>: <span class="string">&quot;system&quot;</span>, <span class="string">&quot;content&quot;</span>: <span class="string">&quot;你是一个代码审查助手&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="string">&quot;role&quot;</span>: <span class="string">&quot;user&quot;</span>,   <span class="string">&quot;content&quot;</span>: <span class="string">&quot;帮我审查这段 Python 代码：...&quot;</span>&#125;,</span><br><span class="line">    ],</span><br><span class="line">    max_tokens=<span class="number">500</span>,</span><br><span class="line">)</span><br><span class="line"><span class="built_in">print</span>(r.choices[<span class="number">0</span>].message.content)</span><br><span class="line"></span><br><span class="line"><span class="comment"># ── 结构化输出（仍是字符串，需手动解析）────────────────────</span></span><br><span class="line"><span class="keyword">import</span> json</span><br><span class="line">r = client.chat.completions.create(</span><br><span class="line">    model=<span class="string">&quot;gpt-5.4&quot;</span>,</span><br><span class="line">    messages=[&#123;<span class="string">&quot;role&quot;</span>: <span class="string">&quot;user&quot;</span>, <span class="string">&quot;content&quot;</span>: <span class="string">&quot;帮我评估问题缺陷的风险&quot;</span>&#125;],</span><br><span class="line">    response_format=&#123;</span><br><span class="line">        <span class="string">&quot;type&quot;</span>: <span class="string">&quot;json_schema&quot;</span>,</span><br><span class="line">        <span class="string">&quot;json_schema&quot;</span>: &#123;</span><br><span class="line">            <span class="string">&quot;name&quot;</span>: <span class="string">&quot;risk_report&quot;</span>,</span><br><span class="line">            <span class="string">&quot;schema&quot;</span>: &#123;</span><br><span class="line">                <span class="string">&quot;type&quot;</span>: <span class="string">&quot;object&quot;</span>,</span><br><span class="line">                <span class="string">&quot;properties&quot;</span>: &#123;</span><br><span class="line">                    <span class="string">&quot;level&quot;</span>:   &#123;<span class="string">&quot;type&quot;</span>: <span class="string">&quot;string&quot;</span>, <span class="string">&quot;enum&quot;</span>: [<span class="string">&quot;low&quot;</span>, <span class="string">&quot;medium&quot;</span>, <span class="string">&quot;high&quot;</span>]&#125;,</span><br><span class="line">                    <span class="string">&quot;score&quot;</span>:   &#123;<span class="string">&quot;type&quot;</span>: <span class="string">&quot;number&quot;</span>&#125;,</span><br><span class="line">                    <span class="string">&quot;reasons&quot;</span>: &#123;<span class="string">&quot;type&quot;</span>: <span class="string">&quot;array&quot;</span>, <span class="string">&quot;items&quot;</span>: &#123;<span class="string">&quot;type&quot;</span>: <span class="string">&quot;string&quot;</span>&#125;&#125;,</span><br><span class="line">                &#125;,</span><br><span class="line">                <span class="string">&quot;required&quot;</span>: [<span class="string">&quot;level&quot;</span>, <span class="string">&quot;score&quot;</span>, <span class="string">&quot;reasons&quot;</span>],</span><br><span class="line">                <span class="string">&quot;additionalProperties&quot;</span>: <span class="literal">False</span>,</span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="string">&quot;strict&quot;</span>: <span class="literal">True</span>,</span><br><span class="line">        &#125;,</span><br><span class="line">    &#125;,</span><br><span class="line">    max_tokens=<span class="number">400</span>,</span><br><span class="line">)</span><br><span class="line">data = json.loads(r.choices[<span class="number">0</span>].message.content)   <span class="comment"># ← 字符串，必须手动解析</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># ── 工具调用（两轮交互）────────────────────────────────────</span></span><br><span class="line">tools = [&#123;</span><br><span class="line">    <span class="string">&quot;type&quot;</span>: <span class="string">&quot;function&quot;</span>,</span><br><span class="line">    <span class="string">&quot;function&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;name&quot;</span>: <span class="string">&quot;get_weather&quot;</span>,</span><br><span class="line">        <span class="string">&quot;description&quot;</span>: <span class="string">&quot;获取城市天气&quot;</span>,</span><br><span class="line">        <span class="string">&quot;parameters&quot;</span>: &#123;</span><br><span class="line">            <span class="string">&quot;type&quot;</span>: <span class="string">&quot;object&quot;</span>,</span><br><span class="line">            <span class="string">&quot;properties&quot;</span>: &#123;<span class="string">&quot;city&quot;</span>: &#123;<span class="string">&quot;type&quot;</span>: <span class="string">&quot;string&quot;</span>&#125;&#125;,</span><br><span class="line">            <span class="string">&quot;required&quot;</span>: [<span class="string">&quot;city&quot;</span>],</span><br><span class="line">        &#125;,</span><br><span class="line">    &#125;,</span><br><span class="line">&#125;]</span><br><span class="line"></span><br><span class="line">messages = [&#123;<span class="string">&quot;role&quot;</span>: <span class="string">&quot;user&quot;</span>, <span class="string">&quot;content&quot;</span>: <span class="string">&quot;北京今天天气怎么样？&quot;</span>&#125;]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 第一轮：模型声明要调用工具</span></span><br><span class="line">r1 = client.chat.completions.create(model=<span class="string">&quot;gpt-5.4&quot;</span>, messages=messages, tools=tools)</span><br><span class="line">tool_call = r1.choices[<span class="number">0</span>].message.tool_calls[<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 客户端执行工具</span></span><br><span class="line">weather_result = get_weather(json.loads(tool_call.function.arguments)[<span class="string">&quot;city&quot;</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># 第二轮：把工具结果&quot;伪装&quot;成一条消息</span></span><br><span class="line">messages += [</span><br><span class="line">    r1.choices[<span class="number">0</span>].message,                      <span class="comment"># assistant 的 tool_calls 消息</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="string">&quot;role&quot;</span>: <span class="string">&quot;tool&quot;</span>,</span><br><span class="line">        <span class="string">&quot;tool_call_id&quot;</span>: tool_call.<span class="built_in">id</span>,</span><br><span class="line">        <span class="string">&quot;content&quot;</span>: json.dumps(weather_result),   <span class="comment"># ← 还是字符串</span></span><br><span class="line">    &#125;,</span><br><span class="line">]</span><br><span class="line">r2 = client.chat.completions.create(model=<span class="string">&quot;gpt-5.4&quot;</span>, messages=messages, tools=tools)</span><br><span class="line"><span class="built_in">print</span>(r2.choices[<span class="number">0</span>].message.content)</span><br><span class="line"></span><br><span class="line"><span class="comment"># ── 流式输出 ──────────────────────────────────────────────</span></span><br><span class="line"><span class="keyword">with</span> client.chat.completions.create(</span><br><span class="line">    model=<span class="string">&quot;gpt-5.4&quot;</span>,</span><br><span class="line">    messages=[&#123;<span class="string">&quot;role&quot;</span>: <span class="string">&quot;user&quot;</span>, <span class="string">&quot;content&quot;</span>: <span class="string">&quot;介绍一下量子计算&quot;</span>&#125;],</span><br><span class="line">    stream=<span class="literal">True</span>,</span><br><span class="line">    max_tokens=<span class="number">300</span>,</span><br><span class="line">) <span class="keyword">as</span> stream:</span><br><span class="line">    <span class="keyword">for</span> chunk <span class="keyword">in</span> stream:</span><br><span class="line">        <span class="built_in">print</span>(chunk.choices[<span class="number">0</span>].delta.content <span class="keyword">or</span> <span class="string">&quot;&quot;</span>, end=<span class="string">&quot;&quot;</span>, flush=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># ── Prompt Cache（全自动，无需任何标记）────────────────────</span></span><br><span class="line"><span class="comment"># 前缀稳定且 ≥ 1024 tokens 时，后台自动建立缓存，命中后费用约降 50%</span></span><br><span class="line">r = client.chat.completions.create(</span><br><span class="line">    model=<span class="string">&quot;gpt-5.4&quot;</span>,</span><br><span class="line">    messages=[</span><br><span class="line">        &#123;<span class="string">&quot;role&quot;</span>: <span class="string">&quot;system&quot;</span>, <span class="string">&quot;content&quot;</span>: LONG_SYSTEM_PROMPT&#125;,   <span class="comment"># 重复前缀，自动缓存</span></span><br><span class="line">        &#123;<span class="string">&quot;role&quot;</span>: <span class="string">&quot;user&quot;</span>,   <span class="string">&quot;content&quot;</span>: user_question&#125;,</span><br><span class="line">    ],</span><br><span class="line">    max_tokens=<span class="number">200</span>,</span><br><span class="line">)</span><br><span class="line">cached = r.usage.prompt_tokens_details.cached_tokens</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;cached=<span class="subst">&#123;cached&#125;</span>&quot;</span>)   <span class="comment"># 首次为 0，后续命中后 &gt; 0</span></span><br></pre></td></tr></table></figure>
+</details>
+<hr>
+<h2 id="Messages-API">Messages API</h2>
+<h3 id="设计背景-2">设计背景</h3>
+<p>2024 年初，Anthropic 随 Claude 3 系列发布了 Messages API(<code>v1/messages</code>)。它从根本上重新定义了&quot;消息内容&quot;，它不是字符串，而是 <strong>类型化内容块（typed content blocks）</strong> 的列表。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">text block        → 文本</span><br><span class="line">image block       → 图片</span><br><span class="line">tool_use block    → 模型要调用某个工具</span><br><span class="line">tool_result block → 工具执行结果</span><br><span class="line">thinking block    → 模型思考过程</span><br></pre></td></tr></table></figure>
+<p>工具调用在这里是<strong>一等公民</strong>，不是附加字段。模型&quot;想要调用工具&quot;这件事被建模为内容流的一部分，而非消息上的额外属性。</p>
+<h3 id="核心设计">核心设计</h3>
+<p><strong>1. 显式(Explicit)优于隐式(Implicit)</strong></p>
+<p>OpenAI 的缓存是完全自动、隐式的，发起请求后台默默去匹配文本，匹配上了就便宜，没匹配上就贵。开发者在发请求前，无法精确预测这次到底能不能命中，只能碰运气。</p>
+<p>Anthropic 则认为，既然代码是程序员写的，那么什么时候该省钱、什么时候该建立断点，应该由程序员在代码里明确说了算。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 显式缓存控制</span></span><br><span class="line">system=[&#123;</span><br><span class="line">    <span class="string">&quot;type&quot;</span>: <span class="string">&quot;text&quot;</span>,</span><br><span class="line">    <span class="string">&quot;text&quot;</span>: LONG_SYSTEM_PROMPT,</span><br><span class="line">    <span class="string">&quot;cache_control&quot;</span>: &#123;<span class="string">&quot;type&quot;</span>: <span class="string">&quot;ephemeral&quot;</span>&#125;,  <span class="comment"># ← 程序员手动标记断点</span></span><br><span class="line">&#125;]</span><br></pre></td></tr></table></figure>
+<p>比如上面代码里给这一段长文本贴上了&quot;缓存标签&quot;，Anthropic 的服务器看到这个标签，就会强制把这一段 100k 字的系统提示词或核心文档钉在内存缓存里，从而在工程上能够做出精准的成本和性能预算。</p>
+<p><strong>2. 类型安全优于字符串约束</strong></p>
+<p>结构化输出用 tool_use 实现，返回的是已解析的 dict，不需要 <code>json.loads</code>。这不是字符串约束，而是协议层面的类型保证，由模型底层和输出采样器直接生成结构数据，在模型吐出 Token 的时候填充工具的参数槽。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 结构化输出：类型语义 → dict</span></span><br><span class="line">r = ac.messages.create(</span><br><span class="line">    model=<span class="string">&quot;claude-sonnet-4-6&quot;</span>,</span><br><span class="line">    tools=[&#123;<span class="string">&quot;name&quot;</span>: <span class="string">&quot;output&quot;</span>, <span class="string">&quot;input_schema&quot;</span>: SCHEMA&#125;],</span><br><span class="line">    tool_choice=&#123;<span class="string">&quot;type&quot;</span>: <span class="string">&quot;tool&quot;</span>, <span class="string">&quot;name&quot;</span>: <span class="string">&quot;output&quot;</span>&#125;,</span><br><span class="line">    messages=[...],</span><br><span class="line">)</span><br><span class="line">data = r.content[<span class="number">0</span>].<span class="built_in">input</span>  <span class="comment"># 直接是 dict，类型保证在协议层，不会 JsonParseEcxeption</span></span><br></pre></td></tr></table></figure>
+<p>Chat Completions 的结构化是&quot;告诉模型输出合法 JSON 字符串&quot;，这是字符串层面的语义；
+Messages API 的结构化是&quot;模型填写函数参数对象&quot;，这是对象类型层面的语义。</p>
+<h3 id="代码示例-2">代码示例</h3>
+<details>
+	<summary>
+		点击展开
+	</summary>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> anthropic</span><br><span class="line">ac = anthropic.Anthropic(base_url=<span class="string">&quot;...&quot;</span>, api_key=<span class="string">&quot;...&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># ── 基础对话 ────────────────────────────────────────────────</span></span><br><span class="line">r = ac.messages.create(</span><br><span class="line">    model=<span class="string">&quot;claude-sonnet-4-6&quot;</span>,</span><br><span class="line">    max_tokens=<span class="number">500</span>,</span><br><span class="line">    system=<span class="string">&quot;你是一个代码审查助手&quot;</span>,</span><br><span class="line">    messages=[&#123;<span class="string">&quot;role&quot;</span>: <span class="string">&quot;user&quot;</span>, <span class="string">&quot;content&quot;</span>: <span class="string">&quot;帮我审查这段 Python 代码：...&quot;</span>&#125;],</span><br><span class="line">)</span><br><span class="line"><span class="built_in">print</span>(r.content[<span class="number">0</span>].text)</span><br><span class="line"></span><br><span class="line"><span class="comment"># ── 结构化输出（tool use，返回已解析的 dict）───────────────</span></span><br><span class="line">r = ac.messages.create(</span><br><span class="line">    model=<span class="string">&quot;claude-sonnet-4-6&quot;</span>,</span><br><span class="line">    max_tokens=<span class="number">400</span>,</span><br><span class="line">    tools=[&#123;</span><br><span class="line">        <span class="string">&quot;name&quot;</span>: <span class="string">&quot;risk_report&quot;</span>,</span><br><span class="line">        <span class="string">&quot;description&quot;</span>: <span class="string">&quot;输出结构化风险评估结果&quot;</span>,</span><br><span class="line">        <span class="string">&quot;input_schema&quot;</span>: &#123;</span><br><span class="line">            <span class="string">&quot;type&quot;</span>: <span class="string">&quot;object&quot;</span>,</span><br><span class="line">            <span class="string">&quot;properties&quot;</span>: &#123;</span><br><span class="line">                <span class="string">&quot;level&quot;</span>:   &#123;<span class="string">&quot;type&quot;</span>: <span class="string">&quot;string&quot;</span>, <span class="string">&quot;enum&quot;</span>: [<span class="string">&quot;low&quot;</span>, <span class="string">&quot;medium&quot;</span>, <span class="string">&quot;high&quot;</span>]&#125;,</span><br><span class="line">                <span class="string">&quot;score&quot;</span>:   &#123;<span class="string">&quot;type&quot;</span>: <span class="string">&quot;number&quot;</span>&#125;,</span><br><span class="line">                <span class="string">&quot;reasons&quot;</span>: &#123;<span class="string">&quot;type&quot;</span>: <span class="string">&quot;array&quot;</span>, <span class="string">&quot;items&quot;</span>: &#123;<span class="string">&quot;type&quot;</span>: <span class="string">&quot;string&quot;</span>&#125;&#125;,</span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="string">&quot;required&quot;</span>: [<span class="string">&quot;level&quot;</span>, <span class="string">&quot;score&quot;</span>, <span class="string">&quot;reasons&quot;</span>],</span><br><span class="line">        &#125;,</span><br><span class="line">    &#125;],</span><br><span class="line">    tool_choice=&#123;<span class="string">&quot;type&quot;</span>: <span class="string">&quot;tool&quot;</span>, <span class="string">&quot;name&quot;</span>: <span class="string">&quot;risk_report&quot;</span>&#125;,</span><br><span class="line">    messages=[&#123;<span class="string">&quot;role&quot;</span>: <span class="string">&quot;user&quot;</span>, <span class="string">&quot;content&quot;</span>: <span class="string">&quot;评估这个供应商的风险&quot;</span>&#125;],</span><br><span class="line">)</span><br><span class="line">data = r.content[<span class="number">0</span>].<span class="built_in">input</span>    <span class="comment"># ← 直接是 dict，无需 json.loads</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># ── 工具调用（两轮交互，内容块形式）────────────────────────</span></span><br><span class="line">r1 = ac.messages.create(</span><br><span class="line">    model=<span class="string">&quot;claude-sonnet-4-6&quot;</span>,</span><br><span class="line">    max_tokens=<span class="number">300</span>,</span><br><span class="line">    tools=[&#123;</span><br><span class="line">        <span class="string">&quot;name&quot;</span>: <span class="string">&quot;get_weather&quot;</span>,</span><br><span class="line">        <span class="string">&quot;description&quot;</span>: <span class="string">&quot;获取城市天气&quot;</span>,</span><br><span class="line">        <span class="string">&quot;input_schema&quot;</span>: &#123;</span><br><span class="line">            <span class="string">&quot;type&quot;</span>: <span class="string">&quot;object&quot;</span>,</span><br><span class="line">            <span class="string">&quot;properties&quot;</span>: &#123;<span class="string">&quot;city&quot;</span>: &#123;<span class="string">&quot;type&quot;</span>: <span class="string">&quot;string&quot;</span>&#125;&#125;,</span><br><span class="line">            <span class="string">&quot;required&quot;</span>: [<span class="string">&quot;city&quot;</span>],</span><br><span class="line">        &#125;,</span><br><span class="line">    &#125;],</span><br><span class="line">    messages=[&#123;<span class="string">&quot;role&quot;</span>: <span class="string">&quot;user&quot;</span>, <span class="string">&quot;content&quot;</span>: <span class="string">&quot;北京今天天气怎么样？&quot;</span>&#125;],</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">tool_use = <span class="built_in">next</span>(b <span class="keyword">for</span> b <span class="keyword">in</span> r1.content <span class="keyword">if</span> b.<span class="built_in">type</span> == <span class="string">&quot;tool_use&quot;</span>)</span><br><span class="line">weather_result = get_weather(tool_use.<span class="built_in">input</span>[<span class="string">&quot;city&quot;</span>])   <span class="comment"># input 已是 dict</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 工具结果是内容块，类型化</span></span><br><span class="line">r2 = ac.messages.create(</span><br><span class="line">    model=<span class="string">&quot;claude-sonnet-4-6&quot;</span>,</span><br><span class="line">    max_tokens=<span class="number">300</span>,</span><br><span class="line">    tools=[...],</span><br><span class="line">    messages=[</span><br><span class="line">        &#123;<span class="string">&quot;role&quot;</span>: <span class="string">&quot;user&quot;</span>,      <span class="string">&quot;content&quot;</span>: <span class="string">&quot;北京今天天气怎么样？&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="string">&quot;role&quot;</span>: <span class="string">&quot;assistant&quot;</span>, <span class="string">&quot;content&quot;</span>: r1.content&#125;,    <span class="comment"># 含 tool_use 块</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="string">&quot;role&quot;</span>: <span class="string">&quot;user&quot;</span>,</span><br><span class="line">            <span class="string">&quot;content&quot;</span>: [&#123;</span><br><span class="line">                <span class="string">&quot;type&quot;</span>:        <span class="string">&quot;tool_result&quot;</span>,</span><br><span class="line">                <span class="string">&quot;tool_use_id&quot;</span>: tool_use.<span class="built_in">id</span>,</span><br><span class="line">                <span class="string">&quot;content&quot;</span>:     [&#123;<span class="string">&quot;type&quot;</span>: <span class="string">&quot;text&quot;</span>, <span class="string">&quot;text&quot;</span>: <span class="built_in">str</span>(weather_result)&#125;],</span><br><span class="line">                <span class="comment"># ↑ 类型化对象，而非字符串</span></span><br><span class="line">            &#125;],</span><br><span class="line">        &#125;,</span><br><span class="line">    ],</span><br><span class="line">)</span><br><span class="line"><span class="built_in">print</span>(r2.content[<span class="number">0</span>].text)</span><br><span class="line"></span><br><span class="line"><span class="comment"># ── 流式输出 ──────────────────────────────────────────────</span></span><br><span class="line"><span class="keyword">with</span> ac.messages.stream(</span><br><span class="line">    model=<span class="string">&quot;claude-sonnet-4-6&quot;</span>,便利性用控制权换来的。工具在 server 侧执行，中间过程不可见；`previous_response_id` 的上下文是黑盒，把透明度换成了自动化。</span><br><span class="line">    max_tokens=<span class="number">300</span>,</span><br><span class="line">    messages=[&#123;<span class="string">&quot;role&quot;</span>: <span class="string">&quot;user&quot;</span>, <span class="string">&quot;content&quot;</span>: <span class="string">&quot;介绍一下量子计算&quot;</span>&#125;],</span><br><span class="line">) <span class="keyword">as</span> stream:</span><br><span class="line">    <span class="keyword">for</span> text <span class="keyword">in</span> stream.text_stream:</span><br><span class="line">        <span class="built_in">print</span>(text, end=<span class="string">&quot;&quot;</span>, flush=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># ── Prompt Caching（显式断点，内联在内容块里）───────────────</span></span><br><span class="line"><span class="comment"># cache_control 标记&quot;缓存到此为止的所有前缀&quot;</span></span><br><span class="line"><span class="comment"># 命中后输入 token 费用降至约 10%，TTFT 明显下降</span></span><br><span class="line">r = ac.messages.create(</span><br><span class="line">    model=<span class="string">&quot;claude-sonnet-4-6&quot;</span>,</span><br><span class="line">    max_tokens=<span class="number">500</span>,</span><br><span class="line">    system=[&#123;</span><br><span class="line">        <span class="string">&quot;type&quot;</span>: <span class="string">&quot;text&quot;</span>,</span><br><span class="line">        <span class="string">&quot;text&quot;</span>: LONG_SYSTEM_PROMPT,              <span class="comment"># 数千字的详细规则</span></span><br><span class="line">        <span class="string">&quot;cache_control&quot;</span>: &#123;<span class="string">&quot;type&quot;</span>: <span class="string">&quot;ephemeral&quot;</span>&#125;,  <span class="comment"># ← 程序员来标断点，显式控制</span></span><br><span class="line">        <span class="comment"># 低频任务加 &quot;ttl&quot;: &quot;1h&quot;</span></span><br><span class="line">    &#125;],</span><br><span class="line">    messages=[&#123;<span class="string">&quot;role&quot;</span>: <span class="string">&quot;user&quot;</span>, <span class="string">&quot;content&quot;</span>: user_question&#125;],</span><br><span class="line">)</span><br><span class="line">u = r.usage</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;cache_write=<span class="subst">&#123;u.cache_creation_input_tokens&#125;</span>  cache_read=<span class="subst">&#123;u.cache_read_input_tokens&#125;</span>&quot;</span>)</span><br><span class="line"><span class="comment"># 首次：cache_write &gt; 0  |  命中：cache_read &gt; 0，实际费用大幅下降</span></span><br></pre></td></tr></table></figure>
+</details>
+<hr>
+<h2 id="Responses-API">Responses API</h2>
+<h3 id="设计背景-3">设计背景</h3>
+<p>2025 年 3 月，OpenAI 发布了 Responses API(<code>v1/responses</code>)。这是三套 API 中抽象层级最高的，client 不再管理消息列表，不再执行工具，不再维护对话历史，只是<strong>下达任务</strong>，等待结果。</p>
+<p>OpenAI 在官方博客中解释了设计动机：</p>
+<blockquote>
+<p>&quot;怎样让开发者以最简单、最强大的方式调用模型？&quot;</p>
+</blockquote>
+<p>核心设计转变在于：<strong>内置工具的执行从客户端移到了服务端</strong>。<code>web_search</code>、<code>code_interpreter</code> 等内置工具由 server 自主执行，模型自己决定何时调用、如何组合，客户端看不到中间过程。</p>
+<p>模型在一轮请求中可能既说了话（Text）、又思考了（Reasoning）、还跑了代码（Code）、最后调用了自定义工具（Tool Call），Responses API 的返回对象变成了一个极其规范的类型化数组（Typed Items Array）。</p>
+<h3 id="核心设计-2">核心设计</h3>
+<p><strong>1. 服务端状态</strong></p>
+<p><code>previous_response_id</code> 引用上一轮，server 自动带入历史。客户端不再传 <code>messages[]</code>，传的是&quot;接着上次继续&quot;。
+便利性用控制权换来的。工具在 server 侧执行，中间过程不可见；<code>previous_response_id</code> 的上下文是黑盒，把透明度换成了自动化。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">r1 = client.responses.create(</span><br><span class="line">    model=<span class="string">&quot;gpt-4o&quot;</span>,</span><br><span class="line">    <span class="built_in">input</span>=[</span><br><span class="line">        &#123;<span class="string">&quot;role&quot;</span>: <span class="string">&quot;user&quot;</span>, <span class="string">&quot;content&quot;</span>: <span class="string">&quot;我叫张三，订单号 #A1234&quot;</span>&#125;</span><br><span class="line">    ],</span><br><span class="line">    store=<span class="literal">True</span>  <span class="comment"># 允许服务器缓存和托管这段会话状态</span></span><br><span class="line">)</span><br><span class="line">r2 = client.responses.create(</span><br><span class="line">    model=<span class="string">&quot;gpt-4o&quot;</span>,</span><br><span class="line">    <span class="built_in">input</span>=[</span><br><span class="line">        &#123;<span class="string">&quot;role&quot;</span>: <span class="string">&quot;user&quot;</span>, <span class="string">&quot;content&quot;</span>: <span class="string">&quot;我的订单状态怎么样？&quot;</span>&#125;</span><br><span class="line">    ],</span><br><span class="line">    previous_response_id=r1.<span class="built_in">id</span>,  <span class="comment"># ← 核心：无需在 input 里传第一句，服务器自动关联</span></span><br><span class="line">    store=<span class="literal">True</span>,</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p><strong>2. 推理控制</strong></p>
+<p><code>reasoning.effort: low/medium/high</code> 让程序员在延迟、成本、质量之间按需权衡，这是显式控制&quot;模型需要思考多久&quot;的接口。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">r = client.responses.create(</span><br><span class="line">    model=<span class="string">&quot;o1&quot;</span>,  <span class="comment"># 涉及 reasoning 通常使用 o 系列模型</span></span><br><span class="line">    <span class="built_in">input</span>=[</span><br><span class="line">        &#123;<span class="string">&quot;role&quot;</span>: <span class="string">&quot;user&quot;</span>, <span class="string">&quot;content&quot;</span>: <span class="string">&quot;分析这段代码的时间复杂度和潜在 Bug：...&quot;</span>&#125;</span><br><span class="line">    ],</span><br><span class="line">    reasoning_effort=<span class="string">&quot;low&quot;</span>,  <span class="comment"># 正确的控制思考强度的参数</span></span><br><span class="line">    max_output_tokens=<span class="number">1500</span>,</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p><strong>3. 内置工具</strong></p>
+<p>以前要在 Chat Completions 里让模型&quot;联网搜索&quot;或&quot;运行代码&quot;，需要自己写 Google 爬虫、自己在后端用 Docker 跑 Python，再伪装成 <code>role: &quot;tool&quot;</code> 喂回去。
+在 Responses API 里，OpenAI 把这些能力做成了类似操作系统的<code>系统调用</code>程序员只需要在 tools 里像开关一样显式声明：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">response = client.responses.create(</span><br><span class="line">    model=<span class="string">&quot;gpt-4o&quot;</span>,</span><br><span class="line">    <span class="comment"># input 取代了旧的 messages，接收结构化的角色对话</span></span><br><span class="line">    <span class="built_in">input</span>=[</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="string">&quot;role&quot;</span>: <span class="string">&quot;user&quot;</span>,</span><br><span class="line">            <span class="string">&quot;content&quot;</span>: <span class="string">&quot;查一下今天特斯拉的股价，并用 Python 画出近五天的趋势图。&quot;</span></span><br><span class="line">        &#125;</span><br><span class="line">    ],</span><br><span class="line">    <span class="comment"># 显式声明开启的系统原生工具箱，无需手动编写工具代码</span></span><br><span class="line">    tools=[</span><br><span class="line">        &#123;<span class="string">&quot;type&quot;</span>: <span class="string">&quot;web_search&quot;</span>&#125;,       <span class="comment"># 开启联网搜索</span></span><br><span class="line">        &#123;<span class="string">&quot;type&quot;</span>: <span class="string">&quot;code_interpreter&quot;</span>&#125;, <span class="comment"># 开启云端 Python 代码沙箱</span></span><br><span class="line">        &#123;<span class="string">&quot;type&quot;</span>: <span class="string">&quot;computer_use&quot;</span>&#125;      <span class="comment"># 开启自动化屏幕操作能力</span></span><br><span class="line">    ]</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>Responses API 的便利性用控制权换来的，工具在 server 侧执行，中间过程不可见，<code>previous_response_id</code> 的上下文是黑盒，高墙之内是全自动化的乐园，而高墙之外的程序员则交出了灵魂的控制权。</p>
+<h3 id="代码示例-3">代码示例</h3>
+<details>
+	<summary>
+		点击展开
+	</summary>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> openai <span class="keyword">import</span> OpenAI</span><br><span class="line">client = OpenAI(base_url=<span class="string">&quot;...&quot;</span>, api_key=<span class="string">&quot;...&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># ── 有状态多轮（server 维护历史）────────────────────────────</span></span><br><span class="line"><span class="comment"># ⚠️ store=True 是必要条件，否则后续轮次无法引用</span></span><br><span class="line">r1 = client.responses.create(</span><br><span class="line">    model=<span class="string">&quot;gpt-5.4&quot;</span>,</span><br><span class="line">    <span class="built_in">input</span>=<span class="string">&quot;我叫张三，订单号 #A1234&quot;</span>,</span><br><span class="line">    store=<span class="literal">True</span>,</span><br><span class="line">    max_output_tokens=<span class="number">80</span>,</span><br><span class="line">)</span><br><span class="line">r2 = client.responses.create(</span><br><span class="line">    model=<span class="string">&quot;gpt-5.4&quot;</span>,</span><br><span class="line">    <span class="built_in">input</span>=<span class="string">&quot;我的订单状态怎么样？&quot;</span>,</span><br><span class="line">    previous_response_id=r1.<span class="built_in">id</span>,   <span class="comment"># ← 无需传完整历史，server 自动带入</span></span><br><span class="line">    store=<span class="literal">True</span>,ub 的很多基础接口用了十几年，路径里依然是 /v1。/v1</span><br><span class="line">    max_output_tokens=<span class="number">200</span>,</span><br><span class="line">)</span><br><span class="line"><span class="built_in">print</span>(r2.output_text)   <span class="comment"># → &quot;您好张三，关于您的订单 #A1234...&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># ⚠️ 并发陷阱：LiteLLM 代理层缓存忽略 previous_response_id</span></span><br><span class="line"><span class="comment"># 相同 input 字符串跨会话会命中同一缓存，导致上下文混淆</span></span><br><span class="line"><span class="comment"># 规避：每条 input 加运行级 nonce</span></span><br><span class="line"><span class="keyword">import</span> uuid</span><br><span class="line">RUN_NONCE = uuid.uuid4().<span class="built_in">hex</span>[:<span class="number">8</span>]</span><br><span class="line">r = client.responses.create(</span><br><span class="line">    model=<span class="string">&quot;gpt-5.4&quot;</span>,</span><br><span class="line">    <span class="built_in">input</span>=<span class="string">f&quot;[nonce=<span class="subst">&#123;RUN_NONCE&#125;</span> session=<span class="subst">&#123;session_id&#125;</span>] 我叫张三&quot;</span>,</span><br><span class="line">    store=<span class="literal">True</span>, max_output_tokens=<span class="number">80</span>,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># ── 内置工具（server 自主执行，客户端只看结果）──────────────</span></span><br><span class="line">r = client.responses.create(</span><br><span class="line">    model=<span class="string">&quot;gpt-5.4&quot;</span>,</span><br><span class="line">    <span class="built_in">input</span>=<span class="string">&quot;今天 A 股收盘情况如何？&quot;</span>,</span><br><span class="line">    tools=[&#123;<span class="string">&quot;type&quot;</span>: <span class="string">&quot;web_search_preview&quot;</span>&#125;],</span><br><span class="line">    max_output_tokens=<span class="number">400</span>,</span><br><span class="line">    timeout=<span class="number">45</span>,       <span class="comment"># web_search 通常 8-15s，token 消耗约 4000-8000/次</span></span><br><span class="line">)</span><br><span class="line"><span class="built_in">print</span>(r.output_text)  <span class="comment"># 已包含搜索结果，client 无需感知搜索过程</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># ── 推理控制 ──────────────────────────────────────────────</span></span><br><span class="line"><span class="comment"># 实测（同一代码分析任务）：</span></span><br><span class="line"><span class="comment"># effort=low    11s, ~440 tokens  — 简单任务</span></span><br><span class="line"><span class="comment"># effort=medium 26s, ~580 tokens  — 中等复杂度</span></span><br><span class="line"><span class="comment"># effort=high   46s, ~1600 tokens — 高精度需求（约 4x tokens）</span></span><br><span class="line">r = client.responses.create(</span><br><span class="line">    model=<span class="string">&quot;gpt-5.4&quot;</span>,</span><br><span class="line">    <span class="built_in">input</span>=<span class="string">&quot;分析这段代码的时间复杂度和潜在 Bug：...&quot;</span>,</span><br><span class="line">    reasoning=&#123;<span class="string">&quot;effort&quot;</span>: <span class="string">&quot;low&quot;</span>&#125;,</span><br><span class="line">    text=&#123;<span class="string">&quot;format&quot;</span>: &#123;<span class="string">&quot;type&quot;</span>: <span class="string">&quot;json_object&quot;</span>&#125;&#125;,</span><br><span class="line">    max_output_tokens=<span class="number">1500</span>,   <span class="comment"># ⚠️ 推理 + 输出共享 token 预算，设小了 output_text 为空</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># ── 结构化输出（Responses API 语法，仍需 json.loads）────────</span></span><br><span class="line"><span class="keyword">import</span> json</span><br><span class="line">r = client.responses.create(</span><br><span class="line">    model=<span class="string">&quot;gpt-5.4&quot;</span>,</span><br><span class="line">    <span class="built_in">input</span>=<span class="string">&quot;评估供应商 Acme Corp 的合规风险&quot;</span>,</span><br><span class="line">    text=&#123;<span class="string">&quot;format&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;type&quot;</span>:   <span class="string">&quot;json_schema&quot;</span>,</span><br><span class="line">        <span class="string">&quot;name&quot;</span>:   <span class="string">&quot;risk_report&quot;</span>,</span><br><span class="line">        <span class="string">&quot;schema&quot;</span>: SCHEMA,</span><br><span class="line">        <span class="string">&quot;strict&quot;</span>: <span class="literal">True</span>,</span><br><span class="line">    &#125;&#125;,</span><br><span class="line">    max_output_tokens=<span class="number">400</span>,</span><br><span class="line">)</span><br><span class="line">data = json.loads(r.output_text)   <span class="comment"># ← 仍是字符串，需要手动解析</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># ── 后台异步长任务 ─────────────────────────────────────────</span></span><br><span class="line"><span class="keyword">import</span> asyncio</span><br><span class="line">r = <span class="keyword">await</span> client.responses.create(</span><br><span class="line">    model=<span class="string">&quot;gpt-5.4&quot;</span>,</span><br><span class="line">    <span class="built_in">input</span>=<span class="string">&quot;生成完整的市场分析报告...&quot;</span>,</span><br><span class="line">    background=<span class="literal">True</span>,      <span class="comment"># 立即返回，status=&quot;queued&quot;</span></span><br><span class="line">    store=<span class="literal">True</span>,</span><br><span class="line">    max_output_tokens=<span class="number">800</span>,</span><br><span class="line">    timeout=<span class="number">10</span>,</span><br><span class="line">)</span><br><span class="line"><span class="comment"># 轮询——用 status 判断，不要对比 ID（LiteLLM 每次重签 ID）</span></span><br><span class="line"><span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">30</span>):</span><br><span class="line">    <span class="keyword">await</span> asyncio.sleep(<span class="number">2</span>)</span><br><span class="line">    r = <span class="keyword">await</span> client.responses.retrieve(r.<span class="built_in">id</span>)</span><br><span class="line">    <span class="keyword">if</span> r.status <span class="keyword">in</span> (<span class="string">&quot;completed&quot;</span>, <span class="string">&quot;failed&quot;</span>, <span class="string">&quot;cancelled&quot;</span>):</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"><span class="built_in">print</span>(r.output_text)</span><br><span class="line"></span><br><span class="line"><span class="comment"># ── 流式：⚠️ OpenAI SDK 有兼容问题，改用 httpx ──────────────</span></span><br><span class="line"><span class="keyword">import</span> httpx</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">stream_response</span>(<span class="params">prompt: <span class="built_in">str</span></span>):</span><br><span class="line">    <span class="keyword">async</span> <span class="keyword">with</span> httpx.AsyncClient(timeout=<span class="number">60</span>) <span class="keyword">as</span> http:</span><br><span class="line">        <span class="keyword">async</span> <span class="keyword">with</span> http.stream(</span><br><span class="line">            <span class="string">&quot;POST&quot;</span>, <span class="string">&quot;https://litellm.ecarxgroup.com/v1/responses&quot;</span>,</span><br><span class="line">            headers=&#123;<span class="string">&quot;Authorization&quot;</span>: <span class="string">f&quot;Bearer <span class="subst">&#123;KEY&#125;</span>&quot;</span>,</span><br><span class="line">                     <span class="string">&quot;Content-Type&quot;</span>: <span class="string">&quot;application/json&quot;</span>&#125;,</span><br><span class="line">            json=&#123;<span class="string">&quot;model&quot;</span>: <span class="string">&quot;gpt-5.4&quot;</span>, <span class="string">&quot;input&quot;</span>: prompt,</span><br><span class="line">                  <span class="string">&quot;stream&quot;</span>: <span class="literal">True</span>, <span class="string">&quot;max_output_tokens&quot;</span>: <span class="number">300</span>&#125;,</span><br><span class="line">        ) <span class="keyword">as</span> resp:</span><br><span class="line">            <span class="keyword">async</span> <span class="keyword">for</span> line <span class="keyword">in</span> resp.aiter_lines():</span><br><span class="line">                <span class="keyword">if</span> line.startswith(<span class="string">&quot;data:&quot;</span>):</span><br><span class="line">                    obj = json.loads(line[<span class="number">5</span>:].strip())</span><br><span class="line">                    <span class="keyword">if</span> obj.get(<span class="string">&quot;type&quot;</span>) == <span class="string">&quot;response.output_text.delta&quot;</span>:</span><br><span class="line">                        <span class="built_in">print</span>(obj[<span class="string">&quot;delta&quot;</span>].get(<span class="string">&quot;text&quot;</span>, <span class="string">&quot;&quot;</span>), end=<span class="string">&quot;&quot;</span>, flush=<span class="literal">True</span>)</span><br></pre></td></tr></table></figure>
+</details>
+<hr>
+<h2 id="横向对比">横向对比</h2>
+<h3 id="核心差异总览">核心差异总览</h3>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Chat Completions</th>
+<th>Messages API</th>
+<th>Responses API</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>核心隐喻</strong></td>
+<td>对话补全</td>
+<td>内容编排</td>
+<td>任务委托</td>
+</tr>
+<tr>
+<td><strong>模型角色</strong></td>
+<td>对话伙伴</td>
+<td>类型化处理器</td>
+<td>自主代理人</td>
+</tr>
+<tr>
+<td><strong>状态管理</strong></td>
+<td>客户端传 <code>messages[]</code></td>
+<td>客户端传 <code>messages[]</code></td>
+<td>服务端 <code>previous_response_id</code></td>
+</tr>
+<tr>
+<td><strong>工具执行</strong></td>
+<td>客户端（字符串参数）</td>
+<td>客户端（typed dict 参数）</td>
+<td>内置工具→服务端；自定义函数→客户端</td>
+</tr>
+<tr>
+<td><strong>结构化输出</strong></td>
+<td>字符串</td>
+<td>dict</td>
+<td>字符串</td>
+</tr>
+<tr>
+<td><strong>缓存控制</strong></td>
+<td>后台自动识别</td>
+<td>显式断点 <code>cache_control</code></td>
+<td><code>prompt_cache_key</code> 命名</td>
+</tr>
+<tr>
+<td><strong>可审计性</strong></td>
+<td>高（每步可见）</td>
+<td>高（每步可见）</td>
+<td>低（工具执行不可见）</td>
+</tr>
+<tr>
+<td><strong>控制粒度</strong></td>
+<td>中</td>
+<td>高</td>
+<td>低</td>
+</tr>
+<tr>
+<td><strong>便利程度</strong></td>
+<td>中</td>
+<td>低</td>
+<td>高</td>
+</tr>
+<tr>
+<td><strong>模型覆盖</strong></td>
+<td>全部</td>
+<td>claude-* 专用</td>
+<td>gpt-* 专用</td>
+</tr>
+</tbody>
+</table>
+<h3 id="复杂度分布">复杂度分布</h3>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">                客户端复杂度        服务端复杂度</span><br><span class="line">Chat Completions   中（管消息历史）      低（无状态）</span><br><span class="line">Messages API       高（管历史+工具调度）  低（无状态）</span><br><span class="line">Responses API      低（只传任务）        高（管状态+执行工具）</span><br></pre></td></tr></table></figure>
+<h3 id="显式-vs-隐式">显式 vs 隐式</h3>
+<p>三套 API 反映了不同的设计取向：</p>
+<ul>
+<li><strong>Messages API 最&quot;显式&quot;</strong>——你标记缓存断点、你传 typed 内容块、你执行工具</li>
+<li><strong>Responses API 最&quot;隐式&quot;</strong>——大量决策委托给 server</li>
+<li><strong>Chat Completions 居中</strong>——客户端管历史，但缓存全自动</li>
+</ul>
+<h3 id="选型指南">选型指南</h3>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">需要多模型兼容（gpt/gemini/deepseek/claude 统一入口）？</span><br><span class="line">  └─ 是 → Chat Completions</span><br><span class="line"></span><br><span class="line">只用 claude-*，且需要以下任一：</span><br><span class="line">  - 结构化输出直接得 dict（无需 json.loads）</span><br><span class="line">  - 精确控制缓存断点（费用降至 10%）</span><br><span class="line">  - 工具调用类型安全</span><br><span class="line">  └─ 是 → Messages API</span><br><span class="line"></span><br><span class="line">只用 gpt-*，且需要以下任一：</span><br><span class="line">  - 有状态多轮（省去传完整历史）</span><br><span class="line">  - 内置工具（web_search / code_interpreter）</span><br><span class="line">  - 推理深度控制（reasoning.effort）</span><br><span class="line">  - 后台异步任务</span><br><span class="line">  └─ 是 → Responses API</span><br><span class="line"></span><br><span class="line">其他一切场景 → Chat Completions（更稳定，覆盖最广）</span><br></pre></td></tr></table></figure>
+<h3 id="演化路径">演化路径</h3>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Text Completions</span><br><span class="line">  &quot;给我续写这段文字&quot;</span><br><span class="line">  f(text) → text</span><br><span class="line">       │</span><br><span class="line">       ▼</span><br><span class="line">Chat Completions（对话隐喻）</span><br><span class="line">  &quot;给我续写这段对话&quot;</span><br><span class="line">  f(messages[]) → message</span><br><span class="line">  ─ 内容是字符串，角色是 system/user/assistant/tool</span><br><span class="line">  ─ 工具调用是附加字段，结构化输出是&quot;格式合规的字符串&quot;</span><br><span class="line">       │</span><br><span class="line">       ▼</span><br><span class="line">Messages API（类型化内容模型）</span><br><span class="line">  &quot;给我处理这些内容块&quot;</span><br><span class="line">  f(messages[content_blocks[]]) → content_blocks[]</span><br><span class="line">  ─ 内容是类型化对象（text / image / tool_use / tool_result）</span><br><span class="line">  ─ 工具调用是一等公民，缓存控制内联在内容块里</span><br><span class="line">       │</span><br><span class="line">       ▼</span><br><span class="line">Responses API（代理隐喻）</span><br><span class="line">  &quot;帮我完成这个任务&quot;</span><br><span class="line">  agent.do(input, tools=[built-ins], memory=server_side) → output</span><br><span class="line">  ─ server 维护状态，server 执行内置工具</span><br><span class="line">  ─ 客户端只看最终结果</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&gt; **Chat Completions** 是 LLM 的 TCP/IP——不是最优雅的，但因为协调成本最低而成为通用语；</span><br><span class="line">&gt; **Messages API** 是给&quot;想掌控每一步&quot;的工程师设计的精密工具；</span><br><span class="line">&gt; **Responses API** 是给&quot;想把问题甩给模型&quot;的产品开发者设计的高层抽象。</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="参考文档">参考文档</h2>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://platform.openai.com/docs">OpenAI API Platform</a></li>
+<li><a target="_blank" rel="noopener" href="https://api-docs.deepseek.com/zh-cn/">Deepseek API Documentation</a></li>
+<li><a target="_blank" rel="noopener" href="https://platform.claude.com/docs/zh-CN/api/overview">Claude API Documentation</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/classification-evaluation/" rel="prev" title="机器学习与统计分类中的性能评估">
+                  <i class="fa fa-angle-left"></i> 机器学习与统计分类中的性能评估
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">sitJac</span>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+<script src="/blog/js/post-toc.js" defer></script>
+<script src="/blog/js/theme-toggle.js" defer></script>
+<script src="/blog/js/code-block.js" defer></script>
+
+</body>
+</html>
